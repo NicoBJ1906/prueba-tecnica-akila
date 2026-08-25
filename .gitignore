@@ -18,8 +18,11 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
-# Estado de ejecución del triaje (se regenera; no debe versionarse)
-ejercicio1_triaje/salida/estado.json
+# Salida del triaje: se regenera en cada ejecución y no debe versionarse.
+# Si se versionara, quien clone el repositorio ejecutaría el proceso sobre un
+# Excel que ya tiene filas y acabaría con el doble. La ejecución de referencia
+# está guardada aparte, en docs/ejemplo-ejecucion/.
+ejercicio1_triaje/salida/
 
 # Sistema
 .DS_Store

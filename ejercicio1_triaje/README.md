@@ -130,8 +130,12 @@ Ejecutado en modo `reglas` (sin IA), que es el peor caso:
 | Enviadas a revisión humana | 2 |
 | Sin acción (cortesía) | 1 |
 
-El Excel real está en [`salida/seguimiento.xlsx`](salida/seguimiento.xlsx) y el
-informe en [`salida/informe_ejecucion.md`](salida/informe_ejecucion.md).
+**La ejecución de referencia está guardada** en
+[`docs/ejemplo-ejecucion/`](../docs/ejemplo-ejecucion/): el
+[Excel generado](../docs/ejemplo-ejecucion/seguimiento.xlsx) y su
+[informe](../docs/ejemplo-ejecucion/informe_ejecucion.md), tal y como salieron.
+Al ejecutar el comando, tu propia salida aparece en `salida/`, que no está
+versionada precisamente para que el Excel no arrastre filas de nadie más.
 
 ### Qué hace el sistema con cada correo, y por qué
 
