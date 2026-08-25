@@ -48,6 +48,12 @@ Presentar «271 vendidos» sería reportar un 30 % de ventas que no existen. Por
 el dashboard **no esconde el problema**: lo enseña arriba del todo, explica la
 regla que aplica y deja comparar ambas lecturas con un selector.
 
+![El mismo dashboard leyendo el export crudo](../docs/capturas/dashboard-datos-crudos.png)
+
+*El selector en «Export crudo»: las mismas fórmulas sobre los datos sin
+consolidar dan 271 vendidos y un 59 % de avance. El aviso rojo está ahí para que
+nadie tome una decisión con esta vista por accidente.*
+
 ### La regla de consolidación
 
 Un apartamento se identifica por **torre + piso + puerta**. Cuando hay varias

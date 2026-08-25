@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from openpyxl import load_workbook
 
 from triaje.estado import RegistroProcesados
@@ -24,6 +25,42 @@ class TestLectura:
         correos = leer_correos(CSV_CORREOS)
         assert correos[0].remitente == "maria.lopez@gmail.com"
         assert correos[0].fecha_recepcion.hour == 8
+
+
+class TestEntradasDegradadas:
+    """El proceso del día no puede caerse por una fila mal formada."""
+
+    def _csv(self, tmp_path, contenido: str) -> Path:
+        ruta = tmp_path / "correos.csv"
+        ruta.write_text(contenido, encoding="utf-8")
+        return ruta
+
+    def test_una_fila_con_fecha_ilegible_se_descarta_y_el_resto_sigue(self, tmp_path):
+        ruta = self._csv(tmp_path, (
+            "fecha_recepcion,remitente,asunto,cuerpo\n"
+            "FECHA-INVALIDA,a@b.com,x,y\n"
+            "2026-07-20 09:00,c@d.com,Entrega,¿cuándo entregan el apartamento 803?\n"
+        ))
+        correos = leer_correos(ruta)
+        assert len(correos) == 1
+        assert correos[0].remitente == "c@d.com"
+
+    def test_un_csv_sin_filas_no_rompe_nada(self, config, tmp_path):
+        ruta = self._csv(tmp_path, "fecha_recepcion,remitente,asunto,cuerpo\n")
+        resultado = ejecutar(leer_correos(ruta), config)
+        assert resultado.filas == []
+        assert resultado.porcentaje_automatizado == 0.0
+
+    def test_un_csv_sin_las_columnas_esperadas_falla_con_un_mensaje_claro(self, tmp_path):
+        ruta = self._csv(tmp_path, "asunto,cuerpo\nx,y\n")
+        with pytest.raises(ValueError, match="fecha_recepcion"):
+            leer_correos(ruta)
+
+    def test_un_resultado_vacio_produce_un_excel_valido(self, config, tmp_path):
+        resultado = ejecutar([], config)
+        libro = load_workbook(escribir(resultado, tmp_path / "vacio.xlsx"))
+        assert len(libro.sheetnames) == 4
+        assert libro["Seguimiento"].max_row == 1  # solo la cabecera
 
 
 class TestOrdenDeEtapas:

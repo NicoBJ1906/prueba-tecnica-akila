@@ -98,7 +98,7 @@ def _grafico_ventas_semana(serie: pd.DataFrame, medir_valor: bool, media_movil: 
         return barras.properties(height=320)
 
     linea = base.mark_line(color=NARANJA, strokeWidth=2).encode(
-        y=alt.Y(f"media_movil:Q", title=titulo_y),
+        y=alt.Y("media_movil:Q", title=titulo_y),
         tooltip=[
             alt.Tooltip("semana:T", title="Semana del", format="%d/%m/%Y"),
             alt.Tooltip("media_movil:Q", title=f"Media {MEDIA_MOVIL_SEMANAS} semanas", format=",.1f"),

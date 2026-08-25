@@ -273,7 +273,7 @@ ejercicio1_triaje/
 │   ├── excel.py           # volcado al Excel de seguimiento
 │   ├── informe.py         # informe de ejecución
 │   └── __main__.py        # línea de comandos
-└── tests/                 # 97 pruebas, incluidas las adversariales
+└── tests/                 # 101 pruebas, incluidas las adversariales
 ```
 
 ### El Excel que produce
