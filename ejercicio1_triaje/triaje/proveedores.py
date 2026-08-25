@@ -176,17 +176,26 @@ class ProveedorReglas:
 
 @dataclass
 class ProveedorAnthropic:
-    """Claude Haiku con salida estructurada."""
+    """Claude Haiku con salida estructurada.
+
+    `cliente` existe para poder probar la construcción de la petición sin
+    credenciales ni red: los tests inyectan un doble. En uso normal se deja sin
+    tocar y el proveedor crea el cliente real.
+    """
 
     nombre: str = "anthropic"
     modelo: str = MODELO_ANTHROPIC
+    cliente: object | None = None
     tokens_entrada: int = 0
     tokens_salida: int = 0
     llamadas: int = 0
 
     def __post_init__(self) -> None:
+        if self.cliente is not None:
+            return
+
         try:
-            import anthropic  # noqa: F401
+            import anthropic
         except ImportError as exc:
             raise ErrorDeProveedor(
                 "Falta el paquete 'anthropic'. Instálalo con:\n"
@@ -200,16 +209,12 @@ class ProveedorAnthropic:
                 "Nunca escribas la clave en el código ni en config.toml."
             )
 
-        import anthropic
-
-        self._cliente = anthropic.Anthropic()
+        self.cliente = anthropic.Anthropic()
 
     def clasificar(self, correo: Correo, config: Config) -> Clasificacion:
-        import anthropic
-
         sistema, usuario = construir_prompt(correo, config)
         try:
-            respuesta = self._cliente.messages.create(
+            respuesta = self.cliente.messages.create(
                 model=self.modelo,
                 max_tokens=MAX_TOKENS,
                 system=sistema,
@@ -218,8 +223,12 @@ class ProveedorAnthropic:
                     "format": {"type": "json_schema", "schema": esquema_respuesta(config)}
                 },
             )
-        except anthropic.APIError as exc:
-            raise ErrorDeProveedor(f"Error de la API de Anthropic: {exc}") from exc
+        except Exception as exc:
+            # Cualquier fallo del proveedor (red, cuota, autenticación) se
+            # traduce al error propio del pipeline, que sabe degradar a reglas.
+            if isinstance(exc, ErrorDeProveedor):
+                raise
+            raise ErrorDeProveedor(f"Error llamando a la API de Anthropic: {exc}") from exc
 
         self.llamadas += 1
         self.tokens_entrada += respuesta.usage.input_tokens
