@@ -1,0 +1,197 @@
+# ---------------------------------------------------------------------------
+# Configuración del triaje de correos
+#
+# Este fichero lo mantiene la persona que hoy hace el proceso a mano. Se edita
+# con cualquier editor de texto y NO requiere tocar el código ni saber
+# programar: al guardarlo, la siguiente ejecución ya usa los cambios.
+#
+# Las tres cosas que se cambian en el día a día:
+#   1. [responsables]  — a quién se le asigna cada tema
+#   2. [remitentes_automaticos] — qué correos no son de clientes
+#   3. [urgencia]      — qué hace que algo sea urgente
+# ---------------------------------------------------------------------------
+
+[general]
+# Por debajo de esta confianza, la fila se marca para revisión humana en lugar
+# de darse por buena. Subirlo = más revisión y menos errores; bajarlo = más
+# automatización y más riesgo. 0.70 es un punto de partida conservador.
+umbral_confianza = 0.70
+
+# Cuántos días hacia atrás se aceptan correos (evita reprocesar archivo antiguo
+# si alguien exporta el buzón entero por error). 0 = sin límite.
+antiguedad_maxima_dias = 0
+
+
+# ---------------------------------------------------------------------------
+# Remitentes que NO son clientes escribiendo: notificaciones de bancos, envíos
+# automáticos, listas de correo. Se descartan antes de gastar nada en
+# clasificarlos, pero quedan registrados en el informe por si hubo un error.
+#
+# Se compara en minúsculas: basta con que el remitente CONTENGA el texto.
+# ---------------------------------------------------------------------------
+[remitentes_automaticos]
+patrones = [
+    "no-reply",
+    "noreply",
+    "no_reply",
+    "notificaciones@",
+    "notificacion@",
+    "alertas@",
+    "newsletter",
+    "mailer-daemon",
+    "automatico@",
+]
+
+# Frases típicas de un correo generado por una máquina. Si el remitente no está
+# en la lista de arriba pero el cuerpo dice esto, también se descarta.
+frases = [
+    "este es un mensaje automático",
+    "por favor no responda",
+    "por favor no respondas",
+    "no responder a este correo",
+    "mensaje generado automáticamente",
+]
+
+
+# ---------------------------------------------------------------------------
+# Asuntos que SIEMPRE pasan por una persona, diga lo que diga la clasificación
+# automática. Son los que tienen consecuencias legales o de dinero: el coste de
+# equivocarse es mucho mayor que el ahorro de automatizarlos.
+# ---------------------------------------------------------------------------
+[revision_obligatoria]
+palabras = [
+    "desistir",
+    "desistimiento",
+    "devolución",
+    "devolucion",
+    "reembolso",
+    "demanda",
+    "abogado",
+    "tutela",
+    "superintendencia",
+    "incumplimiento",
+    "cancelar la compra",
+    "anular la compra",
+]
+motivo = "Asunto con implicación legal o financiera: lo decide una persona."
+
+
+# ---------------------------------------------------------------------------
+# Correos de cortesía sin nada que hacer ("ok, gracias"). Se registran como
+# 'Sin acción' para dejar constancia de que se leyeron, sin generar trabajo.
+# Solo aplica si el cuerpo es corto: un "gracias" dentro de un correo largo no
+# convierte el correo en cortesía.
+# ---------------------------------------------------------------------------
+[cortesia]
+longitud_maxima_caracteres = 120
+frases = [
+    "muchas gracias",
+    "ok, gracias",
+    "ok gracias",
+    "listo, gracias",
+    "perfecto, gracias",
+    "recibido",
+    "entendido",
+    "quedo atento",
+]
+
+
+# ---------------------------------------------------------------------------
+# RÚBRICA DE URGENCIA
+#
+# La usa igual el clasificador automático y la inteligencia artificial: así la
+# urgencia es una decisión de la empresa y no una opinión distinta cada vez.
+# ---------------------------------------------------------------------------
+[urgencia]
+# Alta: hay dinero en movimiento, un plazo inmediato o un cliente ya enfadado.
+alta = [
+    "hoy",
+    "urgente",
+    "urgencia",
+    "inmediato",
+    "esta semana",
+    "mañana",
+    "desembolso",
+    "ya aprobó",
+    "ya aprobo",
+    "nadie me contesta",
+    "nadie me responde",
+    "sin respuesta",
+    "llevo tres semanas",
+    "llevo dos semanas",
+    "reiterar",
+    "segunda vez",
+]
+# Media: hay una petición concreta que atender, pero sin plazo inminente.
+media = [
+    "necesito",
+    "requiero",
+    "solicito",
+    "cuándo",
+    "cuando entregan",
+    "fecha",
+    "documentos",
+    "cotización",
+    "cotizacion",
+    "confirmar",
+]
+# Todo lo demás es Baja.
+
+
+# ---------------------------------------------------------------------------
+# TEMAS DEL NEGOCIO
+#
+# Cada tema se detecta por palabras clave y determina el responsable. Añadir un
+# tema nuevo es añadir un bloque aquí y una línea en [responsables].
+# ---------------------------------------------------------------------------
+[temas]
+entrega = ["entrega", "entregan", "fecha de entrega", "cuándo entregan", "obra", "retraso"]
+credito = ["crédito", "credito", "hipotecario", "banco", "desembolso", "cuota inicial", "consignar", "consigno", "pago", "financiación", "financiacion"]
+acabados = ["acabados", "cocina", "enchape", "color", "planos", "pintura", "closet", "griferia", "grifería"]
+escrituracion = ["escrituración", "escrituracion", "escritura", "notaría", "notaria", "documentos"]
+desistimiento = ["desistir", "desistimiento", "devolución", "devolucion", "reembolso", "cancelar la compra"]
+zonas_comunes = ["parqueadero", "zonas comunes", "salón social", "salon social", "gimnasio", "ascensor", "inundado"]
+comercial = ["información", "informacion", "precios", "disponibles", "quedan apartamentos", "formas de pago", "brochure", "cotización", "cotizacion", "locales comerciales", "áreas disponibles", "areas disponibles"]
+alianza = ["alianza", "comercializar", "inmobiliaria", "ofrecerles nuestros servicios", "propuesta comercial", "aliado"]
+
+
+# ---------------------------------------------------------------------------
+# QUIÉN ATIENDE CADA TEMA
+#
+# Esto es política de la empresa, no una decisión técnica: por eso vive aquí y
+# no dentro del programa. Cambia el nombre del rol o pon el nombre propio de la
+# persona; el sistema escribirá exactamente lo que aquí figure.
+# ---------------------------------------------------------------------------
+[responsables]
+entrega = "Servicio al Cliente"
+credito = "Cartera"
+acabados = "Posventa y Obra"
+escrituracion = "Jurídica"
+desistimiento = "Jurídica"
+zonas_comunes = "Posventa y Obra"
+comercial = "Comercial"
+alianza = "Gerencia Comercial"
+otro = "Servicio al Cliente"
+
+# Si el tema no se pudo determinar, se asigna por tipo de petición.
+[responsables_por_tipo]
+Consulta = "Servicio al Cliente"
+Incidencia = "Posventa y Obra"
+Pedido = "Comercial"
+"Reclamación" = "Servicio al Cliente"
+
+
+# ---------------------------------------------------------------------------
+# Texto de la columna "Acción" según el tema. Es una plantilla: la parte
+# variable (el apartamento, el detalle) la rellena el sistema.
+# ---------------------------------------------------------------------------
+[acciones]
+entrega = "Confirmar por escrito la fecha de entrega"
+credito = "Enviar datos de consignación y lista de documentos"
+acabados = "Revisar solicitud de acabados y confirmar costo y plazo"
+escrituracion = "Enviar lista de documentos y agenda de notaría"
+desistimiento = "Escalar a Jurídica: procedimiento y plazos de devolución"
+zonas_comunes = "Verificar en obra y reportar estado"
+comercial = "Enviar información comercial y disponibilidad"
+alianza = "Evaluar propuesta y responder"
+otro = "Revisar el correo y definir la respuesta"

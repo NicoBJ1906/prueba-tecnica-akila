@@ -1,0 +1,16 @@
+# Dependencias de la solución completa (los dos ejercicios).
+# Probado con Python 3.14 en macOS y con Python 3.11 en Linux.
+#
+# Instalación:
+#   python -m venv .venv
+#   source .venv/bin/activate      (Windows: .venv\Scripts\activate)
+#   pip install -r requirements.txt
+
+pandas>=2.0            # ETL de la cartera de apartamentos
+streamlit>=1.30        # dashboard (arrastra altair, usado para los gráficos)
+openpyxl>=3.1          # Excel de seguimiento del triaje
+pytest>=7.4            # batería de pruebas
+
+# La clasificación con IA es OPCIONAL: el triaje funciona entero sin ella.
+# Para activarla, instala además el proveedor que prefieras:
+#   pip install -r requirements-ia.txt

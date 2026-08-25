@@ -14,11 +14,9 @@ from dashboard.metricas import (
     ventas_por_semana,
 )
 
-from .test_etl import df_de, fila
-
 
 class TestVentasPorSemana:
-    def test_agrupa_por_semana_iso_etiquetando_el_lunes(self):
+    def test_agrupa_por_semana_iso_etiquetando_el_lunes(self, fila, df_de):
         # Miércoles y viernes de la misma semana ISO.
         df = df_de(
             fila(id=1, estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-07")),
@@ -29,7 +27,7 @@ class TestVentasPorSemana:
         assert resultado.iloc[0]["semana"] == pd.Timestamp("2026-01-05")  # lunes
         assert resultado.iloc[0]["unidades"] == 2
 
-    def test_rellena_las_semanas_sin_ventas(self):
+    def test_rellena_las_semanas_sin_ventas(self, fila, df_de):
         """Un hueco comercial debe verse en el eje, no desaparecer."""
         df = df_de(
             fila(id=1, estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05")),
@@ -39,28 +37,28 @@ class TestVentasPorSemana:
         assert len(resultado) == 4
         assert (resultado["unidades"] == [1, 0, 0, 1]).all()
 
-    def test_puede_desactivarse_el_relleno(self):
+    def test_puede_desactivarse_el_relleno(self, fila, df_de):
         df = df_de(
             fila(id=1, estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05")),
             fila(id=2, piso=6, estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-26")),
         )
         assert len(ventas_por_semana(df, incluir_semanas_vacias=False)) == 2
 
-    def test_ignora_los_disponibles(self):
+    def test_ignora_los_disponibles(self, fila, df_de):
         df = df_de(
             fila(id=1, estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-07")),
             fila(id=2, piso=6, estado=ESTADO_DISPONIBLE),
         )
         assert ventas_por_semana(df)["unidades"].sum() == 1
 
-    def test_sin_ventas_devuelve_tabla_vacia_con_columnas(self):
+    def test_sin_ventas_devuelve_tabla_vacia_con_columnas(self, fila, df_de):
         resultado = ventas_por_semana(df_de(fila(estado=ESTADO_DISPONIBLE)))
         assert resultado.empty
         assert list(resultado.columns) == ["semana", "unidades", "valor_cop"]
 
 
 class TestTiposVendidos:
-    def test_los_porcentajes_suman_cien(self):
+    def test_los_porcentajes_suman_cien(self, fila, df_de):
         df = df_de(
             fila(id=1, tipo_apartamento="1 Alcoba", estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05")),
             fila(id=2, piso=6, tipo_apartamento="1 Alcoba", estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05")),
@@ -71,7 +69,7 @@ class TestTiposVendidos:
         assert tabla.iloc[0]["tipo_apartamento"] == "1 Alcoba"
         assert tabla.iloc[0]["porcentaje"] == pytest.approx(66.67, abs=0.01)
 
-    def test_el_porcentaje_es_sobre_ventas_no_sobre_inventario(self):
+    def test_el_porcentaje_es_sobre_ventas_no_sobre_inventario(self, fila, df_de):
         """Dos vendidos y ocho disponibles: cada vendido es el 50 % de las ventas."""
         vendidos = [
             fila(id=i, piso=i, tipo_apartamento=t, estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05"))
@@ -81,12 +79,12 @@ class TestTiposVendidos:
         tabla = tipos_vendidos(df_de(*vendidos, *disponibles))
         assert set(tabla["porcentaje"]) == {50.0}
 
-    def test_sin_ventas_devuelve_tabla_vacia(self):
+    def test_sin_ventas_devuelve_tabla_vacia(self, fila, df_de):
         assert tipos_vendidos(df_de(fila(estado=ESTADO_DISPONIBLE))).empty
 
 
 class TestResumen:
-    def test_cuenta_vendidos_disponibles_y_variedad(self):
+    def test_cuenta_vendidos_disponibles_y_variedad(self, fila, df_de):
         df = df_de(
             fila(id=1, tipo_apartamento="1 Alcoba", estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05")),
             fila(id=2, piso=6, tipo_apartamento="Penthouse", estado=ESTADO_DISPONIBLE),
@@ -97,7 +95,7 @@ class TestResumen:
         assert r.variedad_tipos == 2
         assert r.porcentaje_avance == pytest.approx(33.33, abs=0.01)
 
-    def test_sin_ventas_no_divide_por_cero(self):
+    def test_sin_ventas_no_divide_por_cero(self, fila, df_de):
         r = resumen(df_de(fila(estado=ESTADO_DISPONIBLE)))
         assert r.ritmo_semanal_reciente == 0.0
         assert r.meses_inventario is None

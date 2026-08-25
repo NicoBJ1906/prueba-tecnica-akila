@@ -1,0 +1,14 @@
+# Proveedores de clasificación con IA (opcionales).
+#
+# El triaje funciona sin nada de esto: en modo `reglas` clasifica con lógica
+# determinista y produce el mismo Excel. Instala solo el que vayas a usar.
+#
+#   pip install -r requirements-ia.txt
+#   export ANTHROPIC_API_KEY=...        (o GEMINI_API_KEY=...)
+#   python -m triaje --proveedor anthropic
+#
+# La clave se lee SOLO de variables de entorno. Nunca la escribas en el código
+# ni en config.toml, y nunca la subas al repositorio.
+
+anthropic>=0.40        # Claude Haiku 4.5
+google-genai>=1.0      # Gemini Flash (alternativa con plan gratuito)
