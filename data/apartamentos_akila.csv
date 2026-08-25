@@ -1,0 +1,458 @@
+id,torre,piso,numero_puerta,apartamento,tipo_apartamento,area_m2,precio_cop,estado,fecha_venta,fecha_entrega,forma_pago,porcentaje_credito,monto_credito_cop,monto_contado_cop
+1,Torre 2,11,5,Torre 2 Apto 1105,2 Alcobas,74,682500000,Disponible,,2027-08-16,,,,
+2,Torre 1,6,2,Torre 1 Apto 602,1 Alcoba,47,350200000,Disponible,,2027-10-31,,,,
+3,Torre 4,6,4,Torre 4 Apto 604,Penthouse,149,1357700000,Disponible,,2026-10-07,,,,
+4,Torre 1,20,3,Torre 1 Apto 2003,Apartaestudio,38,351400000,Disponible,,2027-01-02,,,,
+5,Torre 1,19,5,Torre 1 Apto 1905,Penthouse,138,1253900000,Disponible,,2027-10-04,,,,
+6,Torre 3,21,5,Torre 3 Apto 2105,1 Alcoba,49,394000000,Vendido,2025-10-17,2026-09-11,Crédito,55,216700000,177300000
+7,Torre 3,6,1,Torre 3 Apto 601,2 Alcobas,76,609600000,Vendido,2025-11-08,2026-10-24,Crédito,40,243800000,365800000
+8,Torre 4,10,3,Torre 4 Apto 1003,3 Alcobas,96,753300000,Disponible,,2028-04-11,,,,
+9,Torre 1,18,2,Torre 1 Apto 1802,1 Alcoba,53,419900000,Disponible,,2027-04-11,,,,
+10,Torre 3,13,1,Torre 3 Apto 1301,1 Alcoba,58,437200000,Vendido,2025-08-04,2027-03-12,Crédito,39,170500000,266700000
+11,Torre 4,21,4,Torre 4 Apto 2104,3 Alcobas,109,1032700000,Disponible,,2026-10-15,,,,
+12,Torre 2,17,3,Torre 2 Apto 1703,Penthouse,157,1450000000,Disponible,,2026-11-09,,,,
+13,Torre 4,21,5,Torre 4 Apto 2105,1 Alcoba,46,380300000,Vendido,2026-04-03,2028-05-11,Crédito,51,194000000,186300000
+14,Torre 3,19,2,Torre 3 Apto 1902,Apartaestudio,33,298800000,Vendido,2026-07-17,2027-10-11,Crédito,54,161400000,137400000
+15,Torre 3,19,3,Torre 3 Apto 1903,2 Alcobas,60,531900000,Disponible,,2027-05-24,,,,
+16,Torre 4,14,4,Torre 4 Apto 1404,2 Alcobas,70,540100000,Disponible,,2028-05-04,,,,
+17,Torre 2,7,4,Torre 2 Apto 704,2 Alcobas,76,629200000,Vendido,2025-07-16,2027-06-12,Crédito,41,258000000,371200000
+18,Torre 3,4,5,Torre 3 Apto 405,Apartaestudio,30,280200000,Disponible,,2027-08-07,,,,
+19,Torre 3,8,6,Torre 3 Apto 806,Penthouse,123,1016700000,Disponible,,2027-09-25,,,,
+20,Torre 4,4,2,Torre 4 Apto 402,1 Alcoba,56,411500000,Vendido,2025-07-06,2028-06-29,Contado,0,0,411500000
+21,Torre 4,3,5,Torre 4 Apto 305,Penthouse,172,1240700000,Vendido,2026-06-22,2026-11-21,Crédito,58,719600000,521100000
+22,Torre 4,7,5,Torre 4 Apto 705,3 Alcobas,109,760300000,Vendido,2026-07-07,2028-05-11,Crédito,69,524600000,235700000
+23,Torre 4,13,3,Torre 4 Apto 1303,2 Alcobas,80,740900000,Disponible,,2027-07-03,,,,
+24,Torre 2,18,6,Torre 2 Apto 1806,2 Alcobas,81,595200000,Vendido,2026-02-12,2027-12-28,Crédito,36,214300000,380900000
+25,Torre 3,2,5,Torre 3 Apto 205,Penthouse,180,1200400000,Disponible,,2028-04-13,,,,
+26,Torre 1,4,5,Torre 1 Apto 405,1 Alcoba,55,445900000,Disponible,,2027-04-17,,,,
+27,Torre 4,1,2,Torre 4 Apto 102,Apartaestudio,32,224400000,Vendido,2026-05-28,2027-03-05,Contado,0,0,224400000
+28,Torre 4,15,2,Torre 4 Apto 1502,Penthouse,154,1379900000,Disponible,,2027-01-20,,,,
+29,Torre 2,20,6,Torre 2 Apto 2006,1 Alcoba,57,409300000,Disponible,,2026-12-22,,,,
+30,Torre 2,8,5,Torre 2 Apto 805,2 Alcobas,69,636700000,Vendido,2026-03-31,2028-03-13,Crédito,67,426600000,210100000
+31,Torre 1,22,5,Torre 1 Apto 2205,Penthouse,163,1461600000,Vendido,2025-06-29,2027-04-29,Contado,0,0,1461600000
+32,Torre 2,17,6,Torre 2 Apto 1706,3 Alcobas,93,812800000,Vendido,2026-01-02,2027-06-15,Crédito,54,438900000,373900000
+33,Torre 4,15,1,Torre 4 Apto 1501,3 Alcobas,92,670300000,Disponible,,2028-05-27,,,,
+34,Torre 2,11,1,Torre 2 Apto 1101,3 Alcobas,113,818400000,Disponible,,2027-04-12,,,,
+35,Torre 4,20,6,Torre 4 Apto 2006,1 Alcoba,57,394100000,Disponible,,2026-11-13,,,,
+36,Torre 1,3,3,Torre 1 Apto 303,3 Alcobas,87,641000000,Disponible,,2027-04-08,,,,
+37,Torre 2,12,6,Torre 2 Apto 1206,2 Alcobas,67,478700000,Disponible,,2026-12-27,,,,
+38,Torre 1,22,6,Torre 1 Apto 2206,Apartaestudio,37,336000000,Vendido,2026-05-30,2027-10-17,Contado,0,0,336000000
+39,Torre 1,13,6,Torre 1 Apto 1306,Penthouse,160,1125800000,Vendido,2026-04-05,2027-07-07,Contado,0,0,1125800000
+40,Torre 4,22,4,Torre 4 Apto 2204,2 Alcobas,76,528200000,Disponible,,2026-11-23,,,,
+41,Torre 4,5,1,Torre 4 Apto 501,3 Alcobas,91,828100000,Disponible,,2028-01-22,,,,
+42,Torre 1,13,4,Torre 1 Apto 1304,1 Alcoba,51,442900000,Vendido,2026-01-23,2026-11-14,Crédito,40,177200000,265700000
+43,Torre 3,1,3,Torre 3 Apto 103,3 Alcobas,114,776900000,Disponible,,2028-05-10,,,,
+44,Torre 1,5,4,Torre 1 Apto 504,3 Alcobas,107,944800000,Vendido,2026-03-12,2026-11-22,Crédito,51,481800000,463000000
+45,Torre 3,15,1,Torre 3 Apto 1501,Apartaestudio,30,274900000,Disponible,,2026-09-01,,,,
+46,Torre 3,3,5,Torre 3 Apto 305,1 Alcoba,44,314800000,Vendido,2025-10-13,2027-06-14,Crédito,45,141700000,173100000
+47,Torre 4,20,5,Torre 4 Apto 2005,1 Alcoba,48,354700000,Disponible,,2027-11-21,,,,
+48,Torre 3,6,5,Torre 3 Apto 605,1 Alcoba,44,310000000,Disponible,,2028-01-29,,,,
+49,Torre 2,5,2,Torre 2 Apto 502,2 Alcobas,81,670300000,Disponible,,2028-03-04,,,,
+50,Torre 1,22,3,Torre 1 Apto 2203,2 Alcobas,60,415600000,Disponible,,2027-12-20,,,,
+51,Torre 2,10,5,Torre 2 Apto 1005,Penthouse,166,1146200000,Disponible,,2026-10-28,,,,
+52,Torre 3,3,2,Torre 3 Apto 302,1 Alcoba,53,480900000,Vendido,2026-05-19,2027-03-11,Contado,0,0,480900000
+53,Torre 3,4,4,Torre 3 Apto 404,2 Alcobas,65,531800000,Vendido,2025-09-25,2027-04-28,Contado,0,0,531800000
+54,Torre 2,15,2,Torre 2 Apto 1502,1 Alcoba,46,413600000,Vendido,2026-01-06,2028-01-02,Crédito,36,148900000,264700000
+55,Torre 4,10,2,Torre 4 Apto 1002,Apartaestudio,42,334200000,Vendido,2025-06-08,2027-08-25,Crédito,37,123700000,210500000
+56,Torre 1,17,5,Torre 1 Apto 1705,Apartaestudio,40,346400000,Disponible,,2026-09-23,,,,
+57,Torre 2,5,2,Torre 2 Apto 502,Penthouse,154,1039300000,Disponible,,2028-01-28,,,,
+58,Torre 4,2,3,Torre 4 Apto 203,2 Alcobas,62,578200000,Vendido,2025-11-27,2027-04-01,Contado,0,0,578200000
+59,Torre 4,15,3,Torre 4 Apto 1503,Apartaestudio,30,202600000,Vendido,2025-06-26,2026-09-24,Crédito,31,62800000,139800000
+60,Torre 1,14,3,Torre 1 Apto 1403,3 Alcobas,109,808300000,Vendido,2026-03-20,2026-09-15,Contado,0,0,808300000
+61,Torre 2,22,6,Torre 2 Apto 2206,Penthouse,132,960900000,Disponible,,2028-05-21,,,,
+62,Torre 4,19,2,Torre 4 Apto 1902,Apartaestudio,38,253700000,Vendido,2025-11-08,2027-03-19,Contado,0,0,253700000
+63,Torre 2,2,5,Torre 2 Apto 205,1 Alcoba,45,377000000,Vendido,2025-07-30,2027-03-18,Crédito,35,132000000,245000000
+64,Torre 4,21,1,Torre 4 Apto 2101,2 Alcobas,78,678800000,Vendido,2025-06-16,2027-10-20,Contado,0,0,678800000
+65,Torre 2,21,1,Torre 2 Apto 2101,2 Alcobas,68,591200000,Vendido,2026-02-21,2026-11-22,Crédito,67,396100000,195100000
+66,Torre 4,16,2,Torre 4 Apto 1602,Apartaestudio,34,300800000,Vendido,2025-10-16,2026-09-10,Contado,0,0,300800000
+67,Torre 1,7,1,Torre 1 Apto 701,3 Alcobas,99,784600000,Vendido,2026-06-09,2028-06-30,Crédito,33,258900000,525700000
+68,Torre 4,11,1,Torre 4 Apto 1101,3 Alcobas,99,929700000,Disponible,,2027-04-11,,,,
+69,Torre 3,20,5,Torre 3 Apto 2005,1 Alcoba,43,288300000,Disponible,,2027-11-10,,,,
+70,Torre 2,2,5,Torre 2 Apto 205,Penthouse,154,1226700000,Disponible,,2028-06-13,,,,
+71,Torre 1,14,6,Torre 1 Apto 1406,Penthouse,128,1076200000,Disponible,,2027-01-23,,,,
+72,Torre 2,21,1,Torre 2 Apto 2101,Apartaestudio,36,327400000,Vendido,2025-10-02,2027-02-21,Crédito,34,111300000,216100000
+73,Torre 4,9,6,Torre 4 Apto 906,Apartaestudio,36,280000000,Disponible,,2027-01-17,,,,
+74,Torre 3,19,2,Torre 3 Apto 1902,2 Alcobas,62,549500000,Vendido,2025-07-04,2027-06-25,Crédito,30,164800000,384700000
+75,Torre 3,21,5,Torre 3 Apto 2105,Penthouse,173,1582300000,Vendido,2026-06-05,2026-11-17,Crédito,51,807000000,775300000
+76,Torre 1,1,4,Torre 1 Apto 104,Apartaestudio,32,281500000,Disponible,,2027-12-23,,,,
+77,Torre 1,10,3,Torre 1 Apto 1003,Penthouse,160,1094800000,Disponible,,2028-04-16,,,,
+78,Torre 4,19,5,Torre 4 Apto 1905,Penthouse,146,1247100000,Vendido,2026-01-13,2027-08-27,Contado,0,0,1247100000
+79,Torre 2,4,4,Torre 2 Apto 404,2 Alcobas,66,532900000,Vendido,2026-01-06,2028-02-07,Crédito,37,197200000,335700000
+80,Torre 4,15,3,Torre 4 Apto 1503,2 Alcobas,63,594700000,Vendido,2026-05-22,2027-06-13,Contado,0,0,594700000
+81,Torre 4,19,6,Torre 4 Apto 1906,3 Alcobas,102,872000000,Vendido,2025-06-07,2028-03-13,Contado,0,0,872000000
+82,Torre 2,7,1,Torre 2 Apto 701,2 Alcobas,78,679900000,Disponible,,2027-12-15,,,,
+83,Torre 3,8,4,Torre 3 Apto 804,1 Alcoba,54,399700000,Disponible,,2027-09-24,,,,
+84,Torre 1,16,4,Torre 1 Apto 1604,1 Alcoba,57,487800000,Disponible,,2028-05-14,,,,
+85,Torre 3,13,3,Torre 3 Apto 1303,2 Alcobas,64,516700000,Vendido,2026-05-28,2028-05-12,Contado,0,0,516700000
+86,Torre 2,4,4,Torre 2 Apto 404,3 Alcobas,96,861800000,Vendido,2025-08-15,2027-08-08,Contado,0,0,861800000
+87,Torre 4,21,3,Torre 4 Apto 2103,Apartaestudio,34,278800000,Disponible,,2026-12-02,,,,
+88,Torre 1,1,2,Torre 1 Apto 102,3 Alcobas,101,926700000,Vendido,2026-02-11,2027-01-09,Contado,0,0,926700000
+89,Torre 2,5,1,Torre 2 Apto 501,Apartaestudio,40,315800000,Disponible,,2028-05-16,,,,
+90,Torre 2,4,3,Torre 2 Apto 403,Penthouse,160,1066200000,Disponible,,2026-10-09,,,,
+91,Torre 2,4,2,Torre 2 Apto 402,Apartaestudio,40,358300000,Vendido,2026-06-10,2027-09-30,Contado,0,0,358300000
+92,Torre 1,9,6,Torre 1 Apto 906,2 Alcobas,64,435800000,Vendido,2025-08-24,2027-08-24,Crédito,34,148200000,287600000
+93,Torre 1,8,5,Torre 1 Apto 805,2 Alcobas,61,449800000,Vendido,2026-02-10,2027-11-04,Contado,0,0,449800000
+94,Torre 4,5,4,Torre 4 Apto 504,Penthouse,175,1415800000,Disponible,,2026-12-14,,,,
+95,Torre 1,20,2,Torre 1 Apto 2002,3 Alcobas,107,992200000,Vendido,2026-03-27,2027-07-15,Crédito,47,466300000,525900000
+96,Torre 3,3,1,Torre 3 Apto 301,Apartaestudio,36,326500000,Disponible,,2027-02-04,,,,
+97,Torre 3,11,2,Torre 3 Apto 1102,Apartaestudio,37,323000000,Disponible,,2027-09-25,,,,
+98,Torre 3,11,1,Torre 3 Apto 1101,Apartaestudio,32,278800000,Vendido,2025-09-02,2028-04-16,Contado,0,0,278800000
+99,Torre 3,6,4,Torre 3 Apto 604,Penthouse,134,1139400000,Vendido,2026-06-13,2027-05-06,Crédito,39,444400000,695000000
+100,Torre 2,5,4,Torre 2 Apto 504,Apartaestudio,30,246300000,Disponible,,2028-02-23,,,,
+101,Torre 3,21,5,Torre 3 Apto 2105,Penthouse,168,1202200000,Vendido,2026-02-15,2026-12-12,Crédito,30,360700000,841500000
+102,Torre 1,3,1,Torre 1 Apto 301,2 Alcobas,79,662200000,Disponible,,2028-06-26,,,,
+103,Torre 4,13,2,Torre 4 Apto 1302,1 Alcoba,54,462200000,Disponible,,2028-03-20,,,,
+104,Torre 4,22,5,Torre 4 Apto 2205,Apartaestudio,38,278300000,Vendido,2026-02-09,2028-06-11,Contado,0,0,278300000
+105,Torre 2,7,5,Torre 2 Apto 705,3 Alcobas,94,721000000,Vendido,2026-02-01,2026-12-18,Crédito,50,360500000,360500000
+106,Torre 3,10,6,Torre 3 Apto 1006,Penthouse,161,1151000000,Vendido,2026-03-19,2027-01-08,Contado,0,0,1151000000
+107,Torre 2,3,1,Torre 2 Apto 301,Penthouse,151,1028600000,Vendido,2025-08-20,2027-01-18,Contado,0,0,1028600000
+108,Torre 4,19,3,Torre 4 Apto 1903,1 Alcoba,51,432400000,Disponible,,2026-12-09,,,,
+109,Torre 2,21,2,Torre 2 Apto 2102,2 Alcobas,62,556300000,Disponible,,2028-01-28,,,,
+110,Torre 3,6,4,Torre 3 Apto 604,3 Alcobas,97,659800000,Vendido,2026-03-13,2028-01-22,Crédito,54,356300000,303500000
+111,Torre 1,5,1,Torre 1 Apto 501,1 Alcoba,56,431300000,Disponible,,2026-12-17,,,,
+112,Torre 2,5,2,Torre 2 Apto 502,Penthouse,178,1506500000,Disponible,,2027-12-31,,,,
+113,Torre 2,17,1,Torre 2 Apto 1701,Penthouse,136,1190900000,Vendido,2026-04-20,2028-01-26,Crédito,51,607400000,583500000
+114,Torre 4,8,3,Torre 4 Apto 803,Penthouse,178,1292300000,Vendido,2026-07-20,2028-05-10,Crédito,57,736600000,555700000
+115,Torre 3,16,2,Torre 3 Apto 1602,3 Alcobas,104,758000000,Vendido,2026-02-18,2028-01-18,Crédito,50,379000000,379000000
+116,Torre 4,2,2,Torre 4 Apto 202,Penthouse,130,1074700000,Disponible,,2027-07-01,,,,
+117,Torre 4,13,6,Torre 4 Apto 1306,1 Alcoba,58,465600000,Vendido,2025-08-28,2028-05-15,Contado,0,0,465600000
+118,Torre 3,7,3,Torre 3 Apto 703,3 Alcobas,93,676700000,Disponible,,2026-10-23,,,,
+119,Torre 2,20,6,Torre 2 Apto 2006,Penthouse,155,1255700000,Vendido,2025-12-03,2027-10-21,Crédito,55,690600000,565100000
+120,Torre 1,18,2,Torre 1 Apto 1802,1 Alcoba,53,348000000,Vendido,2026-05-25,2027-11-26,Contado,0,0,348000000
+121,Torre 4,19,3,Torre 4 Apto 1903,Penthouse,166,1219900000,Disponible,,2028-04-23,,,,
+122,Torre 2,1,6,Torre 2 Apto 106,Apartaestudio,34,222000000,Vendido,2026-07-13,2027-03-27,Contado,0,0,222000000
+123,Torre 4,1,1,Torre 4 Apto 101,Penthouse,136,918700000,Vendido,2026-06-08,2028-05-06,Contado,0,0,918700000
+124,Torre 2,9,5,Torre 2 Apto 905,Penthouse,167,1297300000,Vendido,2026-07-15,2027-04-03,Crédito,43,557800000,739500000
+125,Torre 3,3,5,Torre 3 Apto 305,1 Alcoba,55,463500000,Vendido,2026-01-01,2027-09-29,Crédito,32,148300000,315200000
+126,Torre 4,9,5,Torre 4 Apto 905,3 Alcobas,87,789600000,Vendido,2025-08-11,2026-10-20,Crédito,51,402700000,386900000
+127,Torre 1,8,2,Torre 1 Apto 802,2 Alcobas,77,505200000,Vendido,2026-06-09,2028-05-07,Crédito,33,166700000,338500000
+128,Torre 4,11,6,Torre 4 Apto 1106,Apartaestudio,37,303900000,Vendido,2026-01-18,2027-07-16,Crédito,46,139800000,164100000
+129,Torre 4,20,3,Torre 4 Apto 2003,2 Alcobas,66,576300000,Vendido,2025-11-22,2028-06-26,Crédito,36,207500000,368800000
+130,Torre 1,13,1,Torre 1 Apto 1301,3 Alcobas,95,710200000,Vendido,2026-06-30,2027-10-30,Crédito,57,404800000,305400000
+131,Torre 1,4,4,Torre 1 Apto 404,Apartaestudio,37,265500000,Vendido,2026-02-20,2027-02-17,Crédito,33,87600000,177900000
+132,Torre 3,1,5,Torre 3 Apto 105,Penthouse,134,1114100000,Disponible,,2027-07-23,,,,
+133,Torre 2,1,4,Torre 2 Apto 104,Apartaestudio,35,267400000,Vendido,2026-03-20,2027-07-24,Contado,0,0,267400000
+134,Torre 3,7,5,Torre 3 Apto 705,1 Alcoba,56,374200000,Vendido,2025-10-14,2028-02-18,Contado,0,0,374200000
+135,Torre 2,9,2,Torre 2 Apto 902,1 Alcoba,46,400800000,Disponible,,2028-02-22,,,,
+136,Torre 2,20,6,Torre 2 Apto 2006,3 Alcobas,100,936300000,Vendido,2026-05-24,2026-11-13,Crédito,36,337100000,599200000
+137,Torre 4,8,4,Torre 4 Apto 804,2 Alcobas,78,563000000,Vendido,2026-04-04,2028-04-22,Crédito,61,343400000,219600000
+138,Torre 4,19,3,Torre 4 Apto 1903,Penthouse,141,1150100000,Vendido,2026-02-25,2028-01-19,Crédito,64,736100000,414000000
+139,Torre 2,9,4,Torre 2 Apto 904,1 Alcoba,47,393000000,Vendido,2026-04-26,2027-08-15,Contado,0,0,393000000
+140,Torre 1,22,4,Torre 1 Apto 2204,3 Alcobas,92,819000000,Vendido,2026-07-17,2027-04-20,Crédito,32,262100000,556900000
+141,Torre 1,9,6,Torre 1 Apto 906,1 Alcoba,43,318200000,Disponible,,2026-09-16,,,,
+142,Torre 4,9,1,Torre 4 Apto 901,2 Alcobas,71,478100000,Vendido,2026-05-26,2027-08-15,Crédito,68,325100000,153000000
+143,Torre 2,5,2,Torre 2 Apto 502,1 Alcoba,55,488900000,Disponible,,2027-09-10,,,,
+144,Torre 2,15,3,Torre 2 Apto 1503,Apartaestudio,37,334900000,Vendido,2025-09-04,2027-12-03,Contado,0,0,334900000
+145,Torre 3,4,6,Torre 3 Apto 406,2 Alcobas,66,617800000,Disponible,,2026-10-13,,,,
+146,Torre 3,12,1,Torre 3 Apto 1201,Apartaestudio,38,302500000,Vendido,2025-08-23,2026-10-05,Crédito,40,121000000,181500000
+147,Torre 3,6,3,Torre 3 Apto 603,Apartaestudio,37,285500000,Vendido,2026-05-30,2027-11-20,Contado,0,0,285500000
+148,Torre 4,21,6,Torre 4 Apto 2106,1 Alcoba,54,406200000,Vendido,2026-04-19,2027-02-20,Contado,0,0,406200000
+149,Torre 4,10,4,Torre 4 Apto 1004,Penthouse,168,1205000000,Vendido,2026-01-27,2027-01-13,Crédito,46,554300000,650700000
+150,Torre 4,19,3,Torre 4 Apto 1903,2 Alcobas,76,585300000,Disponible,,2027-09-30,,,,
+151,Torre 1,15,6,Torre 1 Apto 1506,3 Alcobas,88,677700000,Vendido,2026-04-06,2027-03-26,Contado,0,0,677700000
+152,Torre 4,4,3,Torre 4 Apto 403,Penthouse,121,1105200000,Vendido,2025-06-21,2027-08-16,Crédito,58,641000000,464200000
+153,Torre 2,6,3,Torre 2 Apto 603,Penthouse,175,1259100000,Vendido,2026-03-13,2028-04-20,Crédito,45,566600000,692500000
+154,Torre 3,8,2,Torre 3 Apto 802,3 Alcobas,114,946700000,Vendido,2026-03-04,2027-06-24,Contado,0,0,946700000
+155,Torre 3,9,6,Torre 3 Apto 906,1 Alcoba,49,336200000,Vendido,2025-09-07,2027-05-26,Contado,0,0,336200000
+156,Torre 1,10,6,Torre 1 Apto 1006,1 Alcoba,50,399600000,Vendido,2026-05-12,2027-08-21,Contado,0,0,399600000
+157,Torre 2,22,3,Torre 2 Apto 2203,3 Alcobas,103,820900000,Vendido,2025-12-01,2026-09-02,Crédito,37,303700000,517200000
+158,Torre 3,4,1,Torre 3 Apto 401,Penthouse,143,1131500000,Disponible,,2027-03-13,,,,
+159,Torre 2,8,3,Torre 2 Apto 803,1 Alcoba,53,391800000,Disponible,,2028-04-29,,,,
+160,Torre 1,12,4,Torre 1 Apto 1204,Apartaestudio,30,236600000,Vendido,2026-04-16,2028-04-01,Contado,0,0,236600000
+161,Torre 1,1,3,Torre 1 Apto 103,3 Alcobas,106,834000000,Vendido,2026-02-22,2027-11-01,Contado,0,0,834000000
+162,Torre 1,5,1,Torre 1 Apto 501,Apartaestudio,33,271100000,Vendido,2025-11-07,2026-11-05,Crédito,35,94900000,176200000
+163,Torre 1,2,6,Torre 1 Apto 206,2 Alcobas,82,681000000,Disponible,,2027-10-31,,,,
+164,Torre 3,5,2,Torre 3 Apto 502,Apartaestudio,40,325300000,Disponible,,2028-02-23,,,,
+165,Torre 2,6,6,Torre 2 Apto 606,2 Alcobas,77,530900000,Disponible,,2026-11-07,,,,
+166,Torre 1,19,6,Torre 1 Apto 1906,Penthouse,170,1276100000,Disponible,,2028-02-21,,,,
+167,Torre 3,4,1,Torre 3 Apto 401,1 Alcoba,58,477600000,Vendido,2025-11-20,2027-08-11,Crédito,36,171900000,305700000
+168,Torre 4,11,1,Torre 4 Apto 1101,2 Alcobas,79,564100000,Vendido,2026-06-28,2026-09-22,Crédito,31,174900000,389200000
+169,Torre 2,12,4,Torre 2 Apto 1204,Penthouse,129,1132800000,Disponible,,2027-11-27,,,,
+170,Torre 3,19,3,Torre 3 Apto 1903,Penthouse,175,1473200000,Vendido,2025-12-23,2027-09-28,Contado,0,0,1473200000
+171,Torre 4,7,6,Torre 4 Apto 706,3 Alcobas,87,798700000,Disponible,,2026-10-19,,,,
+172,Torre 2,22,1,Torre 2 Apto 2201,3 Alcobas,85,612200000,Vendido,2025-10-11,2028-05-29,Crédito,50,306100000,306100000
+173,Torre 3,4,1,Torre 3 Apto 401,Penthouse,132,1053700000,Disponible,,2027-12-17,,,,
+174,Torre 4,5,3,Torre 4 Apto 503,Apartaestudio,35,254200000,Vendido,2025-07-30,2028-05-31,Contado,0,0,254200000
+175,Torre 2,20,3,Torre 2 Apto 2003,Penthouse,152,1377000000,Vendido,2026-05-15,2027-10-26,Crédito,44,605900000,771100000
+176,Torre 2,10,1,Torre 2 Apto 1001,3 Alcobas,100,920100000,Disponible,,2026-11-26,,,,
+177,Torre 4,12,4,Torre 4 Apto 1204,Penthouse,141,940800000,Vendido,2026-05-05,2026-12-29,Contado,0,0,940800000
+178,Torre 1,10,4,Torre 1 Apto 1004,2 Alcobas,80,565400000,Disponible,,2027-10-29,,,,
+179,Torre 1,20,2,Torre 1 Apto 2002,3 Alcobas,92,658000000,Disponible,,2027-03-17,,,,
+180,Torre 1,19,6,Torre 1 Apto 1906,Apartaestudio,41,281800000,Disponible,,2028-05-09,,,,
+181,Torre 4,18,3,Torre 4 Apto 1803,3 Alcobas,102,687200000,Vendido,2025-12-28,2027-06-15,Contado,0,0,687200000
+182,Torre 2,15,2,Torre 2 Apto 1502,3 Alcobas,102,890600000,Vendido,2026-03-08,2027-07-23,Crédito,30,267200000,623400000
+183,Torre 1,14,3,Torre 1 Apto 1403,1 Alcoba,51,481100000,Vendido,2026-06-20,2026-11-13,Crédito,53,255000000,226100000
+184,Torre 2,22,3,Torre 2 Apto 2203,Apartaestudio,40,312700000,Vendido,2025-06-19,2026-11-25,Crédito,43,134500000,178200000
+185,Torre 2,8,5,Torre 2 Apto 805,2 Alcobas,80,755700000,Vendido,2025-06-08,2026-11-25,Contado,0,0,755700000
+186,Torre 3,11,4,Torre 3 Apto 1104,Penthouse,137,1181700000,Vendido,2026-07-03,2027-01-15,Crédito,34,401800000,779900000
+187,Torre 1,22,1,Torre 1 Apto 2201,Apartaestudio,35,231000000,Disponible,,2028-02-28,,,,
+188,Torre 4,8,5,Torre 4 Apto 805,3 Alcobas,113,866200000,Vendido,2025-08-23,2026-10-21,Crédito,66,571700000,294500000
+189,Torre 2,4,2,Torre 2 Apto 402,1 Alcoba,43,286900000,Disponible,,2027-11-03,,,,
+190,Torre 1,4,1,Torre 1 Apto 401,Penthouse,162,1500600000,Vendido,2025-06-11,2028-04-10,Contado,0,0,1500600000
+191,Torre 2,5,2,Torre 2 Apto 502,1 Alcoba,57,510500000,Vendido,2026-02-17,2028-04-24,Contado,0,0,510500000
+192,Torre 3,11,5,Torre 3 Apto 1105,1 Alcoba,58,394800000,Disponible,,2028-03-18,,,,
+193,Torre 2,15,2,Torre 2 Apto 1502,3 Alcobas,103,766400000,Vendido,2025-12-26,2027-11-12,Crédito,47,360200000,406200000
+194,Torre 1,16,3,Torre 1 Apto 1603,2 Alcobas,70,628500000,Disponible,,2027-08-08,,,,
+195,Torre 4,6,3,Torre 4 Apto 603,2 Alcobas,79,543400000,Vendido,2026-03-21,2027-06-25,Crédito,60,326000000,217400000
+196,Torre 1,22,1,Torre 1 Apto 2201,Penthouse,147,1322400000,Vendido,2025-10-03,2027-02-18,Crédito,55,727300000,595100000
+197,Torre 2,16,2,Torre 2 Apto 1602,3 Alcobas,103,736800000,Vendido,2025-10-08,2026-11-30,Contado,0,0,736800000
+198,Torre 3,12,6,Torre 3 Apto 1206,3 Alcobas,101,825500000,Vendido,2026-02-08,2026-11-20,Contado,0,0,825500000
+199,Torre 4,2,6,Torre 4 Apto 206,2 Alcobas,68,615900000,Vendido,2026-02-21,2028-04-07,Crédito,45,277200000,338700000
+200,Torre 1,7,1,Torre 1 Apto 701,Apartaestudio,40,363700000,Vendido,2026-03-03,2027-07-08,Crédito,62,225500000,138200000
+201,Torre 3,5,2,Torre 3 Apto 502,3 Alcobas,92,598800000,Disponible,,2026-09-12,,,,
+202,Torre 4,11,2,Torre 4 Apto 1102,3 Alcobas,91,621000000,Vendido,2026-03-08,2027-02-17,Contado,0,0,621000000
+203,Torre 3,18,1,Torre 3 Apto 1801,1 Alcoba,51,444500000,Disponible,,2027-04-24,,,,
+204,Torre 2,15,5,Torre 2 Apto 1505,2 Alcobas,63,462600000,Disponible,,2027-10-21,,,,
+205,Torre 3,18,5,Torre 3 Apto 1805,Penthouse,169,1559600000,Disponible,,2026-10-09,,,,
+206,Torre 4,17,4,Torre 4 Apto 1704,2 Alcobas,79,745700000,Vendido,2026-06-03,2027-07-11,Contado,0,0,745700000
+207,Torre 2,13,2,Torre 2 Apto 1302,2 Alcobas,75,596700000,Disponible,,2027-08-30,,,,
+208,Torre 1,21,4,Torre 1 Apto 2104,Penthouse,157,1281500000,Vendido,2026-03-19,2028-03-14,Contado,0,0,1281500000
+209,Torre 4,20,6,Torre 4 Apto 2006,Penthouse,171,1458300000,Disponible,,2027-08-08,,,,
+210,Torre 2,7,6,Torre 2 Apto 706,3 Alcobas,85,719200000,Disponible,,2027-05-22,,,,
+211,Torre 2,21,6,Torre 2 Apto 2106,1 Alcoba,50,418300000,Vendido,2026-05-27,2027-07-31,Contado,0,0,418300000
+212,Torre 3,5,5,Torre 3 Apto 505,1 Alcoba,45,303900000,Vendido,2026-04-08,2027-09-01,Contado,0,0,303900000
+213,Torre 2,7,5,Torre 2 Apto 705,2 Alcobas,72,547100000,Vendido,2026-02-02,2027-05-23,Contado,0,0,547100000
+214,Torre 3,8,4,Torre 3 Apto 804,Apartaestudio,39,330200000,Disponible,,2028-05-10,,,,
+215,Torre 2,12,1,Torre 2 Apto 1201,2 Alcobas,70,486800000,Vendido,2026-07-20,2028-01-02,Crédito,35,170400000,316400000
+216,Torre 3,18,3,Torre 3 Apto 1803,2 Alcobas,78,601300000,Vendido,2025-06-02,2027-05-15,Crédito,30,180400000,420900000
+217,Torre 4,1,2,Torre 4 Apto 102,3 Alcobas,93,710500000,Disponible,,2027-07-02,,,,
+218,Torre 3,21,6,Torre 3 Apto 2106,2 Alcobas,64,417900000,Disponible,,2027-04-01,,,,
+219,Torre 1,14,4,Torre 1 Apto 1404,Apartaestudio,30,236300000,Vendido,2025-08-19,2027-03-01,Contado,0,0,236300000
+220,Torre 3,10,3,Torre 3 Apto 1003,2 Alcobas,77,636300000,Disponible,,2027-11-11,,,,
+221,Torre 2,13,6,Torre 2 Apto 1306,1 Alcoba,56,419800000,Vendido,2026-07-18,2027-03-16,Contado,0,0,419800000
+222,Torre 4,20,1,Torre 4 Apto 2001,3 Alcobas,107,751100000,Vendido,2026-06-12,2026-09-30,Contado,0,0,751100000
+223,Torre 4,4,5,Torre 4 Apto 405,Penthouse,151,1144200000,Vendido,2025-11-18,2028-03-23,Crédito,37,423400000,720800000
+224,Torre 4,8,2,Torre 4 Apto 802,Apartaestudio,40,315300000,Disponible,,2027-07-17,,,,
+225,Torre 2,19,6,Torre 2 Apto 1906,3 Alcobas,110,816600000,Disponible,,2028-05-01,,,,
+226,Torre 2,21,3,Torre 2 Apto 2103,3 Alcobas,85,695200000,Disponible,,2027-11-05,,,,
+227,Torre 1,20,5,Torre 1 Apto 2005,1 Alcoba,43,399600000,Vendido,2025-07-02,2027-05-21,Crédito,55,219800000,179800000
+228,Torre 2,7,6,Torre 2 Apto 706,3 Alcobas,100,773600000,Disponible,,2028-02-16,,,,
+229,Torre 2,7,3,Torre 2 Apto 703,3 Alcobas,88,596800000,Disponible,,2028-05-22,,,,
+230,Torre 1,2,5,Torre 1 Apto 205,3 Alcobas,103,790100000,Disponible,,2026-12-30,,,,
+231,Torre 2,5,2,Torre 2 Apto 502,2 Alcobas,77,569000000,Vendido,2025-09-06,2027-03-10,Crédito,43,244700000,324300000
+232,Torre 2,16,1,Torre 2 Apto 1601,Apartaestudio,42,373500000,Disponible,,2027-01-02,,,,
+233,Torre 2,12,2,Torre 2 Apto 1202,3 Alcobas,115,815200000,Disponible,,2027-04-28,,,,
+234,Torre 1,13,1,Torre 1 Apto 1301,3 Alcobas,105,936200000,Vendido,2026-06-14,2027-07-23,Crédito,32,299600000,636600000
+235,Torre 1,2,4,Torre 1 Apto 204,3 Alcobas,103,963000000,Vendido,2026-04-15,2027-05-14,Contado,0,0,963000000
+236,Torre 1,12,6,Torre 1 Apto 1206,Penthouse,132,912000000,Vendido,2025-07-22,2027-06-17,Crédito,48,437800000,474200000
+237,Torre 4,17,5,Torre 4 Apto 1705,2 Alcobas,65,479200000,Disponible,,2028-04-07,,,,
+238,Torre 2,7,4,Torre 2 Apto 704,1 Alcoba,54,371900000,Vendido,2025-07-26,2027-10-15,Crédito,66,245500000,126400000
+239,Torre 2,2,5,Torre 2 Apto 205,1 Alcoba,44,390700000,Vendido,2026-01-13,2028-01-30,Contado,0,0,390700000
+240,Torre 4,2,5,Torre 4 Apto 205,3 Alcobas,95,857300000,Vendido,2026-01-16,2027-09-05,Crédito,35,300100000,557200000
+241,Torre 3,19,2,Torre 3 Apto 1902,3 Alcobas,90,707300000,Vendido,2026-01-01,2027-12-26,Crédito,64,452700000,254600000
+242,Torre 3,13,5,Torre 3 Apto 1305,Penthouse,153,1025600000,Disponible,,2026-10-04,,,,
+243,Torre 1,3,5,Torre 1 Apto 305,2 Alcobas,71,536700000,Disponible,,2027-10-09,,,,
+244,Torre 2,17,3,Torre 2 Apto 1703,3 Alcobas,96,647600000,Vendido,2026-03-16,2028-02-26,Crédito,70,453300000,194300000
+245,Torre 1,17,4,Torre 1 Apto 1704,1 Alcoba,44,329200000,Vendido,2026-01-20,2028-02-17,Contado,0,0,329200000
+246,Torre 1,2,2,Torre 1 Apto 202,Apartaestudio,34,258800000,Vendido,2025-10-13,2027-10-05,Crédito,43,111300000,147500000
+247,Torre 1,18,3,Torre 1 Apto 1803,3 Alcobas,86,793800000,Vendido,2025-09-22,2027-11-10,Contado,0,0,793800000
+248,Torre 3,12,6,Torre 3 Apto 1206,1 Alcoba,46,302100000,Vendido,2026-05-01,2028-02-05,Crédito,44,132900000,169200000
+249,Torre 4,22,4,Torre 4 Apto 2204,2 Alcobas,66,433800000,Disponible,,2028-04-13,,,,
+250,Torre 2,22,2,Torre 2 Apto 2202,Penthouse,127,1118900000,Vendido,2026-06-18,2027-08-18,Crédito,32,358000000,760900000
+251,Torre 2,18,1,Torre 2 Apto 1801,Penthouse,123,972900000,Vendido,2026-05-19,2027-05-23,Crédito,48,467000000,505900000
+252,Torre 3,2,3,Torre 3 Apto 203,Penthouse,180,1649500000,Disponible,,2028-02-29,,,,
+253,Torre 3,13,1,Torre 3 Apto 1301,3 Alcobas,110,960500000,Vendido,2026-02-23,2026-10-05,Contado,0,0,960500000
+254,Torre 2,19,3,Torre 2 Apto 1903,1 Alcoba,46,409000000,Vendido,2026-06-20,2026-11-05,Contado,0,0,409000000
+255,Torre 4,21,2,Torre 4 Apto 2102,Penthouse,128,979100000,Vendido,2026-02-19,2026-12-25,Crédito,41,401400000,577700000
+256,Torre 4,5,1,Torre 4 Apto 501,1 Alcoba,55,409700000,Vendido,2026-05-24,2027-10-07,Crédito,50,204800000,204900000
+257,Torre 4,21,4,Torre 4 Apto 2104,2 Alcobas,70,596200000,Disponible,,2026-09-21,,,,
+258,Torre 1,13,4,Torre 1 Apto 1304,Apartaestudio,40,340600000,Disponible,,2027-04-20,,,,
+259,Torre 1,2,2,Torre 1 Apto 202,2 Alcobas,80,719300000,Vendido,2026-02-20,2028-06-08,Crédito,50,359600000,359700000
+260,Torre 2,18,4,Torre 2 Apto 1804,1 Alcoba,57,386100000,Vendido,2026-03-21,2028-03-23,Crédito,30,115800000,270300000
+261,Torre 2,21,2,Torre 2 Apto 2102,3 Alcobas,94,636700000,Disponible,,2027-10-27,,,,
+262,Torre 3,11,3,Torre 3 Apto 1103,Apartaestudio,40,288400000,Disponible,,2028-01-24,,,,
+263,Torre 4,22,4,Torre 4 Apto 2204,2 Alcobas,76,616900000,Disponible,,2028-04-07,,,,
+264,Torre 2,4,4,Torre 2 Apto 404,Penthouse,142,1010200000,Disponible,,2027-04-23,,,,
+265,Torre 1,21,4,Torre 1 Apto 2104,Apartaestudio,32,269100000,Disponible,,2027-05-29,,,,
+266,Torre 2,22,4,Torre 2 Apto 2204,3 Alcobas,104,987900000,Vendido,2025-10-27,2027-11-28,Crédito,46,454400000,533500000
+267,Torre 4,10,6,Torre 4 Apto 1006,Penthouse,135,1042800000,Vendido,2026-03-22,2027-04-10,Contado,0,0,1042800000
+268,Torre 2,12,4,Torre 2 Apto 1204,Apartaestudio,34,233500000,Vendido,2026-03-01,2026-10-28,Crédito,69,161100000,72400000
+269,Torre 3,19,2,Torre 3 Apto 1902,3 Alcobas,96,777800000,Vendido,2025-06-15,2026-09-17,Contado,0,0,777800000
+270,Torre 3,12,2,Torre 3 Apto 1202,Penthouse,175,1153800000,Disponible,,2026-12-12,,,,
+271,Torre 2,17,5,Torre 2 Apto 1705,1 Alcoba,54,421700000,Vendido,2025-08-05,2027-11-30,Crédito,39,164500000,257200000
+272,Torre 2,5,1,Torre 2 Apto 501,2 Alcobas,66,458700000,Vendido,2025-11-12,2027-02-18,Crédito,50,229400000,229300000
+273,Torre 3,17,1,Torre 3 Apto 1701,1 Alcoba,57,417300000,Vendido,2025-12-14,2027-10-08,Crédito,65,271200000,146100000
+274,Torre 1,7,2,Torre 1 Apto 702,Penthouse,170,1457100000,Vendido,2025-07-21,2028-06-22,Contado,0,0,1457100000
+275,Torre 2,6,5,Torre 2 Apto 605,Apartaestudio,34,301400000,Vendido,2025-09-13,2027-11-23,Crédito,51,153700000,147700000
+276,Torre 3,6,4,Torre 3 Apto 604,Apartaestudio,32,290900000,Vendido,2025-06-11,2027-03-24,Crédito,34,98900000,192000000
+277,Torre 1,11,4,Torre 1 Apto 1104,Penthouse,135,1263400000,Vendido,2026-04-22,2026-10-31,Contado,0,0,1263400000
+278,Torre 1,17,1,Torre 1 Apto 1701,3 Alcobas,107,743000000,Disponible,,2027-08-29,,,,
+279,Torre 1,3,6,Torre 1 Apto 306,2 Alcobas,75,555400000,Vendido,2026-02-11,2028-05-07,Crédito,53,294400000,261000000
+280,Torre 3,5,5,Torre 3 Apto 505,Penthouse,174,1334300000,Vendido,2025-11-19,2027-12-17,Contado,0,0,1334300000
+281,Torre 1,17,2,Torre 1 Apto 1702,1 Alcoba,48,324800000,Disponible,,2026-10-14,,,,
+282,Torre 4,3,3,Torre 4 Apto 303,1 Alcoba,46,340000000,Disponible,,2028-02-29,,,,
+283,Torre 3,22,6,Torre 3 Apto 2206,3 Alcobas,102,807500000,Vendido,2025-11-07,2027-04-13,Crédito,59,476400000,331100000
+284,Torre 2,12,4,Torre 2 Apto 1204,2 Alcobas,78,667000000,Vendido,2025-12-03,2026-10-05,Crédito,30,200100000,466900000
+285,Torre 3,7,4,Torre 3 Apto 704,Penthouse,172,1229600000,Disponible,,2027-11-30,,,,
+286,Torre 1,11,3,Torre 1 Apto 1103,Penthouse,153,1378800000,Vendido,2026-04-17,2027-01-01,Contado,0,0,1378800000
+287,Torre 1,16,1,Torre 1 Apto 1601,1 Alcoba,49,321300000,Disponible,,2028-02-08,,,,
+288,Torre 3,15,6,Torre 3 Apto 1506,1 Alcoba,51,447600000,Disponible,,2028-01-18,,,,
+289,Torre 4,21,4,Torre 4 Apto 2104,1 Alcoba,45,361300000,Vendido,2026-03-25,2026-12-24,Crédito,40,144500000,216800000
+290,Torre 3,9,3,Torre 3 Apto 903,3 Alcobas,111,975100000,Vendido,2025-11-21,2027-08-12,Contado,0,0,975100000
+291,Torre 3,4,5,Torre 3 Apto 405,Penthouse,142,1134300000,Disponible,,2028-05-28,,,,
+292,Torre 4,14,3,Torre 4 Apto 1403,3 Alcobas,105,956300000,Vendido,2026-01-05,2026-12-24,Crédito,41,392100000,564200000
+293,Torre 2,17,2,Torre 2 Apto 1702,3 Alcobas,104,833800000,Disponible,,2027-04-07,,,,
+294,Torre 2,10,1,Torre 2 Apto 1001,Apartaestudio,31,217800000,Vendido,2026-05-12,2027-02-12,Contado,0,0,217800000
+295,Torre 1,18,1,Torre 1 Apto 1801,3 Alcobas,113,969000000,Vendido,2026-03-09,2026-11-01,Crédito,41,397300000,571700000
+296,Torre 4,8,2,Torre 4 Apto 802,2 Alcobas,82,566700000,Vendido,2025-08-26,2026-09-11,Crédito,60,340000000,226700000
+297,Torre 3,8,4,Torre 3 Apto 804,3 Alcobas,113,973700000,Disponible,,2027-12-07,,,,
+298,Torre 3,9,4,Torre 3 Apto 904,1 Alcoba,57,408900000,Vendido,2026-01-10,2027-11-16,Crédito,61,249400000,159500000
+299,Torre 4,14,2,Torre 4 Apto 1402,1 Alcoba,53,481300000,Disponible,,2027-12-23,,,,
+300,Torre 2,4,3,Torre 2 Apto 403,Apartaestudio,34,251200000,Disponible,,2026-11-14,,,,
+301,Torre 4,16,3,Torre 4 Apto 1603,Apartaestudio,39,277800000,Disponible,,2027-03-15,,,,
+302,Torre 3,10,4,Torre 3 Apto 1004,Penthouse,142,1082100000,Disponible,,2028-03-16,,,,
+303,Torre 3,16,4,Torre 3 Apto 1604,Penthouse,153,1206500000,Vendido,2025-11-30,2027-08-11,Crédito,33,398100000,808400000
+304,Torre 2,22,4,Torre 2 Apto 2204,1 Alcoba,43,357700000,Disponible,,2027-11-25,,,,
+305,Torre 3,19,3,Torre 3 Apto 1903,Penthouse,145,1252500000,Disponible,,2028-01-18,,,,
+306,Torre 4,4,3,Torre 4 Apto 403,2 Alcobas,72,587400000,Vendido,2025-10-21,2027-08-14,Contado,0,0,587400000
+307,Torre 1,22,2,Torre 1 Apto 2202,2 Alcobas,71,609500000,Disponible,,2027-06-07,,,,
+308,Torre 1,15,4,Torre 1 Apto 1504,1 Alcoba,45,378100000,Vendido,2026-05-22,2027-06-24,Crédito,64,242000000,136100000
+309,Torre 4,18,3,Torre 4 Apto 1803,3 Alcobas,92,759800000,Vendido,2025-09-07,2027-10-17,Contado,0,0,759800000
+310,Torre 2,12,6,Torre 2 Apto 1206,1 Alcoba,46,411600000,Disponible,,2027-02-07,,,,
+311,Torre 3,13,1,Torre 3 Apto 1301,Penthouse,148,1039400000,Disponible,,2026-12-18,,,,
+312,Torre 1,10,4,Torre 1 Apto 1004,Penthouse,159,1443500000,Disponible,,2027-10-03,,,,
+313,Torre 1,5,2,Torre 1 Apto 502,2 Alcobas,65,596800000,Vendido,2026-02-02,2027-12-06,Contado,0,0,596800000
+314,Torre 3,8,3,Torre 3 Apto 803,Apartaestudio,40,321200000,Vendido,2025-08-18,2028-01-18,Crédito,30,96400000,224800000
+315,Torre 4,19,5,Torre 4 Apto 1905,Apartaestudio,35,278300000,Vendido,2026-04-22,2027-03-12,Crédito,52,144700000,133600000
+316,Torre 2,8,3,Torre 2 Apto 803,2 Alcobas,73,566300000,Vendido,2026-06-05,2027-03-15,Crédito,70,396400000,169900000
+317,Torre 3,2,5,Torre 3 Apto 205,2 Alcobas,77,539200000,Disponible,,2028-01-11,,,,
+318,Torre 1,22,5,Torre 1 Apto 2205,Penthouse,149,1360900000,Disponible,,2026-10-18,,,,
+319,Torre 2,3,5,Torre 2 Apto 305,3 Alcobas,88,785100000,Vendido,2026-05-22,2027-03-16,Crédito,32,251200000,533900000
+320,Torre 1,13,6,Torre 1 Apto 1306,Apartaestudio,38,340400000,Disponible,,2027-09-12,,,,
+321,Torre 3,20,2,Torre 3 Apto 2002,3 Alcobas,93,773900000,Vendido,2025-09-12,2027-05-03,Contado,0,0,773900000
+322,Torre 3,20,5,Torre 3 Apto 2005,3 Alcobas,107,973700000,Vendido,2025-12-31,2027-11-06,Crédito,38,370000000,603700000
+323,Torre 1,8,5,Torre 1 Apto 805,1 Alcoba,46,373600000,Disponible,,2026-11-16,,,,
+324,Torre 1,16,6,Torre 1 Apto 1606,2 Alcobas,69,504500000,Vendido,2025-06-23,2027-01-03,Crédito,69,348100000,156400000
+325,Torre 3,2,2,Torre 3 Apto 202,3 Alcobas,115,822900000,Vendido,2025-06-18,2028-03-01,Contado,0,0,822900000
+326,Torre 2,8,3,Torre 2 Apto 803,Penthouse,137,990800000,Vendido,2026-07-06,2028-04-22,Contado,0,0,990800000
+327,Torre 1,11,1,Torre 1 Apto 1101,3 Alcobas,85,620600000,Vendido,2025-10-09,2027-10-13,Contado,0,0,620600000
+328,Torre 2,13,1,Torre 2 Apto 1301,3 Alcobas,85,783800000,Disponible,,2027-01-21,,,,
+329,Torre 3,14,2,Torre 3 Apto 1402,Penthouse,122,951700000,Disponible,,2028-05-26,,,,
+330,Torre 2,6,2,Torre 2 Apto 602,Apartaestudio,41,307600000,Vendido,2025-06-07,2027-03-21,Crédito,33,101500000,206100000
+331,Torre 2,21,3,Torre 2 Apto 2103,Apartaestudio,33,219400000,Disponible,,2028-01-07,,,,
+332,Torre 4,1,2,Torre 4 Apto 102,3 Alcobas,102,751800000,Vendido,2025-08-14,2027-07-24,Crédito,58,436000000,315800000
+333,Torre 2,7,6,Torre 2 Apto 706,1 Alcoba,55,357700000,Disponible,,2027-08-13,,,,
+334,Torre 1,20,1,Torre 1 Apto 2001,2 Alcobas,73,508200000,Disponible,,2028-03-14,,,,
+335,Torre 3,15,3,Torre 3 Apto 1503,1 Alcoba,47,425100000,Disponible,,2026-12-15,,,,
+336,Torre 3,1,1,Torre 3 Apto 101,1 Alcoba,55,368200000,Vendido,2025-07-05,2028-01-17,Contado,0,0,368200000
+337,Torre 3,4,1,Torre 3 Apto 401,3 Alcobas,101,676800000,Disponible,,2028-01-30,,,,
+338,Torre 4,14,3,Torre 4 Apto 1403,Penthouse,146,1279100000,Vendido,2026-03-08,2027-02-27,Contado,0,0,1279100000
+339,Torre 3,9,2,Torre 3 Apto 902,3 Alcobas,103,845500000,Vendido,2025-11-07,2028-03-07,Crédito,50,422800000,422700000
+340,Torre 4,16,6,Torre 4 Apto 1606,1 Alcoba,43,327400000,Vendido,2026-05-23,2026-10-15,Crédito,43,140800000,186600000
+341,Torre 2,18,4,Torre 2 Apto 1804,Penthouse,152,1046600000,Disponible,,2027-01-11,,,,
+342,Torre 4,13,6,Torre 4 Apto 1306,2 Alcobas,70,509200000,Vendido,2025-12-22,2027-04-22,Crédito,53,269900000,239300000
+343,Torre 4,19,4,Torre 4 Apto 1904,2 Alcobas,73,640500000,Vendido,2025-10-23,2028-03-14,Contado,0,0,640500000
+344,Torre 2,12,1,Torre 2 Apto 1201,3 Alcobas,88,687400000,Vendido,2026-07-11,2027-12-25,Contado,0,0,687400000
+345,Torre 3,16,2,Torre 3 Apto 1602,1 Alcoba,52,414700000,Disponible,,2027-05-20,,,,
+346,Torre 4,1,2,Torre 4 Apto 102,Penthouse,136,1182500000,Vendido,2025-08-02,2027-04-13,Crédito,37,437500000,745000000
+347,Torre 4,5,5,Torre 4 Apto 505,Penthouse,174,1240700000,Disponible,,2026-12-11,,,,
+348,Torre 4,17,4,Torre 4 Apto 1704,Apartaestudio,39,297100000,Vendido,2025-07-22,2026-10-05,Contado,0,0,297100000
+349,Torre 1,21,2,Torre 1 Apto 2102,Penthouse,164,1186400000,Vendido,2026-06-08,2028-04-06,Crédito,62,735600000,450800000
+350,Torre 4,12,3,Torre 4 Apto 1203,Penthouse,155,1328300000,Vendido,2025-09-11,2027-06-11,Crédito,55,730600000,597700000
+351,Torre 3,5,5,Torre 3 Apto 505,1 Alcoba,55,373200000,Vendido,2025-07-30,2027-11-06,Crédito,51,190300000,182900000
+352,Torre 1,1,4,Torre 1 Apto 104,2 Alcobas,60,418200000,Vendido,2026-02-08,2028-03-21,Crédito,32,133800000,284400000
+353,Torre 2,21,1,Torre 2 Apto 2101,1 Alcoba,46,324200000,Disponible,,2027-03-16,,,,
+354,Torre 3,7,2,Torre 3 Apto 702,1 Alcoba,48,314800000,Vendido,2026-01-28,2026-10-27,Contado,0,0,314800000
+355,Torre 1,16,2,Torre 1 Apto 1602,Apartaestudio,31,270200000,Disponible,,2028-02-01,,,,
+356,Torre 4,10,1,Torre 4 Apto 1001,Apartaestudio,41,363800000,Vendido,2025-07-19,2028-04-29,Crédito,39,141900000,221900000
+357,Torre 1,16,1,Torre 1 Apto 1601,1 Alcoba,52,350200000,Vendido,2025-07-06,2026-12-17,Crédito,31,108600000,241600000
+358,Torre 4,17,1,Torre 4 Apto 1701,Apartaestudio,33,240400000,Vendido,2026-06-30,2027-03-02,Crédito,46,110600000,129800000
+359,Torre 1,17,6,Torre 1 Apto 1706,Penthouse,168,1331300000,Vendido,2025-09-20,2027-05-20,Crédito,50,665600000,665700000
+360,Torre 1,17,3,Torre 1 Apto 1703,Apartaestudio,37,270800000,Disponible,,2028-01-29,,,,
+361,Torre 3,18,2,Torre 3 Apto 1802,1 Alcoba,51,332000000,Vendido,2025-11-24,2027-02-10,Contado,0,0,332000000
+362,Torre 4,10,1,Torre 4 Apto 1001,1 Alcoba,43,312500000,Vendido,2026-07-01,2026-12-12,Contado,0,0,312500000
+363,Torre 2,10,5,Torre 2 Apto 1005,Penthouse,143,1025600000,Vendido,2026-07-06,2028-05-15,Crédito,45,461500000,564100000
+364,Torre 1,4,3,Torre 1 Apto 403,1 Alcoba,54,505300000,Vendido,2025-10-24,2028-02-24,Crédito,64,323400000,181900000
+365,Torre 3,9,3,Torre 3 Apto 903,Apartaestudio,42,298200000,Vendido,2025-07-15,2028-03-10,Contado,0,0,298200000
+366,Torre 3,15,6,Torre 3 Apto 1506,2 Alcobas,69,647100000,Disponible,,2027-02-13,,,,
+367,Torre 4,1,1,Torre 4 Apto 101,1 Alcoba,58,463800000,Vendido,2026-04-16,2028-04-11,Crédito,58,269000000,194800000
+368,Torre 3,6,5,Torre 3 Apto 605,2 Alcobas,76,590300000,Vendido,2025-07-01,2027-03-04,Crédito,30,177100000,413200000
+369,Torre 2,7,5,Torre 2 Apto 705,Apartaestudio,32,292300000,Vendido,2025-11-13,2028-01-11,Crédito,51,149100000,143200000
+370,Torre 1,13,2,Torre 1 Apto 1302,3 Alcobas,89,787000000,Disponible,,2027-05-12,,,,
+371,Torre 4,13,2,Torre 4 Apto 1302,2 Alcobas,63,541900000,Vendido,2025-06-23,2026-12-26,Crédito,43,233000000,308900000
+372,Torre 3,5,2,Torre 3 Apto 502,3 Alcobas,98,737700000,Disponible,,2027-11-21,,,,
+373,Torre 2,6,2,Torre 2 Apto 602,1 Alcoba,54,402400000,Disponible,,2027-02-19,,,,
+374,Torre 3,16,6,Torre 3 Apto 1606,Apartaestudio,41,304600000,Vendido,2025-11-27,2026-09-08,Crédito,57,173600000,131000000
+375,Torre 4,4,1,Torre 4 Apto 401,Penthouse,164,1475200000,Vendido,2025-11-08,2027-07-28,Crédito,30,442600000,1032600000
+376,Torre 2,20,2,Torre 2 Apto 2002,2 Alcobas,69,620700000,Vendido,2025-10-10,2027-08-20,Contado,0,0,620700000
+377,Torre 4,14,3,Torre 4 Apto 1403,3 Alcobas,104,713700000,Vendido,2025-11-19,2026-10-21,Crédito,69,492500000,221200000
+378,Torre 3,19,3,Torre 3 Apto 1903,3 Alcobas,92,783600000,Disponible,,2027-04-12,,,,
+379,Torre 1,16,5,Torre 1 Apto 1605,2 Alcobas,74,529900000,Vendido,2026-06-19,2027-08-08,Crédito,41,217300000,312600000
+380,Torre 2,10,4,Torre 2 Apto 1004,Penthouse,177,1286300000,Disponible,,2028-04-19,,,,
+381,Torre 3,12,1,Torre 3 Apto 1201,3 Alcobas,88,672900000,Disponible,,2028-02-06,,,,
+382,Torre 2,4,1,Torre 2 Apto 401,1 Alcoba,54,410500000,Vendido,2025-12-22,2026-12-25,Crédito,48,197000000,213500000
+383,Torre 4,18,4,Torre 4 Apto 1804,1 Alcoba,45,298200000,Vendido,2026-02-11,2026-09-17,Crédito,60,178900000,119300000
+384,Torre 2,7,1,Torre 2 Apto 701,3 Alcobas,108,917400000,Disponible,,2027-08-19,,,,
+385,Torre 2,1,3,Torre 2 Apto 103,1 Alcoba,53,361600000,Vendido,2026-03-15,2027-06-11,Contado,0,0,361600000
+386,Torre 1,19,2,Torre 1 Apto 1902,1 Alcoba,52,392600000,Vendido,2026-05-02,2027-01-23,Crédito,33,129600000,263000000
+387,Torre 2,16,1,Torre 2 Apto 1601,Penthouse,175,1251700000,Vendido,2026-07-19,2026-11-12,Crédito,58,726000000,525700000
+388,Torre 1,18,4,Torre 1 Apto 1804,2 Alcobas,68,587100000,Disponible,,2027-06-12,,,,
+389,Torre 2,22,1,Torre 2 Apto 2201,Apartaestudio,34,251400000,Disponible,,2027-05-19,,,,
+390,Torre 1,7,5,Torre 1 Apto 705,3 Alcobas,100,761600000,Vendido,2025-08-27,2027-07-22,Crédito,65,495000000,266600000
+391,Torre 1,8,6,Torre 1 Apto 806,Apartaestudio,35,251600000,Disponible,,2028-02-08,,,,
+392,Torre 3,22,4,Torre 3 Apto 2204,Apartaestudio,36,250200000,Vendido,2026-07-16,2026-11-16,Crédito,55,137600000,112600000
+393,Torre 1,16,6,Torre 1 Apto 1606,2 Alcobas,74,598200000,Vendido,2026-05-14,2027-01-15,Crédito,69,412800000,185400000
+394,Torre 2,5,2,Torre 2 Apto 502,Penthouse,134,1160400000,Vendido,2026-06-13,2028-04-06,Contado,0,0,1160400000
+395,Torre 1,15,5,Torre 1 Apto 1505,Apartaestudio,35,236400000,Vendido,2025-11-03,2027-03-27,Crédito,43,101700000,134700000
+396,Torre 4,7,5,Torre 4 Apto 705,1 Alcoba,43,389800000,Vendido,2025-10-17,2027-03-31,Crédito,60,233900000,155900000
+397,Torre 1,20,3,Torre 1 Apto 2003,1 Alcoba,57,389600000,Vendido,2026-04-16,2027-11-05,Crédito,48,187000000,202600000
+398,Torre 2,4,4,Torre 2 Apto 404,1 Alcoba,43,332600000,Vendido,2026-06-10,2028-01-19,Crédito,55,182900000,149700000
+399,Torre 1,1,1,Torre 1 Apto 101,1 Alcoba,54,442400000,Vendido,2025-12-22,2027-10-30,Crédito,37,163700000,278700000
+400,Torre 4,11,2,Torre 4 Apto 1102,Apartaestudio,35,259200000,Disponible,,2026-09-23,,,,
+401,Torre 4,11,1,Torre 4 Apto 1101,1 Alcoba,51,331600000,Vendido,2026-03-13,2027-02-13,Contado,0,0,331600000
+402,Torre 4,2,5,Torre 4 Apto 205,Apartaestudio,37,340200000,Vendido,2025-11-16,2027-05-26,Crédito,45,153100000,187100000
+403,Torre 4,2,3,Torre 4 Apto 203,Apartaestudio,38,280600000,Disponible,,2028-05-11,,,,
+404,Torre 2,17,6,Torre 2 Apto 1706,3 Alcobas,92,846100000,Disponible,,2027-03-02,,,,
+405,Torre 4,3,2,Torre 4 Apto 302,3 Alcobas,106,919400000,Vendido,2025-08-04,2027-10-05,Crédito,59,542400000,377000000
+406,Torre 1,13,4,Torre 1 Apto 1304,1 Alcoba,51,367100000,Vendido,2026-05-28,2027-06-17,Crédito,47,172500000,194600000
+407,Torre 4,13,2,Torre 4 Apto 1302,2 Alcobas,78,730900000,Disponible,,2028-04-30,,,,
+408,Torre 4,16,5,Torre 4 Apto 1605,Apartaestudio,41,322100000,Disponible,,2028-04-25,,,,
+409,Torre 3,14,4,Torre 3 Apto 1404,1 Alcoba,43,313300000,Disponible,,2028-02-06,,,,
+410,Torre 2,4,2,Torre 2 Apto 402,3 Alcobas,109,879500000,Vendido,2026-03-26,2028-03-04,Crédito,33,290200000,589300000
+411,Torre 1,11,6,Torre 1 Apto 1106,1 Alcoba,47,326800000,Vendido,2026-01-07,2026-11-14,Crédito,52,169900000,156900000
+412,Torre 4,21,2,Torre 4 Apto 2102,Apartaestudio,34,298400000,Disponible,,2028-03-15,,,,
+413,Torre 2,11,3,Torre 2 Apto 1103,3 Alcobas,103,761600000,Vendido,2025-08-14,2027-12-24,Crédito,35,266600000,495000000
+414,Torre 4,7,5,Torre 4 Apto 705,2 Alcobas,62,408700000,Disponible,,2028-01-08,,,,
+415,Torre 2,10,6,Torre 2 Apto 1006,Apartaestudio,31,256200000,Vendido,2026-05-13,2027-09-18,Contado,0,0,256200000
+416,Torre 4,6,2,Torre 4 Apto 602,1 Alcoba,52,383500000,Vendido,2026-03-29,2028-06-17,Crédito,58,222400000,161100000
+417,Torre 4,21,2,Torre 4 Apto 2102,Apartaestudio,41,359500000,Vendido,2025-06-02,2027-07-30,Contado,0,0,359500000
+418,Torre 1,17,5,Torre 1 Apto 1705,Penthouse,135,981100000,Disponible,,2028-03-27,,,,
+419,Torre 3,12,2,Torre 3 Apto 1202,Apartaestudio,35,228900000,Vendido,2026-05-19,2026-12-06,Crédito,49,112200000,116700000
+420,Torre 3,6,6,Torre 3 Apto 606,1 Alcoba,53,412900000,Disponible,,2027-02-02,,,,
+421,Torre 4,2,3,Torre 4 Apto 203,Penthouse,127,1167300000,Disponible,,2026-10-31,,,,
+422,Torre 3,18,1,Torre 3 Apto 1801,Penthouse,148,1144600000,Disponible,,2027-08-21,,,,
+423,Torre 3,6,6,Torre 3 Apto 606,2 Alcobas,78,553800000,Disponible,,2027-10-02,,,,
+424,Torre 1,7,1,Torre 1 Apto 701,Penthouse,163,1360400000,Disponible,,2027-12-03,,,,
+425,Torre 3,18,2,Torre 3 Apto 1802,2 Alcobas,75,598800000,Vendido,2025-12-25,2027-04-01,Crédito,33,197600000,401200000
+426,Torre 4,13,4,Torre 4 Apto 1304,Penthouse,126,1145600000,Disponible,,2028-02-28,,,,
+427,Torre 4,3,1,Torre 4 Apto 301,Penthouse,175,1239200000,Disponible,,2027-10-22,,,,
+428,Torre 1,14,3,Torre 1 Apto 1403,Apartaestudio,30,250600000,Vendido,2026-01-10,2027-10-10,Contado,0,0,250600000
+429,Torre 2,14,3,Torre 2 Apto 1403,3 Alcobas,102,913100000,Vendido,2026-06-23,2027-01-01,Crédito,41,374400000,538700000
+430,Torre 2,12,4,Torre 2 Apto 1204,3 Alcobas,96,718000000,Vendido,2026-07-01,2027-07-25,Crédito,42,301600000,416400000
+431,Torre 3,3,1,Torre 3 Apto 301,Penthouse,124,835200000,Vendido,2026-05-14,2028-03-12,Contado,0,0,835200000
+432,Torre 2,14,1,Torre 2 Apto 1401,Apartaestudio,32,290400000,Disponible,,2026-11-30,,,,
+433,Torre 4,16,2,Torre 4 Apto 1602,3 Alcobas,85,719600000,Vendido,2026-04-13,2026-11-04,Crédito,36,259100000,460500000
+434,Torre 4,10,3,Torre 4 Apto 1003,Apartaestudio,35,271600000,Vendido,2025-09-08,2027-08-26,Crédito,31,84200000,187400000
+435,Torre 2,12,4,Torre 2 Apto 1204,Apartaestudio,35,301500000,Vendido,2025-11-07,2027-02-14,Crédito,44,132700000,168800000
+436,Torre 3,20,4,Torre 3 Apto 2004,Apartaestudio,31,258600000,Vendido,2025-10-22,2027-09-23,Contado,0,0,258600000
+437,Torre 1,14,5,Torre 1 Apto 1405,1 Alcoba,44,369900000,Vendido,2025-12-19,2026-09-04,Crédito,42,155400000,214500000
+438,Torre 1,5,5,Torre 1 Apto 505,1 Alcoba,48,343700000,Vendido,2025-06-29,2027-08-14,Crédito,59,202800000,140900000
+439,Torre 1,5,2,Torre 1 Apto 502,Penthouse,165,1091200000,Vendido,2026-05-28,2027-11-03,Contado,0,0,1091200000
+440,Torre 1,1,5,Torre 1 Apto 105,Apartaestudio,30,240100000,Vendido,2025-07-16,2027-07-16,Contado,0,0,240100000
+441,Torre 2,21,6,Torre 2 Apto 2106,1 Alcoba,58,391600000,Disponible,,2028-06-20,,,,
+442,Torre 4,19,1,Torre 4 Apto 1901,Penthouse,159,1364300000,Vendido,2025-07-03,2027-09-28,Crédito,39,532100000,832200000
+443,Torre 4,3,1,Torre 4 Apto 301,2 Alcobas,76,534900000,Disponible,,2028-01-29,,,,
+444,Torre 2,2,4,Torre 2 Apto 204,1 Alcoba,46,388700000,Vendido,2026-01-15,2028-04-01,Crédito,33,128300000,260400000
+445,Torre 4,3,3,Torre 4 Apto 303,Apartaestudio,37,331400000,Vendido,2025-09-26,2027-04-08,Contado,0,0,331400000
+446,Torre 4,3,1,Torre 4 Apto 301,2 Alcobas,73,507000000,Disponible,,2026-12-08,,,,
+447,Torre 3,14,5,Torre 3 Apto 1405,Penthouse,163,1429500000,Vendido,2025-09-24,2028-04-04,Contado,0,0,1429500000
+448,Torre 1,16,3,Torre 1 Apto 1603,3 Alcobas,86,666000000,Vendido,2026-07-10,2027-12-04,Contado,0,0,666000000
+449,Torre 1,11,4,Torre 1 Apto 1104,Apartaestudio,41,334600000,Vendido,2026-04-28,2027-07-30,Crédito,40,133800000,200800000
+450,Torre 1,22,2,Torre 1 Apto 2202,1 Alcoba,57,488600000,Disponible,,2026-12-28,,,,
+451,Torre 2,11,6,Torre 2 Apto 1106,Apartaestudio,42,324200000,Vendido,2025-09-27,2028-01-22,Crédito,56,181600000,142600000
+452,Torre 3,5,5,Torre 3 Apto 505,1 Alcoba,56,389600000,Vendido,2026-03-27,2028-01-03,Crédito,57,222100000,167500000
+453,Torre 3,16,4,Torre 3 Apto 1604,Apartaestudio,36,318800000,Disponible,,2027-07-10,,,,
+454,Torre 3,15,2,Torre 3 Apto 1502,2 Alcobas,66,508400000,Disponible,,2027-07-31,,,,
+455,Torre 1,18,3,Torre 1 Apto 1803,1 Alcoba,55,497600000,Vendido,2026-02-08,2026-10-29,Contado,0,0,497600000
+456,Torre 4,20,6,Torre 4 Apto 2006,Apartaestudio,30,228100000,Vendido,2025-10-01,2026-10-03,Crédito,50,114000000,114100000
+457,Torre 1,6,3,Torre 1 Apto 603,1 Alcoba,47,446300000,Vendido,2025-12-08,2027-09-29,Contado,0,0,446300000

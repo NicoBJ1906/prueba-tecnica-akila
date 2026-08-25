@@ -1,0 +1,9 @@
+# Tema fijo en claro: los colores de los gráficos están validados contra fondo
+# claro (contraste y separación para daltonismo). Fijarlo evita que el dashboard
+# se vea distinto según la configuración del equipo de quien lo abre.
+[theme]
+base = "light"
+primaryColor = "#2a78d6"
+
+[browser]
+gatherUsageStats = false

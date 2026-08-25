@@ -1,0 +1,25 @@
+# Secretos — nunca comitear
+.env
+.env.*
+!.env.example
+*.key
+secrets.toml
+.streamlit/secrets.toml
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Estado de ejecución del triaje (se regenera; no debe versionarse)
+ejercicio1_triaje/salida/estado.json
+
+# Sistema
+.DS_Store
