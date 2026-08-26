@@ -64,15 +64,31 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Streamlit reserva por defecto unos 6 rem sobre el contenido. En una pantalla
-# de portátil eso es la diferencia entre ver el gráfico entero y no verlo, así
-# que se recorta el margen superior sin tocar el resto del tema.
+# Ajustes de espacio sobre el tema por defecto de Streamlit:
+#
+# - Reserva unos 6 rem sobre el contenido y 80 px a cada lado. En una pantalla
+#   de portátil eso es la diferencia entre ver el gráfico entero y no verlo, y
+#   deja dos franjas vacías a los lados que estrechan los gráficos sin motivo.
+# - El puente de la rueda se monta en un iframe de altura cero; como los
+#   iframes son `inline`, arrastra el espacio de una línea de texto. Se colapsa
+#   para que no empuje el contenido hacia abajo.
 st.markdown(
     """
     <style>
-      .block-container { padding-top: 2.5rem; padding-bottom: 1rem; }
+      .block-container {
+        padding-top: 2.5rem;
+        padding-bottom: 1rem;
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+      }
       [data-testid="stSidebarContent"] { padding-top: 1.5rem; }
       [data-testid="stMetricValue"] { font-size: 2rem; }
+      /* Colapsado, pero nunca `display: none`: un iframe oculto así puede no
+         llegar a ejecutar su script, y con él se perdería el scroll. */
+      .stIFrame { display: block; height: 0; border: 0; }
+      [data-testid="stElementContainer"]:has(> .stIFrame) {
+        height: 0; min-height: 0; margin: 0; overflow: hidden;
+      }
     </style>
     """,
     unsafe_allow_html=True,
