@@ -48,9 +48,9 @@ Presentar «271 vendidos» sería reportar un 30 % de ventas que no existen. Por
 el dashboard **no esconde el problema**: lo enseña arriba del todo, explica la
 regla que aplica y deja comparar ambas lecturas con un selector.
 
-![El mismo dashboard leyendo el export crudo](../docs/capturas/dashboard-datos-crudos.png)
+![El mismo dashboard leyendo el export sin depurar](../docs/capturas/dashboard-datos-crudos.png)
 
-*El selector en «Export crudo»: las mismas fórmulas sobre los datos sin
+*El selector en «Export sin depurar»: las mismas fórmulas sobre los datos sin
 consolidar dan 271 vendidos y un 59 % de avance. El aviso rojo está ahí para que
 nadie tome una decisión con esta vista por accidente.*
 
@@ -113,7 +113,14 @@ dashboard: está en el proceso que genera el export.
   trimestre.
 - **Meses de inventario** — a ese ritmo, cuánto queda hasta agotar lo disponible.
   Es la respuesta directa a «¿cómo va el proyecto?».
-- **Inventario por tipo** — dónde se está quedando el producto sin colocar.
+- **Inventario por tipo** — dónde se está quedando el producto sin colocar. Cada
+  tipo con su color, lo vendido en tono sólido y lo libre en el mismo color
+  atenuado, para que la barra se lea como avance.
+- **Desglose por tipo de las ventas semanales** — un interruptor convierte el
+  gráfico en barras apiladas por producto. Responde a lo que el total no dice:
+  no solo cuánto se vendió cada semana, sino **qué** se vendió.
+
+![Ventas semanales desglosadas por tipo](../docs/capturas/dashboard-ventas-por-tipo.png)
 
 ### Cómo está organizado
 
@@ -186,13 +193,31 @@ de fallo sin mejorar en nada lo que dirección ve en pantalla.
 Los gráficos son **Altair**, que ya viene con Streamlit: cero dependencias
 añadidas.
 
-### Los colores
+### La identidad visual
 
-La paleta está validada para daltonismo y contraste (separación ΔE 24,7 entre las
-dos series en simulación protanopía, ambas por encima de 3:1 sobre el fondo). Las
-dos series llevan además leyenda y etiquetas, así que el color nunca es el único
-canal de información. El tema queda fijado en claro para que el tablero se vea
-igual en cualquier equipo.
+El tablero usa la marca de Akila, no una paleta genérica. Los valores salen de
+su propia web: el tema de `akila.com.co` declara `--green: #95b747` y
+`--dark-gray: #383838`, y compone en **Poppins**. El logo preside la barra
+lateral y los tonos de apoyo —terracota, turquesa— vienen del mundo de sus
+proyectos (las fachadas en tonos tierra, la torre «Turquesa»).
+
+**Pero la marca no puede romper la lectura de los datos**, y aquí hubo que
+trabajar dos cosas:
+
+- El verde corporativo tal cual se queda en **2,3:1 de contraste** sobre blanco,
+  por debajo del mínimo legible de 3:1. En los gráficos se usa oscurecido
+  (`#7a9a35`); el original se reserva para detalles de marca sobre fondo claro.
+- La pareja natural de su web —verde y naranja— es **indistinguible para el
+  daltonismo rojo-verde** (ΔE 3,3). Por eso «vendido» y «disponible» son verde y
+  azul: ΔE 28,2 en protanopía.
+
+La paleta de los cinco tipos de apartamento se validó completa con el validador
+de la guía de visualización: el peor par contiguo queda en ΔE 10,4 y los cinco
+superan 3:1 de contraste. El orden de los colores no es decorativo — es el que
+mantiene distinguible cada par adyacente en las barras apiladas.
+
+El color nunca va solo: toda serie lleva leyenda o etiqueta en el eje. El tema
+se fija en claro para que el tablero se vea igual en cualquier equipo.
 
 ### Pruebas
 

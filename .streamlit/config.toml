@@ -1,9 +1,17 @@
-# Tema fijo en claro: los colores de los gráficos están validados contra fondo
-# claro (contraste y separación para daltonismo). Fijarlo evita que el dashboard
-# se vea distinto según la configuración del equipo de quien lo abre.
+# Tema del dashboard, alineado con la identidad de Akila (akila.com.co).
+#
+# Se fija en claro a propósito: los colores de las series están validados contra
+# fondo blanco (contraste y separación para daltonismo), y dejarlo al gusto del
+# sistema haría que el tablero se viera distinto en cada equipo.
 [theme]
 base = "light"
-primaryColor = "#2a78d6"
+
+# Verde corporativo, oscurecido para que llegue al mínimo de contraste legible
+# sobre blanco. El original de la web (#95b747) se queda en 2,3:1.
+primaryColor = "#7a9a35"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f2f4ee"
+textColor = "#383838"
 
 [browser]
 gatherUsageStats = false

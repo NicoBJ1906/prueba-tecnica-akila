@@ -202,12 +202,12 @@ class TestCifras:
         assert "91" in texto   # disponibles
         assert "5 tipos" in texto  # variedad de producto
 
-    def test_el_export_crudo_infla_las_cifras_y_avisa(self, pagina):
+    def test_el_export_sin_depurar_infla_las_cifras_y_avisa(self, pagina):
         """El contraste que sostiene la entrega: 209 consolidados frente a 271."""
         p = pagina()
-        p.get_by_text("Export crudo", exact=True).click()
+        p.get_by_text("Export sin depurar", exact=True).click()
         p.wait_for_timeout(2500)
         texto = p.locator('[data-testid="stMain"]').inner_text()
         assert "271" in texto
         assert "186" in texto
-        assert "crudo" in texto.lower()
+        assert "inflada" in texto.lower()

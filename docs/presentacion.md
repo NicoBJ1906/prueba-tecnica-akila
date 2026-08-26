@@ -97,7 +97,7 @@ Enseñar el test: `pytest -k test_si_el_modelo_falla` .
    como Apartaestudio de 38 m² disponible, otra como 1 Alcoba de 57 m² vendida.
    Mismo apartamento físico, dos versiones incompatibles.
 
-3. **Mover el selector a «Export crudo»** y dejar que vean los números cambiar
+3. **Mover el selector a «Export sin depurar»** y dejar que vean los números cambiar
    de 209 a 271.
 
    > «Esta es la diferencia entre reportar el proyecto al 70 % o al 59 %. Si
