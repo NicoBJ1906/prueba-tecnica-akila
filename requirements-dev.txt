@@ -1,11 +1,12 @@
-# Dependencias solo para las pruebas de interfaz (opcionales).
-#
-# El resto de la batería —155 pruebas de datos, reglas y guardrails— no las
-# necesita: sin esto instalado, las pruebas de interfaz se saltan solas y
-# `pytest` sigue pasando.
+# Herramientas de desarrollo. Nada de esto hace falta para ejecutar la
+# solución: sin ellas, las pruebas de interfaz se saltan solas y las 155
+# pruebas de datos siguen pasando.
 #
 #   pip install -r requirements-dev.txt
-#   playwright install chromium
-#   pytest ejercicio2_dashboard/tests/test_interfaz.py
+#   playwright install chromium          # solo para las pruebas de interfaz
+#
+#   pytest                               # toda la batería
+#   ruff check .                         # linter (su configuración vive en pyproject.toml)
 
-playwright>=1.40
+playwright>=1.40   # abre el dashboard en un navegador real para medir la maqueta
+ruff>=0.6          # detecta código muerto e imports sobrantes, que ningún test ve
