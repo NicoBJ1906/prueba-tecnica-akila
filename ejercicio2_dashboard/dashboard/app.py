@@ -21,6 +21,7 @@ from pathlib import Path
 import altair as alt
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 # Permite ejecutar el fichero directamente con `streamlit run ruta/app.py`,
 # que no añade el paquete padre al path.
@@ -82,6 +83,50 @@ st.markdown(
 def _cargar(ruta: str):
     resultado = cargar(ruta)
     return resultado.crudo, resultado.canonico, resultado.informe
+
+
+def _devolver_la_rueda_a_la_pagina() -> None:
+    """Hace que la rueda del ratón siga desplazando la página sobre un gráfico.
+
+    Vega registra su propio manejador de `wheel` sobre el lienzo del gráfico y
+    cancela el evento. En una ventana donde el contenido no cabe entero, eso
+    deja al lector atascado en cuanto el cursor pasa por encima de un gráfico:
+    la página simplemente deja de bajar, sin ninguna señal de por qué.
+
+    El puente escucha en fase de captura —antes que Vega— y traslada el
+    desplazamiento al contenedor que scrollea de verdad. Se instala una sola vez
+    por elemento y un observador lo aplica a los gráficos que Streamlit dibuja
+    después, al cambiar de pestaña o de filtro.
+    """
+    components.html(
+        """
+        <script>
+        (function () {
+          const doc = window.parent.document;
+          const marca = 'ruedaEnlazada';
+
+          function enlazar() {
+            doc.querySelectorAll('.stVegaLiteChart').forEach(function (grafico) {
+              if (grafico.dataset[marca]) return;
+              grafico.dataset[marca] = '1';
+              grafico.addEventListener('wheel', function (evento) {
+                const contenedor = doc.querySelector('[data-testid="stMain"]');
+                if (!contenedor) return;
+                evento.preventDefault();
+                contenedor.scrollTop += evento.deltaY;
+              }, { capture: true, passive: false });
+            });
+          }
+
+          enlazar();
+          new MutationObserver(enlazar).observe(doc.body, {
+            childList: true, subtree: true,
+          });
+        })();
+        </script>
+        """,
+        height=0,
+    )
 
 
 def _columnas_cartera() -> dict:
@@ -425,6 +470,8 @@ y disponibles. Campos en conflicto:
 
 
 def main() -> None:
+    _devolver_la_rueda_a_la_pagina()
+
     try:
         crudo, canonico, informe = _cargar(str(RUTA_CSV_POR_DEFECTO))
     except (FileNotFoundError, ErrorDeEsquema) as exc:

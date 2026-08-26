@@ -122,10 +122,15 @@ cuatro pestañas: **Ventas por semana**, **Producto e inventario**, **Calidad de
 los datos** y **Datos**.
 
 No es una decisión estética. El enunciado pide entender el proyecto «de un
-vistazo», y cada vista cabe entera en una pantalla de portátil sin scroll — algo
-que además importa por un motivo técnico: los gráficos de Vega capturan la rueda
-del ratón, así que un tablero largo deja al lector atascado a mitad de página
-cuando el cursor pasa por encima de un gráfico.
+vistazo», y cada vista cabe entera en una pantalla de portátil sin scroll.
+
+**Un detalle que costó encontrar:** los gráficos de Vega registran su propio
+manejador de la rueda del ratón y cancelan el evento. En una ventana donde el
+contenido no cabe, la página deja de bajar en cuanto el cursor pasa por encima
+de un gráfico, sin ninguna señal de por qué. Además de repartir el contenido
+para que quepa, `app.py` instala un puente que escucha la rueda antes que Vega y
+traslada el desplazamiento al contenedor de la página. Los tooltips siguen
+funcionando igual.
 
 ### Filtros
 
