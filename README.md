@@ -62,6 +62,16 @@ pytest
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
 
+Hay además 11 pruebas de interfaz que abren el dashboard en un navegador real y
+comprueban la maquetación (que el gráfico entre entero en pantalla, que ningún
+indicador se corte, que las pestañas funcionen). Son opcionales y se saltan
+solas si Playwright no está instalado:
+
+```bash
+pip install -r requirements-dev.txt && playwright install chromium
+pytest ejercicio2_dashboard/tests/test_interfaz.py
+```
+
 ---
 
 ## Las dos decisiones que definen esta entrega
