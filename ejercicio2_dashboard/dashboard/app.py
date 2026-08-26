@@ -37,7 +37,6 @@ from dashboard.etl import (  # noqa: E402
     cargar,
 )
 from dashboard.metricas import (  # noqa: E402
-    SEMANAS_RITMO_RECIENTE,
     formato_cop,
     inventario_por_tipo,
     resumen,
@@ -46,28 +45,25 @@ from dashboard.metricas import (  # noqa: E402
 )
 
 # Identidad de Akila, tomada de su propia web (akila.com.co): el tema declara
-# `--green: #95b747` y `--dark-gray: #383838`, y tipografía Poppins.
-VERDE_MARCA = "#95b747"  # el verde corporativo, tal cual
+# `--green: #95b747` y `--dark-gray: #383838`, y compone en Poppins.
 GRIS_MARCA = "#383838"
 
-# Para las series de los gráficos, el verde de marca se usa oscurecido: sobre
-# fondo blanco, el original queda en 2,3:1 de contraste y no llega al mínimo
-# legible de 3:1. El azul acompaña al verde porque verde y naranja —la pareja
-# que pedía la paleta original de la web— son indistinguibles para el daltonismo
-# rojo-verde (ΔE 3,3). Este par se comprobó con el validador de la guía de
-# visualización: ΔE 28,2 en protanopía y 15,6 en tritanopía, ambos sobre 3:1.
-VERDE = "#7a9a35"  # vendido / serie principal
-AZUL = "#1f5fae"  # disponible
+# El verde corporativo se usa oscurecido: el original (#95b747) se queda en
+# 2,3:1 de contraste sobre blanco y no llega al mínimo legible de 3:1.
+VERDE = "#7a9a35"
 TINTA_TENUE = "#898781"
 SUPERFICIE = "#ffffff"
 
-# Un color por tipo de apartamento. Los tonos salen del mundo de Akila: el verde
-# corporativo, la terracota de las fachadas de sus torres y el turquesa que da
-# nombre a uno de sus proyectos. El orden no es decorativo — es el que hace que
-# cada par contiguo siga siendo distinguible con daltonismo: validado al
-# completo, el peor par adyacente queda en ΔE 10,4 (deuteranopía) y los cinco
-# superan 3:1 de contraste sobre blanco.
-PALETA_TIPOS = ["#7a9a35", "#1f5fae", "#b5623a", "#0a8f80", "#a67c00"]
+# Un color por tipo de apartamento, empezando por el verde de marca. Los demás
+# tonos salen del mundo de Akila: la terracota de las fachadas de sus torres y
+# el turquesa que da nombre a uno de sus proyectos.
+#
+# El orden no es decorativo, es lo que mantiene legible el gráfico apilado. La
+# pareja natural de su web —verde y naranja— es indistinguible para el
+# daltonismo rojo-verde (ΔE 3,3), así que la secuencia se eligió con el
+# validador de la guía de visualización: el peor par contiguo queda en ΔE 10,4
+# (deuteranopía) y los cinco superan 3:1 de contraste sobre blanco.
+PALETA_TIPOS = [VERDE, "#1f5fae", "#b5623a", "#0a8f80", "#a67c00"]
 
 # De menor a mayor, para que el color siga al producto y no al ranking de ventas:
 # «1 Alcoba» conserva su color aunque un filtro cambie qué tipo va primero.

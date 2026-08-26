@@ -14,7 +14,7 @@ import logging
 import sys
 from pathlib import Path
 
-from .config import ErrorDeConfiguracion, RUTA_CONFIG_POR_DEFECTO, cargar_config
+from .config import RUTA_CONFIG_POR_DEFECTO, ErrorDeConfiguracion, cargar_config
 from .estado import RegistroProcesados
 from .excel import coste_estimado, escribir
 from .informe import escribir_informe

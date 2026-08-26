@@ -43,7 +43,7 @@ class TestValidacionEsquema:
         with pytest.raises(ErrorDeEsquema, match="sin\nfecha_venta|sin fecha_venta"):
             validar_esquema(df)
 
-    def test_fichero_inexistente(self, tmp_path, fila, df_de):
+    def test_fichero_inexistente(self, tmp_path):
         with pytest.raises(FileNotFoundError):
             cargar_crudo(tmp_path / "no_existe.csv")
 

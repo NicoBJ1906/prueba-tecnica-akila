@@ -138,7 +138,7 @@ class TestFallos:
         class SinTexto(ClienteFalso):
             def __init__(self):
                 super().__init__()
-                self.messages.create = lambda **k: RespuestaFalsa(content=[], usage=Uso())
+                self.messages.create = lambda **_: RespuestaFalsa(content=[], usage=Uso())
 
         p = ProveedorAnthropic(cliente=SinTexto())
         with pytest.raises(ErrorDeProveedor):
