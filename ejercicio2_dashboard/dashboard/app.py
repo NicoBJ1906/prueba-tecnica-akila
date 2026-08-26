@@ -17,6 +17,7 @@ Ejecutar desde la raíz del repositorio:
 
 from __future__ import annotations
 
+import base64
 import sys
 from pathlib import Path
 
@@ -72,7 +73,10 @@ PALETA_TIPOS = ["#7a9a35", "#1f5fae", "#b5623a", "#0a8f80", "#a67c00"]
 # «1 Alcoba» conserva su color aunque un filtro cambie qué tipo va primero.
 ORDEN_TIPOS = ["Apartaestudio", "1 Alcoba", "2 Alcobas", "3 Alcobas", "Penthouse"]
 
-RUTA_LOGO = Path(__file__).resolve().parent / "recursos" / "akila-logo.png"
+# Versión del logo en gris de marca sobre fondo transparente, derivada del
+# original (blanco sobre gris). Sobre la barra clara, una banda oscura a sangre
+# pesaba demasiado para lo que es: una firma, no un encabezado.
+RUTA_LOGO = Path(__file__).resolve().parent / "recursos" / "akila-logo-oscuro.png"
 MEDIA_MOVIL_SEMANAS = 4
 # Ajustado para que la vista completa —cabecera, indicadores, controles y
 # gráfico— quepa sin scroll en una pantalla de portátil de 1280 × 800.
@@ -130,45 +134,62 @@ st.markdown(
       }}
 
       /* --- Barra lateral --------------------------------------------------- */
-      [data-testid="stSidebarContent"] {{ padding-top: 1.25rem; }}
       [data-testid="stSidebar"] {{
-        background: #fbfbfa;
-        border-right: 1px solid #e6e6e2;
+        background: #ffffff;
+        border-right: 1px solid #ececea;
       }}
-      .marca {{
-        border-left: 4px solid {VERDE_MARCA};
-        padding: 0.1rem 0 0.1rem 0.7rem;
-        margin-bottom: 1.4rem;
+      /* Streamlit reserva 60 px arriba para el botón de plegar la barra, y eso
+         dejaba una franja clara sobre el logo. El botón se superpone a la banda
+         de marca —sigue siendo accesible— y la cabecera empieza en el borde. */
+      [data-testid="stSidebarContent"] {{ padding-top: 0; }}
+      [data-testid="stSidebarHeader"] {{
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 5;
+        height: 46px;
+        padding: 0 0.35rem;
+      }}
+      [data-testid="stSidebarHeader"] button {{ color: #ffffff; }}
+      [data-testid="stSidebarUserContent"] {{ padding-top: 0; }}
+
+      /* El logo, como una firma: sin banda, sin recuadro y sin competir con
+         los datos. El peso visual del tablero está en las cifras. */
+      /* El relleno superior deja sitio al botón de plegar, que va superpuesto. */
+      .cabecera {{ padding: 1.15rem 0 1.7rem; }}
+      .marca-logo {{
+        width: 92px;
+        display: block;
+        opacity: 0.9;
+        margin-bottom: 0.85rem;
+      }}
+      .marca-logo-texto {{
+        color: {GRIS_MARCA};
+        font-size: 1.6rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.85rem;
       }}
       .marca-nombre {{
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: {GRIS_MARCA};
-        line-height: 1.25;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #6b6b66;
       }}
-      .marca-sub {{
-        font-size: 0.78rem;
-        color: #8a8a85;
-        margin-top: 0.15rem;
-      }}
-      /* Rótulos de sección: separan los bloques sin gastar el alto de un
-         encabezado ni el trazo de un divisor. */
+      /* Rótulos de sección: separan sin dibujar. */
       .rotulo {{
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: {VERDE};
-        margin: 1.5rem 0 0.4rem;
-        padding-bottom: 0.3rem;
-        border-bottom: 1px solid #e6e6e2;
+        letter-spacing: 0.1em;
+        color: #a8a8a2;
+        margin: 1.9rem 0 0.5rem;
       }}
       .ficha {{
-        font-size: 0.8rem;
-        color: #6b6b66;
-        line-height: 1.7;
+        font-size: 0.78rem;
+        color: #8a8a85;
+        line-height: 1.75;
       }}
-      .ficha strong {{ color: {GRIS_MARCA}; font-weight: 600; }}
+      .ficha strong {{ color: {GRIS_MARCA}; font-weight: 500; }}
 
       /* --- Pestañas -------------------------------------------------------- */
       [data-testid="stTabs"] [data-baseweb="tab-list"],
@@ -210,6 +231,22 @@ st.markdown(
 def _cargar(ruta: str):
     resultado = cargar(ruta)
     return resultado.crudo, resultado.canonico, resultado.informe
+
+
+@st.cache_data
+def _logo_incrustado(ruta: str) -> str:
+    """El logo como data URI, para poder maquetarlo dentro de la cabecera.
+
+    Con `st.image` la imagen llega envuelta en el contenedor de Streamlit y no
+    se puede ajustar su tamaño ni su alineación con precisión.
+
+    La ruta entra como argumento, y no leyendo la constante, para que la caché
+    dependa de ella: si no, cambiar de fichero de logo no refresca nada.
+    """
+    fichero = Path(ruta)
+    if not fichero.exists():
+        return ""
+    return base64.b64encode(fichero.read_bytes()).decode("ascii")
 
 
 def _columnas_cartera() -> dict:
@@ -392,12 +429,15 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
     with st.sidebar:
         # El título vive aquí y no sobre el contenido: en la pantalla principal
         # cada línea de cabecera empuja el gráfico hacia abajo y le come el eje.
-        if RUTA_LOGO.exists():
-            st.image(str(RUTA_LOGO), use_container_width=True)
+        logo = _logo_incrustado(str(RUTA_LOGO))
+        imagen = (
+            f'<img class="marca-logo" src="data:image/png;base64,{logo}" alt="Akila">'
+            if logo
+            else '<div class="marca-logo-texto">akila</div>'
+        )
         st.markdown(
-            '<div class="marca">'
+            f'<div class="cabecera">{imagen}'
             '<div class="marca-nombre">Cartera de apartamentos</div>'
-            '<div class="marca-sub">Estado comercial del proyecto</div>'
             "</div>",
             unsafe_allow_html=True,
         )
