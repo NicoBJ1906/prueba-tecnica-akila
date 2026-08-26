@@ -21,7 +21,6 @@ from pathlib import Path
 import altair as alt
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 
 # Permite ejecutar el fichero directamente con `streamlit run ruta/app.py`,
 # que no añade el paquete padre al path.
@@ -64,31 +63,60 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Ajustes de espacio sobre el tema por defecto de Streamlit:
+# El tema por defecto de Streamlit reserva unos 6 rem sobre el contenido y 80 px
+# a cada lado. En una pantalla de portátil, ese margen es la diferencia entre ver
+# el gráfico entero —con su eje de meses— y tener que buscarlo con el scroll.
 #
-# - Reserva unos 6 rem sobre el contenido y 80 px a cada lado. En una pantalla
-#   de portátil eso es la diferencia entre ver el gráfico entero y no verlo, y
-#   deja dos franjas vacías a los lados que estrechan los gráficos sin motivo.
-# - El puente de la rueda se monta en un iframe de altura cero; como los
-#   iframes son `inline`, arrastra el espacio de una línea de texto. Se colapsa
-#   para que no empuje el contenido hacia abajo.
+# Las pestañas también se estilan aquí: de serie son texto subrayado y pasan
+# desapercibidas, hasta el punto de que se busca abajo el contenido que en
+# realidad está detrás de ellas.
 st.markdown(
     """
     <style>
+      /* 3 rem, no menos: Streamlit fija una barra superior propia y con menos
+         margen las etiquetas de los indicadores quedan por debajo de ella. */
       .block-container {
-        padding-top: 2.5rem;
+        padding-top: 3rem;
         padding-bottom: 1rem;
         padding-left: 2.5rem;
         padding-right: 2.5rem;
       }
+      /* El botón «Deploy» no pinta nada en un tablero de dirección. La barra se
+         mantiene —de ella cuelga el control para reabrir la barra lateral—. */
+      [data-testid="stToolbar"] { display: none; }
       [data-testid="stSidebarContent"] { padding-top: 1.5rem; }
-      [data-testid="stMetricValue"] { font-size: 2rem; }
-      /* Colapsado, pero nunca `display: none`: un iframe oculto así puede no
-         llegar a ejecutar su script, y con él se perdería el scroll. */
-      .stIFrame { display: block; height: 0; border: 0; }
-      [data-testid="stElementContainer"]:has(> .stIFrame) {
-        height: 0; min-height: 0; margin: 0; overflow: hidden;
+      [data-testid="stMetricValue"] { font-size: 1.75rem; }
+      [data-testid="stMetricLabel"] p { font-size: 0.82rem; }
+
+      /* Las pestañas, como un selector visible y no como texto suelto. */
+      [data-testid="stTabs"] [data-baseweb="tab-list"],
+      [data-testid="stTabs"] [role="tablist"] {
+        gap: 0.25rem;
+        background: #f0f2f6;
+        padding: 0.28rem;
+        border-radius: 10px;
       }
+      [data-testid="stTabs"] [role="tab"] {
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #52514e;
+      }
+      /* El espacio entre el icono y el texto está en el propio rótulo; basta
+         con impedir que el navegador lo colapse para que no queden pegados. */
+      [data-testid="stTabs"] [role="tab"] [data-testid="stMarkdownContainer"] p {
+        white-space: pre;
+      }
+      [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
+        background: #ffffff;
+        color: #2a78d6;
+        box-shadow: 0 1px 3px rgba(11, 11, 11, 0.12);
+      }
+      /* El subrayado deslizante sobra cuando la pestaña activa ya tiene fondo. */
+      [data-testid="stTabs"] [data-baseweb="tab-highlight"],
+      [data-testid="stTabs"] [data-baseweb="tab-border"],
+      [data-testid="stTabs"] .react-aria-SelectionIndicator { display: none; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -99,50 +127,6 @@ st.markdown(
 def _cargar(ruta: str):
     resultado = cargar(ruta)
     return resultado.crudo, resultado.canonico, resultado.informe
-
-
-def _devolver_la_rueda_a_la_pagina() -> None:
-    """Hace que la rueda del ratón siga desplazando la página sobre un gráfico.
-
-    Vega registra su propio manejador de `wheel` sobre el lienzo del gráfico y
-    cancela el evento. En una ventana donde el contenido no cabe entero, eso
-    deja al lector atascado en cuanto el cursor pasa por encima de un gráfico:
-    la página simplemente deja de bajar, sin ninguna señal de por qué.
-
-    El puente escucha en fase de captura —antes que Vega— y traslada el
-    desplazamiento al contenedor que scrollea de verdad. Se instala una sola vez
-    por elemento y un observador lo aplica a los gráficos que Streamlit dibuja
-    después, al cambiar de pestaña o de filtro.
-    """
-    components.html(
-        """
-        <script>
-        (function () {
-          const doc = window.parent.document;
-          const marca = 'ruedaEnlazada';
-
-          function enlazar() {
-            doc.querySelectorAll('.stVegaLiteChart').forEach(function (grafico) {
-              if (grafico.dataset[marca]) return;
-              grafico.dataset[marca] = '1';
-              grafico.addEventListener('wheel', function (evento) {
-                const contenedor = doc.querySelector('[data-testid="stMain"]');
-                if (!contenedor) return;
-                evento.preventDefault();
-                contenedor.scrollTop += evento.deltaY;
-              }, { capture: true, passive: false });
-            });
-          }
-
-          enlazar();
-          new MutationObserver(enlazar).observe(doc.body, {
-            childList: true, subtree: true,
-          });
-        })();
-        </script>
-        """,
-        height=0,
-    )
 
 
 def _columnas_cartera() -> dict:
@@ -255,6 +239,12 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
     esos filtros viven en la pestaña de ventas, donde su alcance se entiende.
     """
     with st.sidebar:
+        # El título vive aquí y no sobre el contenido: en la pantalla principal
+        # cada línea de cabecera empuja el gráfico hacia abajo y le come el eje.
+        st.markdown("### Cartera de apartamentos")
+        st.caption("Estado del proyecto")
+        st.divider()
+
         st.subheader("Origen de los datos")
         usar_crudo = st.radio(
             "Vista",
@@ -318,35 +308,17 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
     return usar_crudo, base, filtrado, len(filtrado) < len(base)
 
 
-def _cabecera_calidad(informe) -> None:
-    """Aviso de una sola línea; el detalle vive en su propia pestaña."""
-    if not informe.hay_conflictos:
-        return
-
-    st.warning(
-        f"**{informe.filas_totales} registros, pero solo {informe.unidades_unicas} "
-        f"apartamentos reales** · {informe.unidades_con_conflicto} unidades se "
-        "contradicen entre sí · ver pestaña «Calidad de los datos»",
-        icon="⚠️",
-    )
-
-
 def _kpis(r) -> None:
     """Los cuatro apartados que el enunciado pide como cifra.
 
     Cuatro columnas y no cinco: con cinco, un importe como «$137,7 MM» no cabe
     en una pantalla de portátil y Streamlit lo corta a media palabra. Lo que
-    sobra (el valor pendiente) va a la línea de contexto, donde es texto y no
-    compite por el ancho.
-
-    Los `delta` son contexto, no variación: se muestran en gris (`off`) para no
-    sugerir una subida que nadie ha medido.
+    sobra —el valor pendiente, el avance— baja a la línea de contexto, donde es
+    texto y no compite por el ancho ni añade la altura de un chip de delta.
     """
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Apartamentos vendidos", f"{r.vendidos}",
-              f"{r.porcentaje_avance:.0f} % del proyecto", delta_color="off")
-    c2.metric("Disponibles", f"{r.disponibles}",
-              f"de {r.total_unidades} unidades", delta_color="off")
+    c1.metric("Apartamentos vendidos", f"{r.vendidos}")
+    c2.metric("Disponibles", f"{r.disponibles}")
     c3.metric("Valor vendido", formato_cop(r.valor_vendido_cop))
     c4.metric("Variedad de producto", f"{r.variedad_tipos} tipos")
 
@@ -391,13 +363,6 @@ def _pestana_ventas(df: pd.DataFrame) -> None:
     st.altair_chart(
         _grafico_ventas_semana(serie, medir_valor, media_movil),
         use_container_width=True,
-    )
-
-    semanas_activas = int((serie["unidades"] > 0).sum())
-    st.caption(
-        f"**{int(serie['unidades'].sum())} apartamentos** por "
-        f"**{formato_cop(float(serie['valor_cop'].sum()))}** en el periodo · "
-        f"{semanas_activas} de {len(serie)} semanas con al menos una venta."
     )
 
 
@@ -486,8 +451,6 @@ y disponibles. Campos en conflicto:
 
 
 def main() -> None:
-    _devolver_la_rueda_a_la_pagina()
-
     try:
         crudo, canonico, informe = _cargar(str(RUTA_CSV_POR_DEFECTO))
     except (FileNotFoundError, ErrorDeEsquema) as exc:
@@ -495,9 +458,6 @@ def main() -> None:
         st.stop()
 
     usar_crudo, base, df, hay_filtro = _barra_lateral(crudo, canonico, informe)
-
-    st.subheader("Cartera de apartamentos · estado del proyecto")
-    _cabecera_calidad(informe)
 
     if usar_crudo:
         st.error(
@@ -513,19 +473,30 @@ def main() -> None:
     r = resumen(df)
     _kpis(r)
 
-    partes = [f"Pendiente por vender: **{formato_cop(r.valor_disponible_cop)}**"]
+    # Una sola línea de contexto bajo los indicadores. Cada línea que se añade
+    # aquí baja el gráfico y le recorta el eje de meses, así que todo lo que no
+    # es una cifra de cabecera se resume en este renglón.
+    partes = [f"**{r.porcentaje_avance:.0f} %** del proyecto vendido"]
     if r.meses_inventario is not None:
         partes.append(
-            f"ritmo reciente **{r.ritmo_semanal_reciente:.1f} apartamentos/semana** "
-            f"(últimas {SEMANAS_RITMO_RECIENTE} semanas), inventario para "
+            f"ritmo **{r.ritmo_semanal_reciente:.1f}/semana**, inventario para "
             f"**{r.meses_inventario:.0f} meses**"
         )
+    partes.append(f"pendiente **{formato_cop(r.valor_disponible_cop)}**")
     if hay_filtro:
-        partes.append(f"filtros activos: **{len(df)} de {len(base)}** apartamentos")
-    st.caption(" · ".join(partes) + ".")
+        partes.append(f"filtrando **{len(df)} de {len(base)}**")
+    if informe.hay_conflictos and not usar_crudo:
+        partes.append(
+            f"⚠️ {informe.filas_totales} registros → {informe.unidades_unicas} "
+            "apartamentos reales (ver «Calidad de los datos»)"
+        )
+    st.caption(" · ".join(partes))
 
+    # Espacio fino (U+2002) entre icono y texto: el espacio normal se pierde
+    # al renderizar el emoji y los rótulos quedan como «📈Ventas por semana».
     ventas, producto, calidad, datos = st.tabs(
-        ["Ventas por semana", "Producto e inventario", "Calidad de los datos", "Datos"]
+        ["📈 Ventas por semana", "🏢 Producto e inventario",
+         "⚠️ Calidad de los datos", "📋 Datos"]
     )
     with ventas:
         _pestana_ventas(df)

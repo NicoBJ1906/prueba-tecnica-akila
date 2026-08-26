@@ -1,0 +1,11 @@
+# Dependencias solo para las pruebas de interfaz (opcionales).
+#
+# El resto de la batería —155 pruebas de datos, reglas y guardrails— no las
+# necesita: sin esto instalado, las pruebas de interfaz se saltan solas y
+# `pytest` sigue pasando.
+#
+#   pip install -r requirements-dev.txt
+#   playwright install chromium
+#   pytest ejercicio2_dashboard/tests/test_interfaz.py
+
+playwright>=1.40

@@ -122,15 +122,15 @@ cuatro pestañas: **Ventas por semana**, **Producto e inventario**, **Calidad de
 los datos** y **Datos**.
 
 No es una decisión estética. El enunciado pide entender el proyecto «de un
-vistazo», y cada vista cabe entera en una pantalla de portátil sin scroll.
+vistazo», y el objetivo de maquetación es concreto: **que el gráfico completo,
+con su eje de meses, entre en pantalla sin scroll desde 1280 × 720 hacia
+arriba** — lo que queda visible en un portátil de 13" con el navegador
+maximizado. Verificado en ocho tamaños, de 1024 × 768 a 1920 × 1080.
 
-**Un detalle que costó encontrar:** los gráficos de Vega registran su propio
-manejador de la rueda del ratón y cancelan el evento. En una ventana donde el
-contenido no cabe, la página deja de bajar en cuanto el cursor pasa por encima
-de un gráfico, sin ninguna señal de por qué. Además de repartir el contenido
-para que quepa, `app.py` instala un puente que escucha la rueda antes que Vega y
-traslada el desplazamiento al contenedor de la página. Los tooltips siguen
-funcionando igual.
+Para conseguirlo, el encabezado se mantiene deliberadamente corto: el título
+vive en la barra lateral, los indicadores no llevan chips de variación y todo el
+contexto —avance, ritmo, inventario, aviso de calidad— cabe en un solo renglón.
+Cada línea que se añada ahí le quita altura al gráfico.
 
 ### Filtros
 
@@ -203,3 +203,19 @@ pytest ejercicio2_dashboard/tests -v     # desde la raíz del repositorio
 Cubren la regla de consolidación caso por caso, la validación de esquema (columna
 que falta, fecha corrupta, estado desconocido, fichero vacío), el cálculo de cada
 indicador y los *golden tests* contra las cifras reales.
+
+**Pruebas de interfaz.** Un fallo de maquetación no lo detecta ningún test de
+datos: el tablero puede calcular bien los 209 vendidos y aun así mostrarlos con
+el gráfico cortado. `test_interfaz.py` abre el dashboard en un navegador real y
+mide la página — que el gráfico entre entero en 1280 × 720 y 1440 × 900, que
+ningún indicador quede cortado, que no haya desborde horizontal, que las cuatro
+pestañas pinten contenido y que el contraste consolidado/crudo cambie las cifras
+de 209 a 271.
+
+Son opcionales y se saltan solas si Playwright no está instalado:
+
+```bash
+pip install -r requirements-dev.txt
+playwright install chromium
+pytest ejercicio2_dashboard/tests/test_interfaz.py
+```
