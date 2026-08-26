@@ -114,7 +114,32 @@ dashboard: está en el proceso que genera el export.
 - **Meses de inventario** — a ese ritmo, cuánto queda hasta agotar lo disponible.
   Es la respuesta directa a «¿cómo va el proyecto?».
 - **Inventario por tipo** — dónde se está quedando el producto sin colocar.
-- **Filtro por torre** — para mirar una torre concreta.
+
+### Cómo está organizado
+
+Los indicadores de cabecera están siempre visibles y el detalle se reparte en
+cuatro pestañas: **Ventas por semana**, **Producto e inventario**, **Calidad de
+los datos** y **Datos**.
+
+No es una decisión estética. El enunciado pide entender el proyecto «de un
+vistazo», y cada vista cabe entera en una pantalla de portátil sin scroll — algo
+que además importa por un motivo técnico: los gráficos de Vega capturan la rueda
+del ratón, así que un tablero largo deja al lector atascado a mitad de página
+cuando el cursor pasa por encima de un gráfico.
+
+### Filtros
+
+Se dividen según su alcance, para que nunca haya duda de qué están afectando:
+
+- **En la barra lateral, los estructurales** (torre, tipo de apartamento, precio,
+  área): describen *qué apartamentos* se están mirando y afectan a todo.
+- **En la pestaña de ventas, los del periodo comercial** (rango de fechas, forma
+  de pago): solo tienen sentido sobre las ventas.
+
+La razón de separarlos es que un apartamento disponible **no tiene fecha de venta
+ni forma de pago**. Si esos dos filtros fueran globales, cualquier selección
+dejaría el inventario disponible en cero y el tablero mentiría sin avisar.
+Dejar una selección vacía significa «todos».
 
 ![Detalle de ventas y tipos](../docs/capturas/dashboard-detalle.png)
 
