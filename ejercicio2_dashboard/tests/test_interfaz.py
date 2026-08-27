@@ -432,6 +432,43 @@ class TestNavegacion:
         p.wait_for_timeout(1500)
         assert ancho() > 100, "El control de reabrir no devolvió la barra lateral."
 
+    @pytest.mark.parametrize("ancho,alto", TAMANOS)
+    def test_las_vistas_siguen_al_lado_del_carril_al_recoger(self, pagina, ancho, alto):
+        """Con la columna recogida, el contenido no puede irse debajo de ella.
+
+        Streamlit deja envolver sus columnas, y la vista de calidad trae una
+        tabla cuyo ancho mínimo no cabía junto al carril: la fila se partía y el
+        contenido caía bajo la columna, que mide una pantalla de alto. El centro
+        se veía en blanco y había que bajar a buscarlo.
+
+        Se recorren las cuatro vistas porque el fallo depende de lo que cada una
+        pinte, y solo aparecía en una.
+        """
+        p = pagina(ancho, alto)
+        p.locator(".st-key-nav_plegar button").click()
+        p.wait_for_timeout(ESPERA_RENDER)
+
+        botones = self._botones(p)
+        for indice, etiqueta in enumerate(self.ETIQUETAS):
+            botones.nth(indice).click()
+            p.wait_for_timeout(2000)
+            medidas = p.evaluate(
+                """() => {
+                     const nav = [...document.querySelectorAll(
+                         '[data-testid="stMain"] [data-testid="stColumn"]')]
+                         .find(c => c.querySelector('.cabecera'));
+                     const cont = nav.nextElementSibling;
+                     const rn = nav.getBoundingClientRect();
+                     const rc = cont.getBoundingClientRect();
+                     return {desfase: Math.round(rc.y - rn.y),
+                             titulo: document.querySelector('.titulo-vista')?.innerText};
+                   }"""
+            )
+            assert abs(medidas["desfase"]) < 5, (
+                f"En «{etiqueta}» el contenido cae {medidas['desfase']} px por debajo "
+                f"de la columna recogida: la vista aparece en blanco."
+            )
+
     def test_los_dos_controles_de_plegado_son_gemelos(self, pagina):
         """Los dos bordes de la pantalla se pliegan con el mismo gesto.
 

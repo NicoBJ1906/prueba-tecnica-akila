@@ -455,6 +455,17 @@ st.markdown(
          Se ancla en `.cabecera`, que es marca propia, y no en el orden de las
          columnas, que Streamlit puede reorganizar en pantallas estrechas. */
       @media (min-width: 992px) {{
+        /* Navegación y contenido, en la misma fila pase lo que pase. Streamlit
+           deja que sus columnas envuelvan, y basta con que una vista traiga
+           algo ancho —una tabla, por ejemplo— para que el contenido salte
+           debajo de la columna de vistas y el centro aparezca vacío. Por debajo
+           de este ancho sí queremos que se apilen, y por eso la regla vive
+           dentro de la consulta de medios. */
+        [data-testid="stMain"] [data-testid="stHorizontalBlock"]:has(
+          > [data-testid="stColumn"] .cabecera
+        ) {{
+          flex-wrap: nowrap;
+        }}
         [data-testid="stMain"] [data-testid="stColumn"]:has(.cabecera) {{
           border-right: 1px solid #ececea;
           padding-right: 1.2rem;
@@ -494,10 +505,15 @@ _CSS_NAV_COMPACTA = """
           padding-right: 0.6rem;
         }
         /* El contenido se queda con todo lo que deja libre: sin esto conserva
-           el ancho que le tocaba por peso y aparece un hueco entre ambos. */
+           el ancho que le tocaba por peso y aparece un hueco entre ambos.
+           `flex-basis: 0` y no `auto`: con `auto` la base es el ancho natural
+           del contenido, y la vista de calidad —que lleva una tabla de 1069 px
+           de mínimo— no cabía junto al carril. La fila envolvía y el contenido
+           caía debajo de la columna, que mide una pantalla de alto: se veía el
+           centro en blanco y había que bajar a buscarlo. */
         [data-testid="stMain"] [data-testid="stColumn"]:has(.cabecera)
           + [data-testid="stColumn"] {
-          flex: 1 1 auto !important;
+          flex: 1 1 0 !important;
           width: auto !important;
           min-width: 0 !important;
         }
