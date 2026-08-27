@@ -58,9 +58,26 @@ Se abre en `http://localhost:8501`.
 pytest
 ```
 
-168 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
+170 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
+
+**Que las pruebas pasen no demuestra que sirvan.** Para comprobarlo hay un arnés
+de mutación en `docs/mutaciones.py`: rompe el código a propósito de 19 formas
+distintas —invierte la prioridad de la consolidación, se queda con la venta más
+antigua, calcula el porcentaje sobre el total equivocado, desactiva una
+validación— y verifica que las pruebas lo detecten.
+
+```bash
+python docs/mutaciones.py    # trabaja sobre una copia; no toca el repo
+```
+
+Detecta **17 de 19**. Las dos que sobreviven son *equivalentes*: quitar un
+`dropna` que el `groupby` ya aplicaba, y filtrar por un campo que en esos
+registros siempre es nulo. Ninguna cambia un resultado. La primera pasada
+detectaba 13 de 19 y destapó cuatro huecos reales —entre ellos un `assert`
+tautológico que seguía a la constante que pretendía comprobar—; están
+corregidos.
 
 Hay además 30 pruebas de interfaz que abren el dashboard en un navegador real y
 comprueban la maquetación y el comportamiento: que el gráfico entre entero en

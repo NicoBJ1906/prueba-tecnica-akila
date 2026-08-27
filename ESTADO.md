@@ -99,10 +99,14 @@ siguiendo solo el README): los dos ejercicios arrancan y las pruebas pasan.
    2. *Corrección de las cifras* — recalcular todo con pandas sin usar el código
       del candidato; buscar casos donde la regla de consolidación sea
       indefendible; intentar que `metricas.insights()` afirme algo falso.
-   3. *Calidad de código* — y sobre todo **pruebas de mutación**: romper el
-      código a propósito en una copia (invertir un `>`, cambiar un orden,
-      quitar una condición) y ver qué sobrevive con los tests en verde. Es lo
-      que dice si la cobertura vale algo.
+   3. ~~*Pruebas de mutación*~~ — **HECHO**. Arnés en `docs/mutaciones.py`.
+      Primera pasada: 13/19. Destapó cuatro huecos reales (ventana del ritmo sin
+      comprobar, `avance_acumulado` sin verificar el valor, la salvaguarda de
+      grupos pequeños sin ninguna prueba, y un `assert` tautológico que seguía a
+      la constante que decía comprobar). Corregidos: ahora 17/19, y las dos
+      restantes son mutaciones equivalentes que no cambian ningún resultado.
+      Queda pendiente el resto de la revisión de código (código muerto,
+      acoplamiento a internals de Streamlit, tamaño de `app.py`).
    4. *Ejercicio 1 y la tesis de la IA* — construir correos nuevos con jerga y
       faltas para reventar las reglas; atacar los guardrails; juzgar si «una
       sola etapa con IA» es criterio o excusa.

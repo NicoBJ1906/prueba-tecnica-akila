@@ -9,6 +9,7 @@ from dashboard.etl import ESTADO_DISPONIBLE, ESTADO_VENDIDO
 from dashboard.metricas import (
     MAXIMO_HALLAZGOS,
     ORDEN_TONOS,
+    SEMANAS_RITMO_RECIENTE,
     avance_acumulado,
     avance_por_altura,
     avance_por_torre,
@@ -157,6 +158,43 @@ class TestDatosReales:
         ritmo = ritmo_semanal_reciente(datos.canonico)
         assert 0 < ritmo < 20
 
+    def test_el_ritmo_solo_mira_la_ventana_reciente(self, fila, df_de):
+        """La ventana no es decorativa: tiene que recortar el histórico.
+
+        Antes esto solo comprobaba `0 < ritmo < 20`, un rango que se cumple con
+        cualquier ventana —3, 12 o 52 semanas dan 4,3, 5,1 y 3,6 sobre los datos
+        reales—, así que cambiar `SEMANAS_RITMO_RECIENTE` no rompía nada.
+
+        Aquí se venden 10 apartamentos en 10 semanas seguidas y luego el
+        proyecto se para 5 semanas. Sobre las últimas 5 el ritmo es 0; sobre las
+        15, la media de 10 ventas repartidas.
+        """
+        ventas = [
+            fila(id=i, numero_puerta=i, estado=ESTADO_VENDIDO,
+                 fecha_venta=pd.Timestamp("2026-01-05") + pd.Timedelta(weeks=i))
+            for i in range(10)
+        ]
+        # Una venta muy posterior para que la serie llegue hasta ahí con ceros.
+        ventas.append(
+            fila(id=99, numero_puerta=99, estado=ESTADO_VENDIDO,
+                 fecha_venta=pd.Timestamp("2026-01-05") + pd.Timedelta(weeks=14))
+        )
+        df = df_de(*ventas)
+
+        assert ritmo_semanal_reciente(df, semanas=3) == pytest.approx(1 / 3), (
+            "Las últimas 3 semanas solo tienen la venta suelta del final."
+        )
+        assert ritmo_semanal_reciente(df, semanas=15) == pytest.approx(11 / 15), (
+            "Sobre toda la serie el ritmo es la media de las 11 ventas."
+        )
+        # Y con la ventana POR DEFECTO, que es lo que usa el tablero: sin este
+        # assert, cambiar `SEMANAS_RITMO_RECIENTE` no rompía ninguna prueba,
+        # porque las de arriba pasan la ventana a mano.
+        assert ritmo_semanal_reciente(df) == pytest.approx(8 / 12), (
+            f"Con la ventana por defecto ({SEMANAS_RITMO_RECIENTE} semanas) "
+            "entran las 8 ventas de las últimas doce."
+        )
+
 
 class TestAvanceAcumulado:
     def test_la_curva_es_monotona_y_acaba_en_el_total(self, datos):
@@ -166,6 +204,10 @@ class TestAvanceAcumulado:
         )
         assert curva["unidades"].iloc[-1] == 209
         assert curva["porcentaje_proyecto"].iloc[-1] == pytest.approx(209 / 300 * 100)
+        # El valor también se acumula: comprobar solo las unidades dejaba pasar
+        # que `valor_cop` se quedara sin `cumsum`.
+        assert (curva["valor_cop"].diff().dropna() >= 0).all()
+        assert curva["valor_cop"].iloc[-1] == pytest.approx(137_744_900_000)
 
     def test_sin_ventas_devuelve_tabla_vacia(self, fila, df_de):
         assert avance_acumulado(df_de(fila())).empty
@@ -232,7 +274,14 @@ class TestInsights:
     def test_devuelve_hallazgos_estructurados_y_ordenados(self, datos):
         hallazgos = insights(datos.canonico)
         assert hallazgos, "Con los datos reales tiene que salir algún hallazgo."
-        assert len(hallazgos) <= MAXIMO_HALLAZGOS
+        # Contra el número, no contra la constante: `<= MAXIMO_HALLAZGOS` es
+        # tautológico —sigue a la constante que se quiera cambiar— y dejaba
+        # pasar que el límite desapareciera.
+        assert len(hallazgos) <= 4
+        assert MAXIMO_HALLAZGOS == 4, (
+            "Si se cambia el máximo, hay que revisar que las tarjetas sigan "
+            "cabiendo en una sola fila sin robarle altura al gráfico."
+        )
         for h in hallazgos:
             assert h.tono in ORDEN_TONOS
             assert h.titular and h.cifra and h.detalle
@@ -242,6 +291,31 @@ class TestInsights:
     def test_no_inventa_hallazgos_sin_datos(self, fila, df_de):
         assert insights(df_de(fila())) == []
         assert insights(df_de(fila()).iloc[0:0]) == []
+
+    def test_no_señala_un_grupo_diminuto_como_tendencia(self, fila, df_de):
+        """Una celda de 3 apartamentos sin vender no es «el punto más frío».
+
+        Con lotes pequeños, dos ventas mueven el porcentaje decenas de puntos.
+        `MINIMO_UNIDADES_CELDA` existe para eso y no tenía ninguna prueba: se
+        podía bajar a 1 sin que nada fallara.
+        """
+        filas = []
+        # Torre 1: 30 unidades bien vendidas, para que la media del proyecto sea alta.
+        for i in range(30):
+            filas.append(
+                fila(id=i, torre="Torre 1", piso=3, numero_puerta=i,
+                     estado=ESTADO_VENDIDO, fecha_venta=pd.Timestamp("2026-01-05"))
+            )
+        # Torre 2: solo 3 unidades, ninguna vendida. Fría, pero irrelevante.
+        for i in range(3):
+            filas.append(
+                fila(id=100 + i, torre="Torre 2", piso=20, numero_puerta=i,
+                     estado=ESTADO_DISPONIBLE)
+            )
+        titulares = " ".join(h.titular for h in insights(df_de(*filas)))
+        assert "pisos altos" not in titulares, (
+            f"Señaló un grupo de 3 unidades como el punto más frío: {titulares!r}"
+        )
 
     def test_calla_cuando_la_diferencia_no_es_significativa(self, fila, df_de):
         """Dos torres al mismo ritmo no son noticia: el umbral evita el ruido."""
