@@ -699,6 +699,15 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
 
         base = crudo if usar_crudo else canonico
 
+        # El aviso de calidad vive junto al selector que lo motiva, no en la
+        # cabecera: aquí explica por qué existe esa elección, y quien quiera el
+        # detalle lo tiene entero en su vista.
+        if informe.hay_conflictos and not usar_crudo:
+            st.caption(
+                f"El export trae {informe.filas_totales} registros de "
+                f"{informe.unidades_unicas} apartamentos. Ver «Calidad»."
+            )
+
         st.markdown('<div class="rotulo">Filtros</div>', unsafe_allow_html=True)
 
         # Dejar la selección vacía significa «todas». Evita que la barra se
@@ -729,6 +738,24 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
             value=(area_min, area_max), format="%d m²",
         )
 
+        condiciones = (
+            base["precio_cop"].between(
+                rango_precio[0] * 1_000_000, rango_precio[1] * 1_000_000
+            )
+            & base["area_m2"].between(*rango_area)
+        )
+        if torres_sel:
+            condiciones &= base["torre"].isin(torres_sel)
+        if tipos_sel:
+            condiciones &= base["tipo_apartamento"].isin(tipos_sel)
+        filtrado = base[condiciones]
+        hay_filtro = len(filtrado) < len(base)
+
+        # El recuento de la selección va debajo de los propios filtros, que es
+        # donde se mira al moverlos, y solo aparece cuando hay algo filtrado.
+        if hay_filtro:
+            st.caption(f"Viendo {len(filtrado)} de {len(base)} apartamentos.")
+
         # Pie: la ficha del proyecto, no la del fichero. A dirección le dice
         # algo «300 apartamentos en 4 torres»; «apartamentos_akila.csv», no.
         ventas = canonico[canonico["estado"] == ESTADO_VENDIDO]["fecha_venta"].dropna()
@@ -741,6 +768,12 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
             f"<strong>{canonico['torre'].nunique()}</strong> torres · "
             f"<strong>{canonico['tipo_apartamento'].nunique()}</strong> tipos",
         ]
+        # El avance es del proyecto entero, no de la selección: por eso se
+        # calcula sobre el consolidado y no sobre lo que haya filtrado.
+        if len(canonico):
+            vendidos = int((canonico["estado"] == ESTADO_VENDIDO).sum())
+            avance = vendidos / len(canonico) * 100
+            ficha.append(f"<strong>{avance:.0f} %</strong> vendido")
         if not ventas.empty:
             ficha.append(
                 f"Última venta: <strong>{ventas.max():%d/%m/%Y}</strong>"
@@ -754,17 +787,7 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
             f'<div class="ficha">{"<br>".join(ficha)}</div>', unsafe_allow_html=True
         )
 
-    condiciones = (
-        base["precio_cop"].between(rango_precio[0] * 1_000_000, rango_precio[1] * 1_000_000)
-        & base["area_m2"].between(*rango_area)
-    )
-    if torres_sel:
-        condiciones &= base["torre"].isin(torres_sel)
-    if tipos_sel:
-        condiciones &= base["tipo_apartamento"].isin(tipos_sel)
-
-    filtrado = base[condiciones]
-    return usar_crudo, base, filtrado, len(filtrado) < len(base)
+    return usar_crudo, filtrado
 
 
 def _kpis(r) -> None:
@@ -794,7 +817,7 @@ def _kpis(r) -> None:
             st.metric(etiqueta, valor)
 
 
-def _pestana_ventas(df: pd.DataFrame) -> None:
+def _pestana_ventas(df: pd.DataFrame, r) -> None:
     """Filtros propios del periodo comercial, donde su alcance es evidente."""
     vendidos = df[df["estado"] == ESTADO_VENDIDO]
     if vendidos.empty:
@@ -840,6 +863,15 @@ def _pestana_ventas(df: pd.DataFrame) -> None:
             ventas_por_semana(en_periodo), medir_valor, media_movil=True
         )
     st.altair_chart(grafico, use_container_width=True)
+
+    # El ritmo y los meses de inventario son la lectura del gráfico, no una
+    # cifra de cabecera: puestos aquí se leen junto a las barras que los
+    # explican, y no compiten por el alto de la pantalla.
+    if r.meses_inventario is not None:
+        st.caption(
+            f"Ritmo del último trimestre: {r.ritmo_semanal_reciente:.1f} "
+            f"apartamentos/semana · inventario para {r.meses_inventario:.0f} meses."
+        )
 
 
 def _pestana_producto(df: pd.DataFrame) -> None:
@@ -943,7 +975,7 @@ def main() -> None:
         st.error(f"No se pudieron cargar los datos.\n\n{exc}")
         st.stop()
 
-    usar_crudo, base, df, hay_filtro = _barra_lateral(crudo, canonico, informe)
+    usar_crudo, df = _barra_lateral(crudo, canonico, informe)
 
     if usar_crudo:
         st.error(
@@ -973,24 +1005,11 @@ def main() -> None:
     with contenido:
         _kpis(r)
 
-        # Una sola línea de contexto bajo los indicadores. Cada línea que se
-        # añade aquí baja el gráfico y le recorta el eje de meses, así que todo
-        # lo que no sea una cifra de cabecera se resume en este renglón.
-        partes = [f"**{r.porcentaje_avance:.0f} %** del proyecto vendido"]
-        if r.meses_inventario is not None:
-            partes.append(
-                f"ritmo **{r.ritmo_semanal_reciente:.1f}/semana**, inventario para "
-                f"**{r.meses_inventario:.0f} meses**"
-            )
-        partes.append(f"pendiente **{formato_cop(r.valor_disponible_cop)}**")
-        if hay_filtro:
-            partes.append(f"filtrando **{len(df)} de {len(base)}**")
-        if informe.hay_conflictos and not usar_crudo:
-            partes.append(
-                f"⚠️ {informe.filas_totales} registros → {informe.unidades_unicas} "
-                "apartamentos reales (ver «Calidad»)"
-            )
-        st.caption(" · ".join(partes))
+        # Bajo los indicadores no va nada más. Un renglón que encadena avance,
+        # ritmo, inventario, valor pendiente y aviso de calidad se lee como una
+        # nota al pie y no como un tablero: cada dato de ese resumen tiene ya su
+        # sitio —el ritmo y el inventario en «Ventas», el recuento de registros
+        # en «Calidad», el estado del proyecto en el panel de la derecha—.
 
         # El rótulo de navegación es de una palabra, así que cada vista se
         # presenta con su nombre completo: es donde se explica qué se está
@@ -998,7 +1017,7 @@ def main() -> None:
         if vista == VISTAS[0].nombre:
             st.markdown('<div class="titulo-vista">Ventas por semana</div>',
                         unsafe_allow_html=True)
-            _pestana_ventas(df)
+            _pestana_ventas(df, r)
         elif vista == VISTAS[1].nombre:
             st.markdown('<div class="titulo-vista">Producto e inventario</div>',
                         unsafe_allow_html=True)

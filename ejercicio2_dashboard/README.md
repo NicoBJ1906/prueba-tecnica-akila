@@ -45,8 +45,9 @@ Mismo apartamento físico (torre, piso y puerta), dos versiones incompatibles.
 | Total del proyecto | 457 | **300** |
 
 Presentar «271 vendidos» sería reportar un 30 % de ventas que no existen. Por eso
-el dashboard **no esconde el problema**: lo enseña arriba del todo, explica la
-regla que aplica y deja comparar ambas lecturas con un selector.
+el dashboard **no esconde el problema**: lo avisa junto al selector de vista de
+datos, explica la regla que aplica en su propia pestaña y deja comparar ambas
+lecturas.
 
 ![El mismo dashboard leyendo el export sin depurar](../docs/capturas/dashboard-datos-crudos.png)
 
@@ -109,10 +110,10 @@ dashboard: está en el proceso que genera el export.
 
 **Y lo que dirección pregunta a continuación:**
 
-- **Ritmo comercial reciente** — media de apartamentos por semana del último
-  trimestre.
-- **Meses de inventario** — a ese ritmo, cuánto queda hasta agotar lo disponible.
-  Es la respuesta directa a «¿cómo va el proyecto?».
+- **Ritmo comercial reciente y meses de inventario** — media de apartamentos por
+  semana del último trimestre y, a ese ritmo, cuánto queda hasta agotar lo
+  disponible. Es la respuesta directa a «¿cómo va el proyecto?», y va debajo del
+  gráfico de ventas, que es lo que la sustenta.
 - **Inventario por tipo** — dónde se está quedando el producto sin colocar. Cada
   tipo con su color, lo vendido en tono sólido y lo libre en el mismo color
   atenuado, para que la barra se lea como avance.
@@ -156,9 +157,16 @@ maximizado. Verificado en ocho tamaños, de 1024 × 768 a 1920 × 1080.
 
 Para conseguirlo, el encabezado se mantiene deliberadamente corto: la marca y
 el título viven en la columna de navegación, los indicadores no llevan chips de
-variación y todo el
-contexto —avance, ritmo, inventario, aviso de calidad— cabe en un solo renglón.
-Cada línea que se añada ahí le quita altura al gráfico.
+variación y **debajo de ellos no va nada**. Cada línea que se añada ahí le quita
+altura al gráfico.
+
+Esa disciplina también es de lectura, no solo de espacio. Un renglón de resumen
+que encadene avance, ritmo, inventario, valor pendiente y aviso de calidad se
+lee como una nota al pie: mucha cifra suelta sin nada que la ordene. Cada uno de
+esos datos tiene un sitio donde significa algo —el ritmo y los meses de
+inventario debajo del gráfico que los explica, el recuento de registros junto al
+selector de vista de datos que motiva, el avance y el tamaño del proyecto en su
+ficha—, y ahí es donde están.
 
 ### Filtros
 
