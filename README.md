@@ -105,8 +105,8 @@ más de una vez en fechas distintas.
 | Disponibles | 186 | **91** |
 
 Reportar «271 vendidos» a dirección sería inventar un 30 % de ventas. El
-dashboard avisa del problema junto al selector de vista de datos, documenta la
-regla que aplica en su propia pestaña y permite comparar ambas lecturas, porque
+dashboard le dedica una vista entera —«Calidad»—, documenta la
+regla que aplica y permite comparar ambas lecturas con un selector, porque
 la regla es discutible y quien decide debe poder verla.
 
 El detalle, con las alternativas descartadas, está en el

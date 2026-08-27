@@ -217,6 +217,25 @@ st.markdown(
         background: #fcfcfb;
         padding: 0.6rem 0.75rem;
       }}
+      /* Rótulo y cifra centrados en su tarjeta. Streamlit los alinea a la
+         izquierda y, con el marco alrededor, el contenido quedaba descolgado
+         hacia un lado. El rótulo es una rejilla: ahí `justify-content` mueve
+         las pistas, no lo que hay dentro de ellas, y por eso hace falta
+         `justify-items`. La cifra sí es flex y se centra con `justify-content`. */
+      [data-testid="stMain"] [data-testid="stMetric"] {{
+        text-align: center;
+      }}
+      /* El rótulo es una rejilla cuya única pista mide lo que mide el texto:
+         ni `justify-content` ni un `width: 100%` en el hijo lo centran, porque
+         ambos se resuelven contra esa pista de 57 px y no contra la tarjeta.
+         Pasándolo a bloque, el contenedor del texto ocupa el ancho entero y el
+         `text-align` heredado ya tiene sitio donde centrar. */
+      [data-testid="stMain"] [data-testid="stMetricLabel"] {{
+        display: block;
+      }}
+      [data-testid="stMain"] [data-testid="stMetricValue"] {{
+        justify-content: center;
+      }}
       /* Por debajo del tamaño objetivo algún rótulo pasa a dos renglones y las
          tarjetas quedan desparejas. Se les reserva ese segundo renglón a todas,
          y solo aquí: en el rango objetivo esos 16 px de alto se los quitaría al
@@ -870,14 +889,12 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
 
         base = crudo if usar_crudo else canonico
 
-        # El aviso de calidad vive junto al selector que lo motiva, no en la
-        # cabecera: aquí explica por qué existe esa elección, y quien quiera el
-        # detalle lo tiene entero en su vista.
-        if informe.hay_conflictos and not usar_crudo:
-            st.caption(
-                f"El export trae {informe.filas_totales} registros de "
-                f"{informe.unidades_unicas} apartamentos. Ver «Calidad»."
-            )
+        # Sin nota de calidad aquí: entre los filtros se leía como un papel
+        # pegado en el margen. El hallazgo tiene su propia vista, con las cifras
+        # y el caso de ejemplo, y el selector de arriba ya deja compararlo. La
+        # advertencia sigue apareciendo, en rojo y a pantalla completa, en el
+        # único sitio donde de verdad hace falta: al elegir el export sin
+        # depurar, que es la lectura que engaña.
 
         st.markdown('<div class="rotulo">Filtros</div>', unsafe_allow_html=True)
 

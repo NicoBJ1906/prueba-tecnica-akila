@@ -45,9 +45,11 @@ Mismo apartamento físico (torre, piso y puerta), dos versiones incompatibles.
 | Total del proyecto | 457 | **300** |
 
 Presentar «271 vendidos» sería reportar un 30 % de ventas que no existen. Por eso
-el dashboard **no esconde el problema**: lo avisa junto al selector de vista de
-datos, explica la regla que aplica en su propia pestaña y deja comparar ambas
-lecturas.
+el dashboard **no esconde el problema**: le dedica una de sus cuatro vistas
+—«Calidad»—, con las cifras, la regla y un caso real del fichero, y deja
+comparar ambas lecturas con un selector. Elegir el export sin depurar saca
+además un aviso en rojo a pantalla completa, porque esa es la lectura que
+engaña.
 
 ![El mismo dashboard leyendo el export sin depurar](../docs/capturas/dashboard-datos-crudos.png)
 
