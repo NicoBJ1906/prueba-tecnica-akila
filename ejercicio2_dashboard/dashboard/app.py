@@ -121,9 +121,25 @@ st.markdown(
         padding-left: 2.5rem;
         padding-right: 2.5rem;
       }}
-      /* El botón «Deploy» no pinta nada en un tablero de dirección. La barra se
-         mantiene —de ella cuelga el control para reabrir la barra lateral—. */
-      [data-testid="stToolbar"] {{ display: none; }}
+      /* El botón «Deploy» y el menú de Streamlit no pintan nada en un tablero
+         de dirección. Se ocultan uno a uno, y no la barra entera: dentro vive
+         el control para volver a abrir la barra lateral, y sin él plegarla no
+         tendría vuelta atrás. */
+      [data-testid="stToolbar"] [data-testid="stBaseButton-header"],
+      [data-testid="stMainMenuButton"] {{ display: none; }}
+
+      /* Ese control aparece solo con la barra plegada, y de serie es un icono
+         suelto que se pierde contra el fondo. Aquí se presenta como un botón
+         con la marca, para que se vea que hay algo que abrir. */
+      [data-testid="stExpandSidebarButton"] {{
+        background: {VERDE};
+        border-radius: 8px;
+        padding: 0.3rem;
+        box-shadow: 0 1px 4px rgba(56, 56, 56, 0.22);
+      }}
+      [data-testid="stExpandSidebarButton"]:hover {{ background: {GRIS_MARCA}; }}
+      [data-testid="stExpandSidebarButton"] span,
+      [data-testid="stExpandSidebarButton"] svg {{ color: #ffffff; fill: #ffffff; }}
       [data-testid="stMetricValue"] {{
         font-size: 1.75rem;
         font-weight: 600;

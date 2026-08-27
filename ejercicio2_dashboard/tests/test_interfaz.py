@@ -201,6 +201,37 @@ class TestNavegacion:
             )
             assert visible > 20, f"La pestaña «{etiqueta}» aparece vacía."
 
+    def test_la_barra_lateral_se_pliega_y_se_puede_volver_a_abrir(self, pagina):
+        """Plegar la barra no puede ser un viaje sin retorno.
+
+        El control para reabrirla vive dentro de la barra de herramientas de
+        Streamlit. Al ocultar esa barra entera para quitar el botón «Deploy», el
+        de reabrir se fue con ella: la barra lateral se plegaba y ya no había
+        forma de recuperarla sin recargar la página.
+        """
+        p = pagina()
+        ancho = lambda: p.evaluate(  # noqa: E731
+            "() => document.querySelector('[data-testid=\"stSidebar\"]')"
+            "?.getBoundingClientRect().width ?? 0"
+        )
+        assert ancho() > 100, "La barra lateral debería empezar abierta."
+
+        p.hover('[data-testid="stSidebar"]')
+        p.wait_for_timeout(400)
+        p.click('[data-testid="stSidebarHeader"] button')
+        p.wait_for_timeout(1500)
+        assert ancho() < 50, "La barra lateral no llegó a plegarse."
+
+        reabrir = p.locator('[data-testid="stExpandSidebarButton"]')
+        caja = reabrir.bounding_box()
+        assert caja and caja["width"] > 10 and caja["height"] > 10, (
+            "Con la barra plegada no queda ningún control visible para reabrirla."
+        )
+
+        reabrir.click()
+        p.wait_for_timeout(1500)
+        assert ancho() > 100, "El control de reabrir no devolvió la barra lateral."
+
     def test_la_tabla_de_tipos_esta_en_su_pestana(self, pagina):
         """El contenido que se buscaba haciendo scroll tiene que estar aquí."""
         p = pagina()
