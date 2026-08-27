@@ -186,7 +186,7 @@ ejercicio2_dashboard/
 │   ├── etl.py         # carga, validación, diagnóstico de calidad y consolidación
 │   ├── metricas.py    # los indicadores, como funciones puras
 │   └── app.py         # la interfaz (solo compone y dibuja)
-└── tests/             # 43 de datos + 11 de interfaz
+└── tests/             # 43 de datos + 20 de interfaz
 ```
 
 **La decisión de diseño principal: el cálculo no vive en la interfaz.** `etl.py` y
@@ -254,9 +254,10 @@ indicador y los *golden tests* contra las cifras reales.
 datos: el tablero puede calcular bien los 209 vendidos y aun así mostrarlos con
 el gráfico cortado. `test_interfaz.py` abre el dashboard en un navegador real y
 mide la página — que el gráfico entre entero en 1280 × 720 y 1440 × 900, que
-ningún indicador quede cortado, que no haya desborde horizontal, que las cuatro
-pestañas pinten contenido y que el contraste consolidado/crudo cambie las cifras
-de 209 a 271.
+ningún indicador quede cortado ni pierda letras en unos puntos suspensivos, que
+los cuatro vayan en su tarjeta, que las tres formas de pago quepan en un
+renglón, que no haya desborde horizontal, que las cuatro pestañas pinten
+contenido y que el contraste consolidado/crudo cambie las cifras de 209 a 271.
 
 Son opcionales y se saltan solas si Playwright no está instalado:
 

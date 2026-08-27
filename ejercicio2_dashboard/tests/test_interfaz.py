@@ -149,14 +149,64 @@ class TestMaquetacion:
 
     @pytest.mark.parametrize("ancho,alto", TAMANOS)
     def test_ningun_indicador_queda_cortado(self, pagina, ancho, alto):
-        """Con cinco indicadores, «$137,7 MM» se cortaba a media palabra."""
+        """Con cinco indicadores, «$137,7 MM» se cortaba a media palabra.
+
+        Se mide el ancho real del texto con un `Range` y no con `scrollWidth`:
+        cuando el recorte lo hace un `text-overflow: ellipsis`, el navegador
+        deja `scrollWidth` igual a `clientWidth` y el fallo pasa inadvertido.
+        Se comprueban también los rótulos, no solo las cifras.
+        """
         p = pagina(ancho, alto)
         cortados = p.evaluate(
-            """() => [...document.querySelectorAll('[data-testid="stMetricValue"]')]
-                 .filter(e => e.scrollWidth > e.clientWidth + 1)
-                 .map(e => e.innerText)"""
+            """() => {
+                 const recortado = el => {
+                   const r = document.createRange();
+                   r.selectNodeContents(el);
+                   return Math.ceil(r.getBoundingClientRect().width) > el.clientWidth + 1;
+                 };
+                 return [...document.querySelectorAll(
+                     '[data-testid="stMetricValue"] > div, [data-testid="stMetricLabel"] p'
+                 )].filter(recortado).map(e => e.innerText);
+               }"""
         )
         assert cortados == [], f"Indicadores cortados: {cortados}"
+
+    @pytest.mark.parametrize("ancho,alto", TAMANOS)
+    def test_los_indicadores_van_en_tarjetas(self, pagina, ancho, alto):
+        """Cada cifra dentro de su recuadro, para separarla de las de al lado."""
+        p = pagina(ancho, alto)
+        con_borde = p.evaluate(
+            """() => [...document.querySelectorAll(
+                     '[data-testid="stMain"] [data-testid="stVerticalBlock"]'
+                 )]
+                 .filter(e => e.querySelector(
+                     ':scope > [data-testid="stElementContainer"] > [data-testid="stMetric"]'
+                 ))
+                 .filter(e => parseFloat(getComputedStyle(e).borderTopWidth) > 0)
+                 .length"""
+        )
+        assert con_borde == 4, f"Indicadores en tarjeta: {con_borde} de 4"
+
+    @pytest.mark.parametrize("ancho,alto", TAMANOS)
+    def test_las_formas_de_pago_caben_en_un_renglon(self, pagina, ancho, alto):
+        """«Crédito» se iba a una segunda fila y aparecía estirada y descolgada.
+
+        La columna que las aloja tiene que ser lo bastante ancha para las tres.
+        """
+        p = pagina(ancho, alto)
+        renglones = p.evaluate(
+            """() => {
+                 const grupo = document.querySelector(
+                     '[data-testid="stMain"] [data-testid="stButtonGroup"]'
+                 );
+                 if (!grupo) return null;
+                 return new Set([...grupo.querySelectorAll('button')]
+                   .map(b => Math.round(b.getBoundingClientRect().y))).size;
+               }"""
+        )
+        assert renglones == 1, (
+            f"Las formas de pago ocupan {renglones} renglones en lugar de uno."
+        )
 
     def test_el_panel_de_filtros_esta_a_la_derecha(self, pagina):
         """Streamlit coloca su único panel lateral a la izquierda.

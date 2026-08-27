@@ -185,15 +185,55 @@ st.markdown(
         }}
       }}
       [data-testid="stMetricValue"] {{
-        font-size: 1.75rem;
+        /* Cuerpo fluido en vez de fijo: la cifra más ancha —«$137,7 MM»— tiene
+           que caber entera en la tarjeta, y el ancho de esta depende del de la
+           ventana. Con un tamaño fijo, Streamlit la recorta con puntos
+           suspensivos en cuanto la pantalla se estrecha. */
+        font-size: clamp(1.05rem, 1.8vw, 1.55rem);
         font-weight: 600;
         color: {GRIS_MARCA};
       }}
+      /* El rótulo más largo —«Apartamentos vendidos»— marca el tamaño: con la
+         tipografía por defecto Streamlit lo recorta con puntos suspensivos
+         dentro de la tarjeta. */
       [data-testid="stMetricLabel"] p {{
-        font-size: 0.78rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
         color: #7c7c7c;
+        /* Por debajo del tamaño objetivo, que el rótulo pase a dos renglones
+           antes que perder letras en unos puntos suspensivos. */
+        white-space: normal;
+        text-overflow: clip;
+      }}
+      /* Tarjeta de indicador. El relleno por defecto del contenedor con borde
+         suma casi 40 px de alto a la cabecera, y esa altura sale del gráfico:
+         se ajusta a lo justo para que el marco respire. */
+      [data-testid="stMain"] [data-testid="stVerticalBlock"]:has(
+        > [data-testid="stElementContainer"] > [data-testid="stMetric"]
+      ) {{
+        border: 1px solid #ececea;
+        border-radius: 10px;
+        background: #fcfcfb;
+        padding: 0.6rem 0.75rem;
+      }}
+      /* Por debajo del tamaño objetivo algún rótulo pasa a dos renglones y las
+         tarjetas quedan desparejas. Se les reserva ese segundo renglón a todas,
+         y solo aquí: en el rango objetivo esos 16 px de alto se los quitaría al
+         gráfico sin necesidad. */
+      @media (max-width: 1199px) {{
+        [data-testid="stMetricLabel"] p {{
+          min-height: 3em;
+        }}
+        [data-testid="stMetricValue"] {{
+          font-size: clamp(0.95rem, 1.4vw, 1.3rem);
+        }}
+      }}
+      /* Las tres formas de pago en un solo renglón: el relleno de fábrica las
+         hace anchas de más y la última se iba a una segunda fila. */
+      [data-testid="stMain"] [data-testid="stButtonGroup"] button {{
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
       }}
 
       /* --- Barra lateral --------------------------------------------------- */
@@ -735,11 +775,23 @@ def _kpis(r) -> None:
     sobra —el valor pendiente, el avance— baja a la línea de contexto, donde es
     texto y no compite por el ancho ni añade la altura de un chip de delta.
     """
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Apartamentos vendidos", f"{r.vendidos}")
-    c2.metric("Disponibles", f"{r.disponibles}")
-    c3.metric("Valor vendido", formato_cop(r.valor_vendido_cop))
-    c4.metric("Variedad de producto", f"{r.variedad_tipos} tipos")
+    # Rótulos de una palabra siempre que se pueda: en una tarjeta de 130 px, los
+    # largos («Apartamentos vendidos») se recortan con puntos suspensivos en un
+    # portátil de 1280. La unidad —apartamentos— ya la dan el título de la vista
+    # y el eje del gráfico.
+    cifras = (
+        ("Vendidos", f"{r.vendidos}"),
+        ("Disponibles", f"{r.disponibles}"),
+        ("Valor vendido", formato_cop(r.valor_vendido_cop)),
+        ("Variedad", f"{r.variedad_tipos} tipos"),
+    )
+    # Cada cifra en su propia tarjeta: el marco separa los cuatro indicadores
+    # entre sí y del gráfico que viene debajo. Se usa el contenedor con borde de
+    # Streamlit y no un recuadro dibujado con CSS, para no depender de nombres
+    # internos del framework en un elemento tan visible.
+    for columna, (etiqueta, valor) in zip(st.columns(4), cifras, strict=True):
+        with columna.container(border=True):
+            st.metric(etiqueta, valor)
 
 
 def _pestana_ventas(df: pd.DataFrame) -> None:
@@ -755,7 +807,10 @@ def _pestana_ventas(df: pd.DataFrame) -> None:
     # Controles en línea y de la misma familia visual: un desplegable ancho
     # junto a dos interruptores pequeños deja un bloque gris descolgado a la
     # derecha, y el ojo lo lee como un hueco en la maqueta.
-    c1, c2, c3 = st.columns([5, 3, 2])
+    # El reparto no es arbitrario: las tres formas de pago suman unos 250 px de
+    # botón, y con menos ancho la última se iba a un segundo renglón estirada de
+    # lado a lado. Se le reserva sitio para que la fila quepa entera.
+    c1, c2, c3 = st.columns([3.8, 3.8, 2.4])
     with c1:
         periodo = st.slider(
             "Periodo de ventas", min_value=minima, max_value=maxima,
@@ -763,9 +818,7 @@ def _pestana_ventas(df: pd.DataFrame) -> None:
         )
     with c2:
         formas = ["Todas"] + sorted(vendidos["forma_pago"].dropna().unique())
-        forma = st.segmented_control(
-            "Forma de pago", formas, default="Todas", width="stretch"
-        ) or "Todas"
+        forma = st.segmented_control("Forma de pago", formas, default="Todas") or "Todas"
     with c3:
         medir_valor = st.toggle("Medir en COP", value=False)
         por_tipo = st.toggle("Desglosar por tipo", value=False)
@@ -810,10 +863,20 @@ def _pestana_producto(df: pd.DataFrame) -> None:
                 ),
                 hide_index=True,
                 use_container_width=True,
+                # Sin anchos declarados, la barra de progreso se queda con el
+                # sitio y la última columna —el importe— se corta y obliga a
+                # desplazar la tabla a mano para leerla.
                 column_config={
+                    "Tipo": st.column_config.TextColumn("Tipo", width="small"),
+                    "Vendidos": st.column_config.NumberColumn(
+                        "Vendidos", width="small"
+                    ),
                     "% sobre ventas": st.column_config.ProgressColumn(
-                        "% sobre ventas", format="%.1f %%",
+                        "% sobre ventas", format="%.1f %%", width="small",
                         min_value=0, max_value=float(tabla["porcentaje"].max()),
+                    ),
+                    "Valor vendido": st.column_config.TextColumn(
+                        "Valor vendido", width="small"
                     ),
                 },
             )
