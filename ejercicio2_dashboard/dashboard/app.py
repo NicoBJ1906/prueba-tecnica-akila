@@ -18,6 +18,8 @@ Ejecutar desde la raíz del repositorio:
 from __future__ import annotations
 
 import base64
+import html
+import io
 import sys
 from pathlib import Path
 from typing import NamedTuple
@@ -38,8 +40,19 @@ from dashboard.etl import (  # noqa: E402
     cargar,
 )
 from dashboard.metricas import (  # noqa: E402
+    FRANJAS_ALTURA,
+    TONO_ATENCION,
+    TONO_DATO,
+    TONO_RIESGO,
+    avance_acumulado,
+    avance_por_altura,
+    avance_por_torre,
+    cohortes_entrega,
+    composicion_pago,
     formato_cop,
+    insights,
     inventario_por_tipo,
+    precio_por_m2,
     resumen,
     tipos_vendidos,
     ventas_por_semana,
@@ -81,6 +94,17 @@ ALTO_GRAFICO = 250
 # El de inventario va junto a una tabla y sin controles encima, así que dispone
 # de más sitio; lo necesita para que quepan las cinco categorías con su nombre.
 ALTO_INVENTARIO = 300
+# El mapa del edificio necesita alto para que quepan los 22 pisos con su número.
+ALTO_MAPA = 185
+
+# Escala del mapa de torres: del disponible al vendido, en un solo tono. Una
+# rampa secuencial y no dos colores enfrentados, porque lo que codifica es una
+# magnitud —cuánto se ha colocado— y no dos categorías opuestas.
+RAMPA_AVANCE = ["#f2f5ea", "#d3ddb8", "#adbe80", "#7a9a35", "#4d6221"]
+
+# Azul de la paleta, el mismo que separa vendido de disponible en el resto del
+# tablero. Se reserva para lo que aún no se ha colocado.
+AZUL = "#1f5fae"
 
 st.set_page_config(
     page_title="Akila · Dashboard de ventas",
@@ -334,6 +358,57 @@ st.markdown(
       }}
       .ficha strong {{ color: {GRIS_MARCA}; font-weight: 500; }}
 
+      /* --- Hallazgos ------------------------------------------------------- */
+      /* Una tarjeta por hallazgo, en rejilla, y no cinco frases en lista: así
+         se escanean los titulares y solo se baja al detalle del que interesa.
+         Cada tarjeta repite el mismo orden de lectura —categoría, cifra,
+         titular, evidencia—, que es lo que permite comparar de un vistazo. */
+      .hallazgos {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+        gap: 0.5rem;
+        margin-bottom: 0.9rem;
+      }}
+      .hallazgo {{
+        border: 1px solid #ececea;
+        border-top: 3px solid #d8d8d4;
+        border-radius: 9px;
+        padding: 0.55rem 0.7rem 0.6rem;
+        background: #fcfcfb;
+      }}
+      /* El color solo acompaña: la categoría va escrita, para que el tono no
+         sea el único canal que distingue un riesgo de un dato de contexto. */
+      .hallazgo--riesgo {{ border-top-color: #b5623a; }}
+      .hallazgo--atencion {{ border-top-color: {VERDE}; }}
+      .hallazgo--dato {{ border-top-color: #1f5fae; }}
+      .hallazgo-etiqueta {{
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #a8a8a2;
+      }}
+      .hallazgo-cifra {{
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: {GRIS_MARCA};
+        line-height: 1.25;
+        margin: 0.25rem 0 0.1rem;
+        font-variant-numeric: tabular-nums;
+      }}
+      .hallazgo-titular {{
+        font-size: 0.83rem;
+        font-weight: 600;
+        color: {GRIS_MARCA};
+        line-height: 1.3;
+        margin-bottom: 0.3rem;
+      }}
+      .hallazgo-detalle {{
+        font-size: 0.72rem;
+        line-height: 1.45;
+        color: #7c7c76;
+      }}
+
       /* Nombre completo de la vista activa, ahora que el rótulo de navegación
          es de una sola palabra. */
       .titulo-vista {{
@@ -584,9 +659,44 @@ _CSS_NAV_COMPACTA = """
 
 
 @st.cache_data(show_spinner="Cargando cartera…")
-def _cargar(ruta: str):
+def _cargar(ruta: str, marca_tiempo: float):
+    """Lee y consolida el export. `marca_tiempo` no se usa: invalida la caché.
+
+    `st.cache_data` construye la clave con los argumentos, así que cacheando
+    solo por la ruta el tablero seguía enseñando la primera lectura aunque
+    alguien reemplazara el CSV: las cifras se quedaban congeladas sin avisar.
+    Pasando la fecha de modificación, un fichero nuevo es una clave nueva y el
+    ETL vuelve a ejecutarse entero.
+    """
+    del marca_tiempo
     resultado = cargar(ruta)
     return resultado.crudo, resultado.canonico, resultado.informe
+
+
+@st.cache_data(show_spinner="Leyendo el fichero…")
+def _cargar_subido(contenido: bytes, _nombre: str):
+    """Un export traído desde el navegador, sin pasar por disco.
+
+    La clave de caché son los propios bytes, de modo que subir dos veces el
+    mismo fichero no recalcula y subir uno distinto sí.
+    """
+    resultado = cargar(io.BytesIO(contenido))
+    return resultado.crudo, resultado.canonico, resultado.informe
+
+
+def _origen_de_datos():
+    """Devuelve (crudo, canónico, informe) y la etiqueta del origen en uso.
+
+    El tablero no está atado al fichero del enunciado: si se sube otro export
+    con el mismo esquema, todo —indicadores, gráficos, hallazgos y la regla de
+    consolidación— se recalcula sobre él. Es lo que separa un tablero de una
+    captura de pantalla con datos dentro.
+    """
+    subido = st.session_state.get("csv_subido")
+    if subido is not None:
+        return _cargar_subido(subido.getvalue(), subido.name), subido.name
+    ruta = RUTA_CSV_POR_DEFECTO
+    return _cargar(str(ruta), ruta.stat().st_mtime), ruta.name
 
 
 @st.cache_data
@@ -603,6 +713,14 @@ def _logo_incrustado(ruta: str) -> str:
     if not fichero.exists():
         return ""
     return base64.b64encode(fichero.read_bytes()).decode("ascii")
+
+
+# Claves de los filtros en `session_state`. Se listan aquí para poder
+# devolverlos todos a su valor por defecto de una vez: borrar la clave hace que
+# el widget se vuelva a construir con el valor inicial que le pasa el código.
+CLAVES_FILTRO = (
+    "f_torre", "f_tipo", "f_precio", "f_area", "f_piso", "f_estado", "f_entrega",
+)
 
 
 class Vista(NamedTuple):
@@ -627,8 +745,8 @@ class Vista(NamedTuple):
 VISTAS = (
     Vista(":material/trending_up:", "Ventas"),
     Vista(":material/apartment:", "Producto"),
-    Vista(":material/fact_check:", "Calidad"),
-    Vista(":material/table_rows:", "Registros"),
+    Vista(":material/grid_view:", "Torres"),
+    Vista(":material/table_rows:", "Datos"),
 )
 
 
@@ -816,6 +934,251 @@ def _grafico_ventas_semana(serie: pd.DataFrame, medir_valor: bool, media_movil: 
     return (barras + linea).properties(height=ALTO_GRAFICO)
 
 
+def _grafico_avance_acumulado(df: pd.DataFrame, medir_valor: bool):
+    """La curva de avance: cuánto lleva colocado el proyecto, semana a semana.
+
+    Las barras semanales dicen cuánto se vendió cada semana; esta curva dice por
+    dónde va el proyecto. Un tramo plano es un parón, y en acumulado se ve de
+    lejos aunque en barras pase desapercibido entre semanas de una y dos
+    unidades. Área bajo la línea porque lo que se lee es un total que crece, no
+    una serie que sube y baja.
+    """
+    datos = avance_acumulado(df)
+    campo = "valor_cop" if medir_valor else "unidades"
+    titulo = "Valor acumulado (COP)" if medir_valor else "Apartamentos acumulados"
+
+    base = alt.Chart(datos).encode(
+        x=_eje_x(),
+        y=alt.Y(
+            f"{campo}:Q",
+            title=titulo,
+            axis=alt.Axis(
+                format="$,.0f" if medir_valor else "d",
+                labelColor=TINTA_TENUE, titleColor=TINTA_TENUE,
+            ),
+        ),
+        tooltip=[
+            alt.Tooltip("semana:T", title="Semana del", format="%d/%m/%Y"),
+            alt.Tooltip("unidades:Q", title="Acumulado"),
+            alt.Tooltip("valor_cop:Q", title="Valor (COP)", format=",.0f"),
+            alt.Tooltip("porcentaje_proyecto:Q", title="% del proyecto", format=".1f"),
+        ],
+    )
+    area = base.mark_area(color=VERDE, opacity=0.16, line=False)
+    linea = base.mark_line(color=VERDE, strokeWidth=2.5)
+    return (area + linea).properties(height=ALTO_GRAFICO)
+
+
+def _grafico_precio_area(df: pd.DataFrame):
+    """Cada apartamento como un punto: área contra precio, coloreado por tipo.
+
+    Enseña de una vez el posicionamiento de todo el producto —dónde está cada
+    tipo en la escala de precio y tamaño— y si hay unidades fuera de la nube de
+    las suyas, que es la pregunta que ninguna media responde. Lo disponible va
+    en tono sólido y lo vendido atenuado: aquí lo que interesa mirar es lo que
+    queda por colocar.
+    """
+    datos = precio_por_m2(df)
+    tipos = [t for t in ORDEN_TIPOS if t in set(datos["tipo_apartamento"])]
+
+    return (
+        alt.Chart(datos)
+        .mark_circle(size=58, stroke=SUPERFICIE, strokeWidth=0.6)
+        .encode(
+            x=alt.X(
+                "area_m2:Q", title="Área (m²)",
+                scale=alt.Scale(zero=False, nice=True),
+                axis=alt.Axis(labelColor=TINTA_TENUE, titleColor=TINTA_TENUE),
+            ),
+            y=alt.Y(
+                "precio_cop:Q", title="Precio (COP)",
+                scale=alt.Scale(zero=False, nice=True),
+                axis=alt.Axis(format="$,.0f", labelColor=TINTA_TENUE, titleColor=TINTA_TENUE),
+            ),
+            color=alt.Color(
+                "tipo_apartamento:N", title=None,
+                scale=alt.Scale(domain=tipos, range=PALETA_TIPOS[: len(tipos)]),
+                legend=alt.Legend(orient="top", labelColor=TINTA_TENUE, columns=5),
+            ),
+            opacity=alt.Opacity(
+                "estado:N",
+                scale=alt.Scale(domain=[ESTADO_DISPONIBLE, ESTADO_VENDIDO], range=[0.95, 0.3]),
+                legend=alt.Legend(orient="top", title=None, labelColor=TINTA_TENUE),
+            ),
+            tooltip=[
+                alt.Tooltip("apartamento:N", title="Apartamento"),
+                alt.Tooltip("torre:N", title="Torre"),
+                alt.Tooltip("tipo_apartamento:N", title="Tipo"),
+                alt.Tooltip("area_m2:Q", title="Área (m²)"),
+                alt.Tooltip("precio_cop:Q", title="Precio (COP)", format=",.0f"),
+                alt.Tooltip("precio_m2:Q", title="Precio por m²", format=",.0f"),
+                alt.Tooltip("estado:N", title="Estado"),
+            ],
+        )
+        .properties(height=ALTO_INVENTARIO)
+    )
+
+
+def _grafico_mapa_torres(df: pd.DataFrame):
+    """El proyecto en doce celdas: torre contra altura, con la cifra dentro.
+
+    La primera versión pintaba los 22 pisos uno a uno: 88 celdas que había que
+    estudiar en lugar de leer, y con las etiquetas de piso salteadas de dos en
+    dos era imposible saber qué fila era cuál. Agrupado en tres alturas, la
+    rejilla cabe en un vistazo y cada celda lleva escrito lo que le queda por
+    vender, que es el dato que se busca.
+
+    Se devuelve una superposición: el color codifica el avance y el texto dice
+    cuántas unidades quedan libres, de modo que la información no depende solo
+    del color.
+    """
+    datos = avance_por_altura(df)
+    orden_franjas = [nombre for _, _, nombre in reversed(FRANJAS_ALTURA)]
+
+    base = alt.Chart(datos).encode(
+        x=alt.X(
+            "torre:N", title=None,
+            axis=alt.Axis(labelColor=GRIS_MARCA, labelAngle=0, orient="top",
+                          labelFontSize=12, labelFontWeight=500, domain=False, ticks=False),
+        ),
+        y=alt.Y(
+            "franja:N", title=None, sort=orden_franjas,
+            axis=alt.Axis(labelColor=TINTA_TENUE, labelFontSize=11,
+                          domain=False, ticks=False),
+        ),
+    )
+
+    celdas = base.mark_rect(stroke=SUPERFICIE, strokeWidth=3, cornerRadius=6).encode(
+        color=alt.Color(
+            "porcentaje:Q",
+            title="% vendido",
+            scale=alt.Scale(domain=[40, 100], range=RAMPA_AVANCE, clamp=True),
+            legend=alt.Legend(
+                orient="bottom", labelColor=TINTA_TENUE, titleColor=TINTA_TENUE,
+                gradientLength=140, titleFontSize=10, labelFontSize=10,
+            ),
+        ),
+        tooltip=[
+            alt.Tooltip("torre:N", title="Torre"),
+            alt.Tooltip("franja:N", title="Altura"),
+            alt.Tooltip("total:Q", title="Unidades"),
+            alt.Tooltip("vendidos:Q", title="Vendidas"),
+            alt.Tooltip("disponibles:Q", title="Libres"),
+            alt.Tooltip("porcentaje:Q", title="% vendido", format=".0f"),
+        ],
+    )
+
+    # Solo la cifra, centrada. Llevaba debajo un «libres» de 9 px que, con el
+    # alto que la celda tiene aquí, se montaba encima del número. La palabra ya
+    # está en el rótulo del gráfico y en el tooltip: repetirla dentro de cada
+    # celda no añadía nada y rompía la lectura.
+    #
+    # Blanco sobre las celdas oscuras y tinta sobre las claras: con un solo
+    # color, la mitad de las cifras quedaría ilegible.
+    etiquetas = base.mark_text(fontSize=16, fontWeight=600).encode(
+        text=alt.Text("disponibles:Q"),
+        color=alt.condition(
+            alt.datum.porcentaje > 72, alt.value(SUPERFICIE), alt.value(GRIS_MARCA)
+        ),
+    )
+
+    return (celdas + etiquetas).properties(height=ALTO_MAPA)
+
+
+def _grafico_avance_torres(df: pd.DataFrame):
+    """Una barra por torre, ordenada de peor a mejor, con el porcentaje escrito.
+
+    Barras apiladas de vendido y disponible dejaban cuatro tiras de un píxel con
+    la mitad de los nombres sin sitio. Aquí la barra mide directamente el
+    porcentaje vendido —que es lo que se compara— sobre un carril que representa
+    el total, y el número va escrito al final de cada una.
+    """
+    torres = avance_por_torre(df).sort_values("porcentaje", ascending=True)
+    orden = list(torres["torre"])
+    alto = max(150, 42 * len(orden))
+
+    base = alt.Chart(torres).encode(
+        y=alt.Y(
+            "torre:N", title=None, sort=orden,
+            axis=alt.Axis(labelColor=GRIS_MARCA, labelFontSize=12, labelFontWeight=500,
+                          domain=False, ticks=False),
+        ),
+        tooltip=[
+            alt.Tooltip("torre:N", title="Torre"),
+            alt.Tooltip("total:Q", title="Unidades"),
+            alt.Tooltip("vendidos:Q", title="Vendidas"),
+            alt.Tooltip("disponibles:Q", title="Libres"),
+            alt.Tooltip("porcentaje:Q", title="% vendido", format=".0f"),
+            alt.Tooltip("valor_cop:Q", title="Valor de la torre (COP)", format=",.0f"),
+        ],
+    )
+
+    eje = alt.X(
+        "porcentaje:Q", title=None, scale=alt.Scale(domain=[0, 100]),
+        axis=alt.Axis(format="d", labelColor=TINTA_TENUE, labelFontSize=10,
+                      values=[0, 25, 50, 75, 100], domain=False, ticks=False,
+                      grid=True, gridColor="#f0f0ee"),
+    )
+    # El carril del fondo es el 100 %: da la referencia de cuánto falta sin
+    # necesidad de una segunda serie ni de una leyenda.
+    carril = base.mark_bar(color="#f0f2ea", cornerRadius=5, height=17).encode(
+        x=alt.X("maximo:Q", title=None, scale=alt.Scale(domain=[0, 100]), axis=None)
+    ).transform_calculate(maximo="100")
+    barras = base.mark_bar(color=VERDE, cornerRadius=5, height=17).encode(x=eje)
+    cifras = base.mark_text(
+        align="left", dx=6, fontSize=11, fontWeight=600, color=GRIS_MARCA
+    ).encode(x=eje, text=alt.Text("porcentaje:Q", format=".0f"))
+
+    return (carril + barras + cifras).properties(height=alto)
+
+
+def _grafico_cohortes(df: pd.DataFrame):
+    """Qué se entrega cada trimestre y cuánto de eso sigue sin vender.
+
+    Pone plazo al inventario. «91 disponibles» no dice nada por sí solo; «17 de
+    ellos se entregan en cuatro meses» sí, porque eso ya no se vende sobre
+    plano: se vende terminado, y eso es otra conversación de precio.
+    """
+    datos = cohortes_entrega(df)
+    largo = datos.melt(
+        id_vars=["trimestre", "porcentaje"],
+        value_vars=["vendidos", "disponibles"],
+        var_name="estado", value_name="unidades",
+    ).replace({"vendidos": ESTADO_VENDIDO, "disponibles": ESTADO_DISPONIBLE})
+    largo["_orden"] = (largo["estado"] != ESTADO_VENDIDO).astype(int)
+
+    return (
+        alt.Chart(largo)
+        .mark_bar(stroke=SUPERFICIE, strokeWidth=2, cornerRadiusTopLeft=3,
+                  cornerRadiusTopRight=3, size=26)
+        .encode(
+            order=alt.Order("_orden:Q", sort="ascending"),
+            x=alt.X(
+                "trimestre:T", title=None,
+                axis=alt.Axis(format="%b %Y", labelColor=TINTA_TENUE, labelAngle=0),
+            ),
+            y=alt.Y(
+                "unidades:Q", title="Apartamentos",
+                axis=alt.Axis(labelColor=TINTA_TENUE, titleColor=TINTA_TENUE),
+            ),
+            color=alt.Color(
+                "estado:N", title=None,
+                scale=alt.Scale(
+                    domain=[ESTADO_VENDIDO, ESTADO_DISPONIBLE], range=[VERDE, AZUL]
+                ),
+                legend=alt.Legend(orient="top", labelColor=TINTA_TENUE),
+            ),
+            tooltip=[
+                alt.Tooltip("trimestre:T", title="Entrega", format="%m/%Y"),
+                alt.Tooltip("estado:N", title="Estado"),
+                alt.Tooltip("unidades:Q", title="Apartamentos"),
+                alt.Tooltip("porcentaje:Q", title="% vendido del trimestre", format=".0f"),
+            ],
+        )
+        .properties(height=ALTO_GRAFICO)
+    )
+
+
 def _grafico_inventario(df: pd.DataFrame):
     """Vendido frente a disponible por tipo: dónde queda producto por colocar.
 
@@ -902,11 +1265,12 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
         # llene de etiquetas repitiendo el estado por defecto y la mantiene
         # corta en pantallas de portátil.
         torres_sel = st.multiselect(
-            "Torre", sorted(base["torre"].unique()), placeholder="Todas las torres"
+            "Torre", sorted(base["torre"].unique()), placeholder="Todas las torres",
+            key="f_torre",
         )
         tipos_sel = st.multiselect(
             "Tipo de apartamento", sorted(base["tipo_apartamento"].unique()),
-            placeholder="Todos los tipos",
+            placeholder="Todos los tipos", key="f_tipo",
         )
 
         # Los umbrales se manejan en millones: un deslizador que muestra
@@ -917,27 +1281,79 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
             "Precio (millones COP)",
             min_value=precio_min, max_value=precio_max,
             value=(precio_min, precio_max), step=10, format="$%d M",
-            help="Para aislar el producto de gama alta del resto.",
+            help="Para aislar el producto de gama alta del resto.", key="f_precio",
         )
 
         area_min, area_max = int(base["area_m2"].min()), int(base["area_m2"].max())
         rango_area = st.slider(
             "Área", min_value=area_min, max_value=area_max,
-            value=(area_min, area_max), format="%d m²",
+            value=(area_min, area_max), format="%d m²", key="f_area",
         )
+
+        # La altura es una variable comercial por derecho propio —un piso 20 no
+        # se vende como un piso 2— y estaba en el fichero sin usar.
+        piso_min, piso_max = int(base["piso"].min()), int(base["piso"].max())
+        rango_piso = st.slider(
+            "Piso", min_value=piso_min, max_value=piso_max,
+            value=(piso_min, piso_max),
+            help="Para aislar las plantas bajas de las altas.", key="f_piso",
+        )
+
+        estado_sel = st.segmented_control(
+            "Estado", [ESTADO_VENDIDO, ESTADO_DISPONIBLE], default=None,
+            help="Sin selección, se muestran ambos.", key="f_estado",
+        )
+
+        # Por trimestre y no por día: nadie filtra entregas de obra por fecha
+        # exacta, y un deslizador de dos años en días no se maneja.
+        entregas_validas = base["fecha_entrega"].dropna()
+        rango_entrega = None
+        if not entregas_validas.empty:
+            trimestres = sorted(
+                entregas_validas.dt.to_period("Q").unique().to_timestamp()
+            )
+            if len(trimestres) > 1:
+                rango_entrega = st.select_slider(
+                    "Entrega",
+                    options=trimestres,
+                    value=(trimestres[0], trimestres[-1]),
+                    format_func=lambda t: f"{t:%m/%Y}",
+                    help="Acota por trimestre de entrega de obra.", key="f_entrega",
+                )
 
         condiciones = (
             base["precio_cop"].between(
                 rango_precio[0] * 1_000_000, rango_precio[1] * 1_000_000
             )
             & base["area_m2"].between(*rango_area)
+            & base["piso"].between(*rango_piso)
         )
         if torres_sel:
             condiciones &= base["torre"].isin(torres_sel)
         if tipos_sel:
             condiciones &= base["tipo_apartamento"].isin(tipos_sel)
+        if estado_sel:
+            condiciones &= base["estado"] == estado_sel
+        if rango_entrega is not None:
+            # El último trimestre entra entero: su marca es el día 1, y sin
+            # extenderlo hasta el final se perderían casi todas sus entregas.
+            hasta = rango_entrega[1] + pd.offsets.QuarterEnd(0)
+            condiciones &= base["fecha_entrega"].between(rango_entrega[0], hasta) | base[
+                "fecha_entrega"
+            ].isna()
         filtrado = base[condiciones]
         hay_filtro = len(filtrado) < len(base)
+
+        # Limpiar de un gesto. Con siete filtros, deshacerlos uno a uno para
+        # volver al total del proyecto es tedioso y se acaba recargando la
+        # página, que además pierde la vista en la que se estaba.
+        if hay_filtro and st.button(
+            "Quitar filtros", icon=":material/filter_alt_off:", type="tertiary",
+            key="limpiar_filtros", use_container_width=True,
+        ):
+            for clave in CLAVES_FILTRO:
+                st.session_state.pop(clave, None)
+            st.rerun()
 
         # Pie: la ficha del proyecto, no la del fichero. A dirección le dice
         # algo «300 apartamentos en 4 torres»; «apartamentos_akila.csv», no.
@@ -969,6 +1385,22 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
         st.markdown(
             f'<div class="ficha">{"<br>".join(ficha)}</div>', unsafe_allow_html=True
         )
+
+        # Cargar otro export. El tablero no está atado al fichero del enunciado:
+        # cualquier CSV con el mismo esquema recalcula todo, consolidación
+        # incluida. Si el esquema no cuadra, `validar_esquema` lo dice antes de
+        # pintar una sola cifra, que es preferible a un tablero que enseña
+        # números equivocados sin avisar.
+        with st.expander("Cambiar de fichero"):
+            st.file_uploader(
+                "Export en CSV", type="csv", key="csv_subido",
+                label_visibility="collapsed",
+                help="Mismas columnas que el export original.",
+            )
+            st.caption(
+                "Se recalculan indicadores, gráficos y regla de consolidación. "
+                "El fichero no se guarda: vive solo en esta sesión."
+            )
 
     return usar_crudo, filtrado, hay_filtro, len(base)
 
@@ -1037,15 +1469,34 @@ def _pestana_ventas(df: pd.DataFrame, r) -> None:
         st.info("Ninguna venta cumple estos criterios. Prueba a ampliar el periodo.")
         return
 
-    if por_tipo:
-        grafico = _grafico_ventas_por_tipo(en_periodo, medir_valor)
-    else:
-        # La tendencia solo tiene sentido sobre el total: una media móvil por
-        # cada tipo dejaría el gráfico ilegible.
-        grafico = _grafico_ventas_semana(
-            ventas_por_semana(en_periodo), medir_valor, media_movil=True
+    # Dos lecturas del mismo periodo, una encima de otra: el pulso semanal y el
+    # avance acumulado. Separadas en pestañas y no en dos gráficos apilados
+    # porque, apiladas, la segunda cae fuera de pantalla y el objetivo de esta
+    # maqueta es que lo que se mira quepa sin scroll.
+    ritmo, acumulado = st.tabs(["Ventas por semana", "Avance acumulado"])
+
+    with ritmo:
+        if por_tipo:
+            grafico = _grafico_ventas_por_tipo(en_periodo, medir_valor)
+        else:
+            # La tendencia solo tiene sentido sobre el total: una media móvil por
+            # cada tipo dejaría el gráfico ilegible.
+            grafico = _grafico_ventas_semana(
+                ventas_por_semana(en_periodo), medir_valor, media_movil=True
+            )
+        st.altair_chart(grafico, use_container_width=True)
+
+    with acumulado:
+        # Sobre `df` y no sobre `en_periodo`: el acumulado mide el avance del
+        # proyecto, y recortarlo al periodo elegido arrancaría la curva en cero
+        # como si antes no se hubiera vendido nada.
+        st.altair_chart(
+            _grafico_avance_acumulado(df, medir_valor), use_container_width=True
         )
-    st.altair_chart(grafico, use_container_width=True)
+        st.caption(
+            f"Acumulado sobre el proyecto completo de la selección "
+            f"({len(df)} apartamentos), no sobre el periodo elegido arriba."
+        )
 
     # El ritmo y los meses de inventario son la lectura del gráfico, no una
     # cifra de cabecera: puestos aquí se leen junto a las barras que los
@@ -1058,6 +1509,69 @@ def _pestana_ventas(df: pd.DataFrame, r) -> None:
 
 
 def _pestana_producto(df: pd.DataFrame) -> None:
+    mix, posicion, pago = st.tabs(
+        ["Mix e inventario", "Precio y tamaño", "Forma de pago"]
+    )
+    with mix:
+        _producto_mix(df)
+    with posicion:
+        st.caption(
+            "**Cada punto es un apartamento** · lo disponible en tono sólido, "
+            "lo vendido atenuado"
+        )
+        st.altair_chart(_grafico_precio_area(df), use_container_width=True)
+        st.caption(
+            "Sirve para dos cosas: ver dónde se sitúa cada tipo en la escala de "
+            "precio y tamaño, y detectar unidades que se salen de la nube de las "
+            "suyas. Pasa el ratón por un punto para ver su precio por m²."
+        )
+    with pago:
+        _producto_pago(df)
+
+
+def _producto_pago(df: pd.DataFrame) -> None:
+    """Cómo se paga lo que se vende, y cuánto de eso todavía no es caja."""
+    pagos = composicion_pago(df)
+    if pagos.empty:
+        st.info("Sin ventas en la selección actual.")
+        return
+
+    financiado = float(pagos["credito_cop"].sum())
+    cobrado = float(pagos["contado_cop"].sum())
+    total = financiado + cobrado
+
+    c1, c2, c3 = st.columns(3)
+    with c1.container(border=True):
+        st.metric("Pagado de contado", formato_cop(cobrado))
+    with c2.container(border=True):
+        st.metric("Financiado a crédito", formato_cop(financiado))
+    with c3.container(border=True):
+        st.metric(
+            "Peso del crédito", f"{financiado / total * 100:.0f} %" if total else "—"
+        )
+
+    vista = pagos.assign(
+        valor_cop=pagos["valor_cop"].map(formato_cop),
+        credito_cop=pagos["credito_cop"].map(formato_cop),
+        contado_cop=pagos["contado_cop"].map(formato_cop),
+    ).rename(
+        columns={
+            "forma_pago": "Forma de pago",
+            "unidades": "Apartamentos",
+            "valor_cop": "Valor vendido",
+            "credito_cop": "Parte a crédito",
+            "contado_cop": "Parte en efectivo",
+        }
+    )
+    st.dataframe(vista, hide_index=True, use_container_width=True)
+    st.caption(
+        "Dos ventas del mismo precio no valen lo mismo para caja si una llega "
+        "financiada. El desglose sale de las columnas `monto_credito_cop` y "
+        "`monto_contado_cop` del propio export."
+    )
+
+
+def _producto_mix(df: pd.DataFrame) -> None:
     izquierda, derecha = st.columns([1, 1])
 
     with izquierda:
@@ -1103,6 +1617,141 @@ def _pestana_producto(df: pd.DataFrame) -> None:
     with derecha:
         st.caption("**Inventario por tipo** · dónde queda producto sin colocar")
         st.altair_chart(_grafico_inventario(df), use_container_width=True)
+
+
+def _bloque_insights(df: pd.DataFrame) -> None:
+    """Los hallazgos, arriba de la vista y en su propio recuadro.
+
+    Van antes de los gráficos a propósito: quien abre el tablero con dos minutos
+    quiere la conclusión, y quien tiene diez la comprueba debajo. Las frases se
+    calculan con reglas —están en `metricas.insights`— y cada una se puede
+    verificar en el gráfico que tiene al lado.
+    """
+    hallazgos = insights(df)
+    if not hallazgos:
+        return
+
+    tarjetas = "".join(
+        f'<div class="hallazgo hallazgo--{h.tono}">'
+        f'<div class="hallazgo-etiqueta">{ETIQUETA_TONO[h.tono]}</div>'
+        f'<div class="hallazgo-cifra">{_escapar(h.cifra)}</div>'
+        f'<div class="hallazgo-titular">{_escapar(h.titular)}</div>'
+        f'<div class="hallazgo-detalle">{_escapar(h.detalle)}</div>'
+        "</div>"
+        for h in hallazgos
+    )
+    st.markdown(
+        '<div class="rotulo-nav" style="margin-top:0">Qué está pasando</div>'
+        f'<div class="hallazgos">{tarjetas}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+# Cómo se nombra cada tono en pantalla. La etiqueta es lo primero que se lee de
+# la tarjeta y ordena la mirada antes que el color, que por sí solo no basta.
+ETIQUETA_TONO = {
+    TONO_RIESGO: "Riesgo",
+    TONO_ATENCION: "Atención",
+    TONO_DATO: "Contexto",
+}
+
+
+def _escapar(texto: str) -> str:
+    """Los textos van dentro de HTML, así que se escapan antes de insertarlos.
+
+    Los redacta `metricas.insights` y hoy no traen nada peligroso, pero un
+    nombre de torre con un `&` bastaría para romper la maqueta.
+    """
+    return html.escape(texto, quote=False)
+
+
+def _pestana_torres(df: pd.DataFrame) -> None:
+    """Dónde está lo que queda por vender: por torre, por altura y por plazo."""
+    donde, cuando = st.tabs(["Dónde queda inventario", "Cuándo se entrega"])
+
+    with donde:
+        # Con el filtro de estado en «Vendido» no queda inventario que situar, y
+        # el mapa se llenaba de ceros en verde oscuro: una rejilla que parecía
+        # rota. Es mejor decir por qué está vacía.
+        if not (df["estado"] == ESTADO_DISPONIBLE).any():
+            st.info(
+                "La selección actual no tiene apartamentos disponibles, así que "
+                "no hay inventario que situar. Quita el filtro de estado para "
+                "ver dónde queda producto libre.",
+                icon=":material/filter_alt:",
+            )
+        else:
+            izquierda, derecha = st.columns([1.3, 1])
+            with izquierda:
+                st.caption("**Apartamentos libres** · por torre y altura")
+                st.altair_chart(_grafico_mapa_torres(df), use_container_width=True)
+            with derecha:
+                st.caption("**Avance de cada torre** · % vendido")
+                st.altair_chart(_grafico_avance_torres(df), use_container_width=True)
+
+    with cuando:
+        st.caption(
+            "**Calendario de obra** · cuántos apartamentos se entregan cada "
+            "trimestre y cuántos siguen sin vender"
+        )
+        st.altair_chart(_grafico_cohortes(df), use_container_width=True)
+        st.caption(
+            "Lo que sigue libre y se entrega pronto ya no se vende sobre plano: "
+            "se vende terminado, y eso es otra conversación de precio."
+        )
+
+
+def _pestana_datos(df: pd.DataFrame, crudo: pd.DataFrame, informe) -> None:
+    """Los registros y la auditoría del fichero, en un solo sitio.
+
+    Se muestran las dos lecturas —la consolidada y la del export tal cual— y la
+    explicación de por qué difieren. Poder ver la tabla depurada importa tanto
+    como ver la cruda: es la que sostiene las cifras de arriba, y quien revise
+    esto debe poder comprobarla fila a fila y descargarla.
+    """
+    limpios, sin_depurar, calidad = st.tabs(
+        ["Consolidados", "Export sin depurar", "Cómo se consolidó"]
+    )
+
+    with limpios:
+        st.caption(
+            f"**{len(df)} apartamentos** tras aplicar la regla de consolidación. "
+            "Es la tabla que sostiene todas las cifras del tablero."
+        )
+        st.dataframe(
+            df, hide_index=True, use_container_width=True, height=360,
+            column_config=_columnas_cartera(),
+        )
+        _boton_descarga(df, "apartamentos_consolidados.csv")
+
+    with sin_depurar:
+        st.caption(
+            f"**{len(crudo)} registros** tal y como vienen en el CSV, duplicados "
+            "incluidos. Sirve para auditar la consolidación, no para decidir."
+        )
+        st.dataframe(
+            crudo, hide_index=True, use_container_width=True, height=360,
+            column_config=_columnas_cartera(),
+        )
+        _boton_descarga(crudo, "apartamentos_export_original.csv")
+
+    with calidad:
+        _pestana_calidad(informe, crudo)
+
+
+def _boton_descarga(datos: pd.DataFrame, nombre: str) -> None:
+    """Descarga en CSV de lo que hay en pantalla, filtros incluidos.
+
+    Quien audita una cifra acaba queriendo la tabla fuera del navegador. El
+    fichero sale con la selección aplicada, que es lo que se está mirando.
+    """
+    st.download_button(
+        "Descargar CSV",
+        datos.to_csv(index=False).encode("utf-8"),
+        file_name=nombre,
+        mime="text/csv",
+        icon=":material/download:",
+    )
 
 
 def _pestana_calidad(informe, crudo: pd.DataFrame) -> None:
@@ -1153,10 +1802,23 @@ y disponibles. Campos en conflicto:
 
 def main() -> None:
     try:
-        crudo, canonico, informe = _cargar(str(RUTA_CSV_POR_DEFECTO))
+        (crudo, canonico, informe), origen = _origen_de_datos()
     except (FileNotFoundError, ErrorDeEsquema) as exc:
         st.error(f"No se pudieron cargar los datos.\n\n{exc}")
+        # Sin esto, un fichero subido con el esquema equivocado deja el tablero
+        # atascado en el error: no habría forma de volver al de por defecto.
+        if st.session_state.get("csv_subido") is not None and st.button(
+            "Volver al export original", icon=":material/undo:"
+        ):
+            st.session_state.pop("csv_subido", None)
+            st.rerun()
         st.stop()
+
+    # Qué fichero se está mirando, visible solo cuando no es el de por defecto:
+    # confundir un export de prueba con el bueno es un error caro.
+    if st.session_state.get("csv_subido") is not None:
+        st.info(f"Datos cargados desde **{origen}**, no del export del proyecto.",
+                icon=":material/upload_file:")
 
     usar_crudo, df, hay_filtro, total_sin_filtrar = _barra_lateral(crudo, canonico, informe)
 
@@ -1217,17 +1879,14 @@ def main() -> None:
                         unsafe_allow_html=True)
             _pestana_producto(df)
         elif vista == VISTAS[2].nombre:
-            st.markdown('<div class="titulo-vista">Calidad de los datos</div>',
+            st.markdown('<div class="titulo-vista">Torres y entregas</div>',
                         unsafe_allow_html=True)
-            _pestana_calidad(informe, crudo)
+            _bloque_insights(df)
+            _pestana_torres(df)
         else:
-            st.markdown('<div class="titulo-vista">Registros de la cartera</div>',
+            st.markdown('<div class="titulo-vista">Datos de la cartera</div>',
                         unsafe_allow_html=True)
-            st.caption(f"{len(df)} apartamentos en la selección actual.")
-            st.dataframe(
-                df, hide_index=True, use_container_width=True, height=380,
-                column_config=_columnas_cartera(),
-            )
+            _pestana_datos(df, crudo, informe)
 
 
 if __name__ == "__main__":

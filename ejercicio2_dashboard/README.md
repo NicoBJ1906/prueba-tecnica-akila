@@ -45,9 +45,9 @@ Mismo apartamento físico (torre, piso y puerta), dos versiones incompatibles.
 | Total del proyecto | 457 | **300** |
 
 Presentar «271 vendidos» sería reportar un 30 % de ventas que no existen. Por eso
-el dashboard **no esconde el problema**: le dedica una de sus cuatro vistas
-—«Calidad»—, con las cifras, la regla y un caso real del fichero, y deja
-comparar ambas lecturas con un selector. Elegir el export sin depurar saca
+el dashboard **no esconde el problema**: la vista «Datos» lo explica entero
+—las cifras, la regla y un caso real del fichero— junto a las dos tablas, la
+consolidada y la del export tal cual, y deja comparar ambas lecturas. Elegir el export sin depurar saca
 además un aviso en rojo a pantalla completa, porque esa es la lectura que
 engaña.
 
@@ -110,7 +110,8 @@ dashboard: está en el proceso que genera el export.
 4. **Apartamentos disponibles** — cuántos quedan y por cuánto valor.
 5. **Variedad de producto** — cuántos tipos distintos hay en el proyecto.
 
-**Y lo que dirección pregunta a continuación:**
+**Y lo que dirección pregunta a continuación**, repartido en cuatro vistas —
+Ventas, Producto, Torres y Datos:
 
 - **Ritmo comercial reciente y meses de inventario** — media de apartamentos por
   semana del último trimestre y, a ese ritmo, cuánto queda hasta agotar lo
@@ -122,8 +123,44 @@ dashboard: está en el proceso que genera el export.
 - **Desglose por tipo de las ventas semanales** — un interruptor convierte el
   gráfico en barras apiladas por producto. Responde a lo que el total no dice:
   no solo cuánto se vendió cada semana, sino **qué** se vendió.
+- **Curva de avance acumulado** — las barras dicen cuánto se vendió cada semana;
+  la curva dice por dónde va el proyecto. Un tramo plano es un parón, y en
+  acumulado se ve de lejos aunque entre barras de una y dos unidades pase
+  desapercibido.
+- **Precio contra área** — cada apartamento es un punto, coloreado por tipo y con
+  lo disponible en tono sólido. Enseña de una vez el posicionamiento de todo el
+  producto y las unidades que se salen de la nube de las suyas.
+- **Mapa de torre × altura** — doce celdas con las unidades libres de cada cruce.
+  Cambia la conversación comercial: no es «quedan penthouses», es «quedan 14 en
+  los pisos medios de la Torre 3».
+- **Calendario de entregas** — qué se entrega cada trimestre y cuánto de eso
+  sigue sin vender. Pone plazo al inventario: «91 disponibles» no dice nada por
+  sí solo; «33 de ellos se entregan en menos de un año» sí.
+- **Composición del pago** — cuánto de lo vendido está financiado a crédito. Dos
+  ventas del mismo precio no valen lo mismo para caja, y el dato estaba en el
+  export sin usar.
 
-![Ventas semanales desglosadas por tipo](../docs/capturas/dashboard-ventas-por-tipo.png)
+### Hallazgos automáticos
+
+Cada vista de análisis abre con hasta cuatro tarjetas que dicen **qué está
+pasando**: qué torre va rezagada, cuál es el cruce más frío del proyecto, dónde
+se acumula el inventario, cuánto de lo vendido no es caja todavía.
+
+Se calculan **con reglas, no con un modelo de lenguaje** — el mismo criterio que
+el Ejercicio 1. Son afirmaciones aritméticas que quien las lee puede comprobar
+en el gráfico de al lado, y no admiten una redacción distinta en cada recarga.
+Dos salvaguardas evitan que digan tonterías: una diferencia por debajo de diez
+puntos no se reporta (con lotes de 60-80 unidades entra dentro de lo que mueve
+el azar) y un grupo de menos de quince unidades no se señala como tendencia.
+
+Cada tarjeta se parte en categoría, cifra, titular y evidencia. No es
+decoración: cinco frases seguidas se leen como un párrafo y hay que recorrerlas
+enteras para saber si alguna importa; partidas así se escanean.
+
+![La vista de torres, con los hallazgos y el mapa del proyecto](../docs/capturas/dashboard-torres.png)
+
+*La vista de Torres: cuatro hallazgos calculados con reglas y, debajo, el mapa
+de torre × altura con las unidades libres de cada cruce.*
 
 ### Cómo está organizado
 
@@ -185,19 +222,60 @@ ficha—, y ahí es donde están.
 
 ### Filtros
 
-Se dividen según su alcance, para que nunca haya duda de qué están afectando:
+Siete filtros estructurales en el panel derecho —torre, tipo, precio, área,
+piso, estado y trimestre de entrega— y dos controles de periodo dentro de la
+vista de ventas. El reparto responde a una regla:
 
-- **En el panel derecho, los estructurales** (torre, tipo de apartamento, precio,
-  área): describen *qué apartamentos* se están mirando y afectan a todo.
-- **En la pestaña de ventas, los del periodo comercial** (rango de fechas, forma
-  de pago): solo tienen sentido sobre las ventas.
+- **Los estructurales son globales y persistentes.** Describen *qué apartamentos*
+  se están mirando, así que afectan a todas las vistas y **sobreviven al cambiar
+  de vista**: si acotas a la Torre 3 y saltas a «Producto», sigues en la Torre 3.
+- **Los de periodo comercial son locales** (rango de fechas, forma de pago).
+  Solo tienen sentido sobre las ventas.
 
-La razón de separarlos es que un apartamento disponible **no tiene fecha de venta
-ni forma de pago**. Si esos dos filtros fueran globales, cualquier selección
-dejaría el inventario disponible en cero y el tablero mentiría sin avisar.
-Dejar una selección vacía significa «todos».
+**Por qué no hay filtros distintos en cada vista.** Es tentador —cada análisis
+pide lo suyo— pero rompe lo único que hace útil a un tablero: que la selección
+sea la misma mientras cambias de ángulo. Con filtros por vista, cambiar de
+pestaña te devuelve al total sin avisar y dejas de estar comparando lo mismo. La
+separación correcta no es *por vista*, es **por naturaleza del control**: lo que
+define el conjunto de datos va fuera y persiste; lo que define cómo se dibuja
+—medir en unidades o en pesos, desglosar o no— va dentro de su vista, porque no
+significa nada fuera de ella.
 
-![Detalle de ventas y tipos](../docs/capturas/dashboard-detalle.png)
+Los del periodo van aparte por un motivo concreto: un apartamento disponible
+**no tiene fecha de venta ni forma de pago**. Si fueran globales, cualquier
+selección dejaría el inventario disponible en cero y el tablero mentiría sin
+avisar.
+
+Dejar una selección vacía significa «todos». Cuando hay algo filtrado aparecen
+dos cosas: un aviso en el centro —que sobrevive a plegar el panel, porque si no
+las cifras de una selección pasarían por totales— y un botón para **quitar los
+siete de un gesto**.
+
+### Que los datos cambien no rompe nada
+
+Nada de lo que se ve está precalculado. La cadena es siempre la misma: CSV →
+validación de esquema → consolidación → filtros → indicadores, gráficos y
+hallazgos. Todo se recalcula sobre la selección viva.
+
+Eso incluye **cambiar de fichero**:
+
+- El panel permite subir otro export en CSV. Si trae el mismo esquema, se
+  recalcula todo sobre él —consolidación incluida— y el tablero avisa de que no
+  está mirando el fichero del proyecto. El fichero no se guarda en disco: vive
+  en la sesión.
+- Si el esquema no cuadra, `validar_esquema()` lo dice antes de pintar una sola
+  cifra —«falta la columna `precio_cop`»— y ofrece volver al export original. Es
+  preferible a un tablero que enseña números equivocados sin avisar.
+- Si alguien reemplaza el CSV en disco, la caché se invalida sola: su clave
+  incluye la fecha de modificación del fichero. Sin eso —y así estaba— el
+  tablero seguía sirviendo la primera lectura y las cifras se quedaban
+  congeladas sin que nada lo indicara.
+
+![Precio contra área, por tipo](../docs/capturas/dashboard-precio-area.png)
+
+*Cada punto es un apartamento. Lo disponible en tono sólido, lo vendido
+atenuado: se ve de una vez dónde está cada tipo y qué unidades se salen de la
+nube de las suyas.*
 
 ---
 
@@ -209,7 +287,7 @@ ejercicio2_dashboard/
 │   ├── etl.py         # carga, validación, diagnóstico de calidad y consolidación
 │   ├── metricas.py    # los indicadores, como funciones puras
 │   └── app.py         # la interfaz (solo compone y dibuja)
-└── tests/             # 43 de datos + 25 de interfaz
+└── tests/             # 56 de datos + 30 de interfaz
 ```
 
 **La decisión de diseño principal: el cálculo no vive en la interfaz.** `etl.py` y
@@ -225,6 +303,29 @@ ejercicio2_dashboard/
 Si el CSV cambia de forma, `validar_esquema()` falla con un mensaje que dice qué
 falta. Es preferible a un dashboard que muestra números silenciosamente
 equivocados.
+
+### Añadir un indicador o una vista
+
+La separación de arriba no es teórica: es lo que hace barato mantener esto. Un
+indicador nuevo se añade en tres pasos, y los dos primeros no tocan la interfaz.
+
+1. **Una función pura en `metricas.py`** que reciba un DataFrame y devuelva otro.
+   Todas siguen el mismo contrato: manejan el caso vacío devolviendo un
+   DataFrame con las columnas correctas, y no saben nada de filtros ni de
+   pantalla, porque reciben ya la selección hecha.
+2. **Su test en `test_metricas.py`**, que se ejecuta en milisegundos y sin
+   navegador.
+3. **Una función `_grafico_*` en `app.py`** que solo compone Altair, y una línea
+   donde toque para dibujarla.
+
+Un filtro nuevo son dos líneas —el widget con su `key` y su condición— más la
+clave en `CLAVES_FILTRO` para que el botón de limpiar lo alcance. Una vista
+nueva es una entrada en la tupla `VISTAS` y su función. Nada de esto obliga a
+tocar el ETL ni los indicadores existentes.
+
+Lo que **no** hay que hacer, y por eso está escrito: calcular dentro de la vista.
+En cuanto una cifra se calcula en `app.py`, deja de poder testearse sin levantar
+un navegador y aparece la posibilidad de que dos sitios den números distintos.
 
 ### Por qué Streamlit
 

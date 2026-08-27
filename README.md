@@ -58,13 +58,14 @@ Se abre en `http://localhost:8501`.
 pytest
 ```
 
-155 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
+168 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
 
-Hay además 25 pruebas de interfaz que abren el dashboard en un navegador real y
-comprueban la maquetación (que el gráfico entre entero en pantalla, que ningún
-indicador se corte, que la navegación se recoja a iconos y vuelva a abrirse).
+Hay además 30 pruebas de interfaz que abren el dashboard en un navegador real y
+comprueban la maquetación y el comportamiento: que el gráfico entre entero en
+pantalla, que ningún indicador se corte, que los filtros muevan las cifras y se
+puedan deshacer, y que subir un export distinto recalcule el tablero entero.
 Son opcionales y se saltan solas si Playwright no está instalado:
 
 ```bash

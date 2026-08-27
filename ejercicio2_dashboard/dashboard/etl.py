@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import IO
 
 import pandas as pd
 
@@ -132,17 +133,24 @@ def validar_esquema(df: pd.DataFrame) -> None:
         )
 
 
-def cargar_crudo(ruta: str | Path = RUTA_CSV_POR_DEFECTO) -> pd.DataFrame:
-    """Lee el CSV tal cual viene, con tipos ya normalizados y validado."""
-    ruta = Path(ruta)
-    if not ruta.exists():
-        raise FileNotFoundError(
-            f"No se encontró el fichero de datos en {ruta}. "
-            "Comprueba que ejecutas el comando desde la raíz del repositorio."
-        )
+def cargar_crudo(origen: str | Path | IO = RUTA_CSV_POR_DEFECTO) -> pd.DataFrame:
+    """Lee el CSV tal cual viene, con tipos ya normalizados y validado.
+
+    Acepta una ruta o cualquier objeto de fichero abierto. Lo segundo es lo que
+    permite cargar un export distinto desde el navegador sin escribirlo antes en
+    disco: el ETL no tiene por qué saber de dónde salen los bytes.
+    """
+    if isinstance(origen, (str, Path)):
+        ruta = Path(origen)
+        if not ruta.exists():
+            raise FileNotFoundError(
+                f"No se encontró el fichero de datos en {ruta}. "
+                "Comprueba que ejecutas el comando desde la raíz del repositorio."
+            )
+        origen = ruta
 
     try:
-        df = pd.read_csv(ruta, parse_dates=["fecha_venta", "fecha_entrega"])
+        df = pd.read_csv(origen, parse_dates=["fecha_venta", "fecha_entrega"])
     except ValueError as exc:  # fechas no parseables
         raise ErrorDeEsquema(
             f"No se pudieron interpretar las fechas del CSV: {exc}"
@@ -236,9 +244,9 @@ def consolidar(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def cargar(ruta: str | Path = RUTA_CSV_POR_DEFECTO) -> ResultadoETL:
+def cargar(origen: str | Path | IO = RUTA_CSV_POR_DEFECTO) -> ResultadoETL:
     """Punto de entrada único: crudo, canónico e informe de calidad."""
-    crudo = cargar_crudo(ruta)
+    crudo = cargar_crudo(origen)
     return ResultadoETL(
         crudo=crudo,
         canonico=consolidar(crudo),

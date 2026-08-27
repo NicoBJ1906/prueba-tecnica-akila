@@ -254,7 +254,7 @@ class TestMaquetacion:
 
 
 class TestNavegacion:
-    ETIQUETAS = ["Ventas", "Producto", "Calidad", "Registros"]
+    ETIQUETAS = ["Ventas", "Producto", "Torres", "Datos"]
 
     @staticmethod
     def _botones(p):
@@ -468,6 +468,106 @@ class TestNavegacion:
                 f"En «{etiqueta}» el contenido cae {medidas['desfase']} px por debajo "
                 f"de la columna recogida: la vista aparece en blanco."
             )
+
+    def test_los_filtros_mueven_las_cifras_y_se_pueden_deshacer(self, pagina):
+        """El ciclo completo: filtrar, ver cambiar las cifras y volver al total.
+
+        Es la comprobación de que el tablero es dinámico y no una foto: todo lo
+        que se pinta sale de recalcular sobre la selección, y quitar los filtros
+        devuelve exactamente las cifras de partida.
+        """
+        p = pagina(1440, 900)
+        kpis = lambda: p.evaluate(  # noqa: E731
+            """() => [...document.querySelectorAll('[data-testid="stMetricValue"]')]
+                 .map(e => e.innerText.trim())"""
+        )
+        inicial = kpis()
+        assert not p.locator(".st-key-limpiar_filtros").count(), (
+            "Sin filtros puestos no debería ofrecerse quitarlos."
+        )
+
+        caja = p.locator('[data-testid="stSidebar"] [data-testid="stSlider"]').first.bounding_box()
+        p.mouse.move(caja["x"] + 8, caja["y"] + caja["height"] / 2)
+        p.mouse.down()
+        p.mouse.move(caja["x"] + caja["width"] * 0.45, caja["y"] + caja["height"] / 2, steps=10)
+        p.mouse.up()
+        p.wait_for_timeout(ESPERA_RENDER)
+
+        filtrado = kpis()
+        assert filtrado != inicial, "Los indicadores no reaccionaron al filtro."
+
+        p.locator(".st-key-limpiar_filtros button").click()
+        p.wait_for_timeout(ESPERA_RENDER)
+        assert kpis() == inicial, "Quitar los filtros no devolvió las cifras iniciales."
+
+    def test_un_export_distinto_recalcula_el_tablero(self, pagina, tmp_path_factory):
+        """El tablero no está atado al fichero del enunciado.
+
+        Se sube un export con dos de las cuatro torres y se comprueba que las
+        cifras, la ficha del proyecto y la consolidación se rehacen sobre él.
+        Es lo que separa un tablero de una captura con datos dentro.
+        """
+        import pandas as pd
+
+        origen = pd.read_csv(RAIZ / "data" / "apartamentos_akila.csv")
+        recorte = origen[origen["torre"].isin(["Torre 1", "Torre 2"])]
+        fichero = tmp_path_factory.mktemp("export") / "dos_torres.csv"
+        recorte.to_csv(fichero, index=False)
+
+        p = pagina(1440, 900)
+        antes = p.evaluate(
+            """() => [...document.querySelectorAll('[data-testid="stMetricValue"]')]
+                 .map(e => e.innerText.trim())"""
+        )
+
+        p.get_by_text("Cambiar de fichero", exact=True).click()
+        p.wait_for_timeout(600)
+        p.locator('[data-testid="stSidebar"] input[type="file"]').set_input_files(str(fichero))
+        p.wait_for_timeout(ESPERA_RENDER + 2000)
+
+        despues = p.evaluate(
+            """() => ({
+                 kpis: [...document.querySelectorAll('[data-testid="stMetricValue"]')]
+                        .map(e => e.innerText.trim()),
+                 ficha: document.querySelector('.ficha')?.innerText ?? '',
+                 excepcion: !!document.querySelector('[data-testid="stException"]'),
+               })"""
+        )
+        assert not despues["excepcion"]
+        assert despues["kpis"] != antes, "Las cifras no se recalcularon."
+        assert "2 torres" in despues["ficha"], (
+            f"La ficha sigue describiendo el proyecto anterior: {despues['ficha']!r}"
+        )
+
+    def test_un_export_con_el_esquema_roto_avisa_en_lugar_de_romperse(
+        self, pagina, tmp_path_factory
+    ):
+        """Falta una columna obligatoria: mensaje claro y salida, nunca un traceback."""
+        import pandas as pd
+
+        origen = pd.read_csv(RAIZ / "data" / "apartamentos_akila.csv")
+        fichero = tmp_path_factory.mktemp("roto") / "sin_precio.csv"
+        origen.drop(columns=["precio_cop"]).to_csv(fichero, index=False)
+
+        p = pagina(1440, 900)
+        p.get_by_text("Cambiar de fichero", exact=True).click()
+        p.wait_for_timeout(600)
+        p.locator('[data-testid="stSidebar"] input[type="file"]').set_input_files(str(fichero))
+        p.wait_for_timeout(ESPERA_RENDER + 2000)
+
+        estado = p.evaluate(
+            """() => ({
+                 excepcion: !!document.querySelector('[data-testid="stException"]'),
+                 texto: document.body.innerText,
+               })"""
+        )
+        assert not estado["excepcion"], "Se filtró una excepción de Python a la pantalla."
+        assert "precio_cop" in estado["texto"], (
+            "El aviso debería decir qué columna falta."
+        )
+        assert "Volver al export original" in estado["texto"], (
+            "Sin salida, el tablero se queda atascado en el error."
+        )
 
     def test_los_dos_controles_de_plegado_son_gemelos(self, pagina):
         """Los dos bordes de la pantalla se pliegan con el mismo gesto.
