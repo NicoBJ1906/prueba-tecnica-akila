@@ -123,6 +123,18 @@ def validar_esquema(df: pd.DataFrame) -> None:
                 f"La columna '{columna}' tiene valores vacíos (filas {filas}). "
                 "Es obligatoria para calcular los indicadores."
             )
+        # Y que sean números. Comprobar solo los nulos dejaba pasar un
+        # `precio_cop` con texto: pandas se traía la columna como `str`, la
+        # validación daba el visto bueno y el error aparecía mucho después, al
+        # sumar, con un mensaje que no señalaba ni la columna ni la fila.
+        no_numericos = pd.to_numeric(df[columna], errors="coerce").isna()
+        if no_numericos.any():
+            filas = df.index[no_numericos].tolist()[:5]
+            ejemplos = df.loc[no_numericos, columna].head(3).tolist()
+            raise ErrorDeEsquema(
+                f"La columna '{columna}' tiene valores no numéricos en las filas "
+                f"{filas}: {ejemplos}. Debe contener solo números."
+            )
 
     vendidos_sin_fecha = df[(df["estado"] == ESTADO_VENDIDO) & df["fecha_venta"].isna()]
     if not vendidos_sin_fecha.empty:

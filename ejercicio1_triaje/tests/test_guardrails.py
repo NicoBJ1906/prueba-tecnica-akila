@@ -172,13 +172,35 @@ class TestPromptInjection:
 
 class TestDegradacion:
     def test_si_el_modelo_falla_el_pipeline_sigue_con_reglas(self, correo, config):
-        resultado = ejecutar([correo(cuerpo="¿cuándo entregan el apartamento 803?")],
+        """El correo tiene que ser de los que SÍ escalan al modelo.
+
+        Desde que las reglas van primero, un correo que ellas resuelven con
+        confianza no llega al proveedor, así que uno claro nunca probaría la
+        degradación. Este no da contexto: las reglas dudan, se escala, y ahí es
+        donde el fallo del modelo tiene que notarse.
+        """
+        resultado = ejecutar([correo(asunto="", cuerpo="una pregunta rápida, me avisan")],
                              config, ProveedorQueFalla())
         assert len(resultado.filas) == 1
         fila = resultado.filas[0]
         assert fila.fuente == "reglas"
         assert fila.estado == ESTADO_REVISION
         assert "falló" in fila.motivo
+
+    def test_un_correo_claro_no_llega_a_gastar_una_llamada(self, correo, config):
+        """El otro lado de la moneda: si las reglas bastan, no se paga.
+
+        `ProveedorQueFalla` revienta al ser invocado, así que si este correo
+        acabara en el modelo el pipeline lo marcaría como degradado. Que salga
+        limpio demuestra que ni se le preguntó.
+        """
+        resultado = ejecutar([correo(cuerpo="¿cuándo entregan el apartamento 803?")],
+                             config, ProveedorQueFalla())
+        fila = resultado.filas[0]
+        assert fila.fuente == "reglas"
+        assert "falló" not in fila.motivo, (
+            "Se llamó al modelo para un correo que las reglas ya resolvían."
+        )
 
     def test_ningun_correo_se_pierde_cuando_el_modelo_falla(self, correo, config):
         correos = [correo(cuerpo=f"consulta {i} sobre el apartamento {800 + i}") for i in range(5)]

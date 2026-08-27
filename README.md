@@ -46,6 +46,8 @@ deterministas y produce el mismo Excel.
 
 ### Ejercicio 2 — dashboard
 
+Desde la **raíz del repositorio** (si vienes del paso anterior, `cd ..` primero):
+
 ```bash
 streamlit run ejercicio2_dashboard/dashboard/app.py
 ```
@@ -53,6 +55,9 @@ streamlit run ejercicio2_dashboard/dashboard/app.py
 Se abre en `http://localhost:8501`.
 
 ### Pruebas
+
+También desde la raíz: `pytest` recoge las de cada ejercicio por su ruta, y
+lanzado desde dentro de una carpeta solo encuentra las de esa.
 
 ```bash
 pytest

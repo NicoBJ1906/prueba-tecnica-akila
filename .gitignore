@@ -26,3 +26,8 @@ ejercicio1_triaje/salida/
 
 # Sistema
 .DS_Store
+
+# Notas internas de trabajo, no forman parte de la entrega: la libreta entre
+# sesiones y el guion para defender la presentación. Se quedan en local.
+ESTADO.md
+docs/presentacion.md

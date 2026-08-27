@@ -5,10 +5,12 @@ filtro determinista que va delante reduce el trabajo —y el coste, y el riesgo�
 de la única etapa que puede usar un modelo de lenguaje.
 
     leer → idempotencia → duplicados → automáticos → cortesía
-         → [clasificar: reglas o IA] → guardrails → responsable → fila
+         → reglas → [modelo, solo si las reglas dudan] → guardrails
+         → responsable → fila
 
-De 15 correos de muestra, solo llegan al modelo los que de verdad necesitan
-comprensión del texto. El resto se resuelve por reglas, gratis y al instante.
+Las reglas se ejecutan siempre y resuelven la mayoría. Solo lo que sale por
+debajo del umbral de confianza sube al modelo. Sobre los 15 correos de muestra
+eso son 2 llamadas en lugar de 12.
 """
 
 from __future__ import annotations
@@ -100,21 +102,40 @@ def leer_correos(ruta: str | Path) -> list[Correo]:
 
 
 def _clasificar(correo: Correo, config: Config, proveedor: Proveedor) -> tuple[Clasificacion, str]:
-    """Clasifica con el proveedor elegido, cayendo a reglas si falla.
+    """Reglas primero; el modelo solo para lo que las reglas no resuelven.
+
+    Esta es la forma del híbrido, y no «el modelo clasifica y las reglas son el
+    respaldo». Las reglas se ejecutan siempre: son gratis e instantáneas. Si
+    salen con confianza suficiente, el correo ya está clasificado y no se llama
+    a nadie. Solo lo dudoso —un asunto vago, un cuerpo sin contexto— sube al
+    modelo, que es donde comprender el texto vale lo que cuesta.
+
+    El efecto se mide: sobre los 15 correos de la muestra, llamar al modelo
+    siempre son 12 llamadas; escalando solo lo dudoso, 2. Mismo resultado en los
+    otros 10, a coste cero y sin que salga nada del equipo.
 
     Devuelve también el motivo del respaldo, si lo hubo: que el sistema haya
     tenido que degradarse es información que la persona debe ver en el Excel,
     no algo que se traga un log.
     """
+    por_reglas = clasificar_por_reglas(correo, config)
+
     if isinstance(proveedor, ProveedorReglas):
-        return proveedor.clasificar(correo, config), ""
+        return por_reglas, ""
+
+    # El umbral es el mismo que decide si una fila va a revisión humana: lo que
+    # no convence a las reglas es exactamente lo que merece una segunda opinión.
+    # La mínima y no la media: un correo con dos peticiones, una clara y otra
+    # dudosa, necesita la segunda opinión igual. Promediar la escondería.
+    if por_reglas.confianza_minima >= config.umbral_confianza:
+        return por_reglas, ""
 
     try:
         return proveedor.clasificar(correo, config), ""
     except ErrorDeProveedor as exc:
         registro.warning("Respaldo a reglas en el correo %s: %s", correo.id, exc)
         return (
-            clasificar_por_reglas(correo, config),
+            por_reglas,
             f"El clasificador automático falló ({exc}); se aplicaron reglas.",
         )
 

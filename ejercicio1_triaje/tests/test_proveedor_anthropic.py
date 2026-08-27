@@ -145,8 +145,10 @@ class TestFallos:
             p.clasificar(correo(), config)
 
     def test_el_pipeline_completo_degrada_si_la_api_falla(self, proveedor, correo, config):
+        # Un correo sin contexto, de los que sí escalan al modelo: uno claro lo
+        # resuelven las reglas y nunca llegaría a la API para poder fallar.
         p = proveedor(error=TimeoutError("timeout"))
-        resultado = ejecutar([correo(cuerpo="¿cuándo entregan el apartamento 803?")], config, p)
+        resultado = ejecutar([correo(asunto="", cuerpo="una pregunta, me avisan")], config, p)
 
         assert len(resultado.filas) == 1
         assert resultado.filas[0].fuente == "reglas"
@@ -154,8 +156,13 @@ class TestFallos:
 
 class TestIntegracionConElPipeline:
     def test_la_clasificacion_del_modelo_llega_al_excel(self, proveedor, correo, config):
+        """Cuando el modelo SÍ interviene, su respuesta manda sobre las reglas.
+
+        El correo se elige sin contexto a propósito: las reglas dudan, se
+        escala, y lo que acaba en el Excel es lo que dijo el modelo.
+        """
         resultado = ejecutar(
-            [correo(cuerpo="¿Me confirman la fecha de entrega del apartamento 1105?")],
+            [correo(asunto="", cuerpo="sobre el apartamento 1105, lo que hablamos")],
             config,
             proveedor(),
         )

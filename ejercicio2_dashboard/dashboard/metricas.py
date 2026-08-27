@@ -355,7 +355,11 @@ def insights(df: pd.DataFrame) -> list[Hallazgo]:
 
     hallazgos: list[Hallazgo] = []
 
+    # Mismo mínimo muestral que en el cruce por altura: sin él, una torre con
+    # una sola unidad sin vender salía como «va rezagada, 75 puntos por
+    # detrás». Un porcentaje sobre un lote diminuto no es una tendencia.
     torres = avance_por_torre(df)
+    torres = torres[torres["total"] >= MINIMO_UNIDADES_CELDA]
     if len(torres) > 1:
         mejor = torres.loc[torres["porcentaje"].idxmax()]
         peor = torres.loc[torres["porcentaje"].idxmin()]
@@ -422,7 +426,12 @@ def insights(df: pd.DataFrame) -> list[Hallazgo]:
     # sin vender que se entrega en 2028 todavía tiene recorrido comercial.
     cohortes = cohortes_entrega(disponibles)
     if not cohortes.empty:
-        limite = cohortes["trimestre"].min() + pd.DateOffset(months=12)
+        # La ventana se ancla a HOY, no a la primera entrega del fichero. Anclada
+        # al dato, un proyecto que entrega entero en 2032 seguía saliendo como
+        # «entrega cercana»: siempre había un trimestre a menos de doce meses
+        # del primero. La urgencia es respecto al calendario, no respecto al
+        # propio dato.
+        limite = pd.Timestamp.today().normalize() + pd.DateOffset(months=12)
         proximas = cohortes[cohortes["trimestre"] < limite]
         pendientes = int(proximas["total"].sum())
         if pendientes:

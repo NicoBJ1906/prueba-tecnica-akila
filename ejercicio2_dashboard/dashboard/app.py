@@ -1230,6 +1230,28 @@ def _grafico_inventario(df: pd.DataFrame):
     )
 
 
+def _deslizador_rango(
+    etiqueta: str, minimo: int, maximo: int, clave: str,
+    paso: int = 1, formato: str | None = None, ayuda: str | None = None,
+) -> tuple[int, int]:
+    """Un deslizador de rango que tolera que no haya rango.
+
+    `st.slider` exige `min_value < max_value` y lanza una excepción si son
+    iguales. Con el fichero del enunciado no pasa nunca, pero basta un export
+    donde todas las unidades compartan precio —o una sola torre de una planta—
+    para que el tablero se caiga con un traceback en pantalla y sin forma de
+    deshacer la carga. Cuando no hay rango que elegir, se enseña el valor y se
+    devuelve tal cual.
+    """
+    if minimo >= maximo:
+        st.caption(f"**{etiqueta}**: {formato % minimo if formato else minimo} · valor único")
+        return minimo, maximo
+    return st.slider(
+        etiqueta, min_value=minimo, max_value=maximo, value=(minimo, maximo),
+        step=paso, format=formato, help=ayuda, key=clave,
+    )
+
+
 def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
     """Filtros estructurales: los que describen QUÉ apartamentos se miran.
 
@@ -1277,26 +1299,23 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
         # «217800000» no lo lee nadie.
         precio_min = int(base["precio_cop"].min() // 1_000_000)
         precio_max = int(-(-base["precio_cop"].max() // 1_000_000))
-        rango_precio = st.slider(
-            "Precio (millones COP)",
-            min_value=precio_min, max_value=precio_max,
-            value=(precio_min, precio_max), step=10, format="$%d M",
-            help="Para aislar el producto de gama alta del resto.", key="f_precio",
+        rango_precio = _deslizador_rango(
+            "Precio (millones COP)", precio_min, precio_max, "f_precio",
+            paso=10, formato="$%d M",
+            ayuda="Para aislar el producto de gama alta del resto.",
         )
 
         area_min, area_max = int(base["area_m2"].min()), int(base["area_m2"].max())
-        rango_area = st.slider(
-            "Área", min_value=area_min, max_value=area_max,
-            value=(area_min, area_max), format="%d m²", key="f_area",
+        rango_area = _deslizador_rango(
+            "Área", area_min, area_max, "f_area", formato="%d m²"
         )
 
         # La altura es una variable comercial por derecho propio —un piso 20 no
         # se vende como un piso 2— y estaba en el fichero sin usar.
         piso_min, piso_max = int(base["piso"].min()), int(base["piso"].max())
-        rango_piso = st.slider(
-            "Piso", min_value=piso_min, max_value=piso_max,
-            value=(piso_min, piso_max),
-            help="Para aislar las plantas bajas de las altas.", key="f_piso",
+        rango_piso = _deslizador_rango(
+            "Piso", piso_min, piso_max, "f_piso",
+            ayuda="Para aislar las plantas bajas de las altas.",
         )
 
         estado_sel = st.segmented_control(
@@ -1747,11 +1766,32 @@ def _boton_descarga(datos: pd.DataFrame, nombre: str) -> None:
     """
     st.download_button(
         "Descargar CSV",
-        datos.to_csv(index=False).encode("utf-8"),
+        _csv_seguro(datos),
         file_name=nombre,
         mime="text/csv",
         icon=":material/download:",
     )
+
+
+# Excel y LibreOffice interpretan como fórmula toda celda que empiece por uno de
+# estos caracteres. Un export de origen dudoso con una torre llamada
+# `=cmd|'/c calc'!A1` se convierte en código que se ejecuta al abrir el fichero
+# descargado, en el equipo de quien lo abre.
+INICIOS_DE_FORMULA = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _csv_seguro(datos: pd.DataFrame) -> bytes:
+    """CSV con las celdas de texto neutralizadas frente a inyección de fórmulas.
+
+    Se antepone un apóstrofo a lo que una hoja de cálculo leería como fórmula.
+    El dato sigue siendo legible; lo que se pierde es su capacidad de ejecutarse.
+    """
+    def neutralizar(valor):
+        if isinstance(valor, str) and valor.startswith(INICIOS_DE_FORMULA):
+            return "'" + valor
+        return valor
+
+    return datos.map(neutralizar).to_csv(index=False).encode("utf-8")
 
 
 def _pestana_calidad(informe, crudo: pd.DataFrame) -> None:
