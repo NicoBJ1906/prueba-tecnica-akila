@@ -51,6 +51,7 @@ def componer(resultado: ResultadoTriaje) -> str:
                 ("Descartados antes de clasificar", len(resultado.descartes)),
                 ("Filas generadas en el seguimiento", len(resultado.filas)),
                 ("  · resueltas automáticamente", len(resultado.automaticas)),
+                ("  · sin acción requerida", len(resultado.sin_accion)),
                 ("  · enviadas a revisión humana", len(resultado.para_revision)),
             ],
         ),

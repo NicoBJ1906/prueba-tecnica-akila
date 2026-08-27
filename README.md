@@ -58,14 +58,14 @@ Se abre en `http://localhost:8501`.
 pytest
 ```
 
-178 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
+155 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
 
-Hay además 11 pruebas de interfaz que abren el dashboard en un navegador real y
+Hay además 23 pruebas de interfaz que abren el dashboard en un navegador real y
 comprueban la maquetación (que el gráfico entre entero en pantalla, que ningún
-indicador se corte, que las pestañas funcionen). Son opcionales y se saltan
-solas si Playwright no está instalado:
+indicador se corte, que la navegación se recoja a iconos y vuelva a abrirse).
+Son opcionales y se saltan solas si Playwright no está instalado:
 
 ```bash
 pip install -r requirements-dev.txt && playwright install chromium
@@ -105,9 +105,9 @@ más de una vez en fechas distintas.
 | Disponibles | 186 | **91** |
 
 Reportar «271 vendidos» a dirección sería inventar un 30 % de ventas. El
-dashboard enseña el problema arriba del todo, documenta la regla que aplica y
-permite comparar ambas lecturas con un selector, porque la regla es discutible y
-quien decide debe poder verla.
+dashboard avisa del problema junto al selector de vista de datos, documenta la
+regla que aplica en su propia pestaña y permite comparar ambas lecturas, porque
+la regla es discutible y quien decide debe poder verla.
 
 El detalle, con las alternativas descartadas, está en el
 [README del Ejercicio 2](ejercicio2_dashboard/README.md#lo-primero-que-hay-que-saber-sobre-estos-datos).

@@ -171,6 +171,17 @@ class ResultadoTriaje:
         return [f for f in self.filas if f.estado == ESTADO_AUTOMATICO]
 
     @property
+    def sin_accion(self) -> list[FilaSeguimiento]:
+        """Filas que no piden gestión: un «gracias» sin petición detrás.
+
+        Se cuentan aparte de las automáticas a propósito. Meterlas ahí inflaría
+        el porcentaje de automatización con trabajo que nunca existió; dejarlas
+        fuera del informe, en cambio, descuadraba la suma con el total de filas
+        y quien lo leía tenía que adivinar dónde estaba la que faltaba.
+        """
+        return [f for f in self.filas if f.estado == ESTADO_SIN_ACCION]
+
+    @property
     def porcentaje_automatizado(self) -> float:
         if not self.filas:
             return 0.0

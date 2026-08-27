@@ -1,6 +1,6 @@
 # Informe de ejecución del triaje
 
-Generado el 2026-08-25 17:24.
+Generado el 2026-08-27 00:10.
 
 ## Qué pasó con cada correo
 
@@ -11,6 +11,7 @@ Generado el 2026-08-25 17:24.
 | Descartados antes de clasificar | 2 |
 | Filas generadas en el seguimiento | 15 |
 |   · resueltas automáticamente | 12 |
+|   · sin acción requerida | 1 |
 |   · enviadas a revisión humana | 2 |
 
 
