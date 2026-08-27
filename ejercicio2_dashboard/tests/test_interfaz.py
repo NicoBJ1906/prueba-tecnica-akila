@@ -258,7 +258,16 @@ class TestNavegacion:
 
     @staticmethod
     def _botones(p):
-        return p.locator('[data-testid="stMain"] [data-testid="stButton"] button')
+        """Solo los de vista.
+
+        La columna lleva además el control que la recoge, que no navega a
+        ninguna parte: se descarta por su clave para que contar botones siga
+        contando vistas.
+        """
+        return p.locator(
+            '[data-testid="stMain"] [data-testid="stElementContainer"]'
+            ':not(.st-key-nav_plegar) [data-testid="stButton"] button'
+        )
 
     def test_las_cuatro_vistas_abren_y_pintan_contenido(self, pagina):
         # Se seleccionan por posición y no por nombre: «Datos» también aparece
@@ -306,12 +315,83 @@ class TestNavegacion:
             f"Los rótulos empiezan en posiciones muy distintas: {posiciones}"
         )
 
+    def test_la_navegacion_se_recoge_a_iconos_y_vuelve(self, pagina):
+        """Recogida deja el carril de iconos; desplegada vuelve a los rótulos.
+
+        Es un ciclo completo a propósito: recoger una barra sin poder volver a
+        abrirla ya pasó una vez con el panel de filtros, y desde fuera parece
+        que el tablero se ha roto.
+        """
+        p = pagina(1440, 900)
+        medir = """() => {
+            const nav = [...document.querySelectorAll(
+                '[data-testid="stMain"] [data-testid="stColumn"]')]
+                .find(c => c.querySelector('.cabecera'));
+            const bot = [...document.querySelectorAll(
+                '[data-testid="stMain"] [data-testid="stButton"] button')];
+            const visible = el => el && el.getBoundingClientRect().width > 2;
+            return {
+              ancho: Math.round(nav.getBoundingClientRect().width),
+              rotulos: bot.filter(
+                b => visible(b.querySelector('[data-testid="stMarkdownContainer"]'))).length,
+              iconos: bot.filter(
+                b => visible(b.querySelector('[data-testid="stIconMaterial"]'))).length,
+            };
+        }"""
+
+        desplegada = p.evaluate(medir)
+        assert desplegada["rotulos"] == desplegada["iconos"] > 0
+
+        p.get_by_role("button", name="Contraer").click()
+        p.wait_for_timeout(ESPERA_RENDER)
+        recogida = p.evaluate(medir)
+        assert recogida["ancho"] < desplegada["ancho"], (
+            "La columna no se estrechó al recogerla."
+        )
+        assert recogida["rotulos"] == 0, "Recogida no debería mostrar ningún rótulo."
+        assert recogida["iconos"] == desplegada["iconos"], (
+            "Recogida tienen que seguir viéndose todos los iconos: son la "
+            "única forma de navegar en ese estado."
+        )
+
+        p.get_by_role("button", name="Desplegar").click()
+        p.wait_for_timeout(ESPERA_RENDER)
+        vuelta = p.evaluate(medir)
+        assert vuelta == desplegada, f"No volvió al estado inicial: {vuelta}"
+
+    @pytest.mark.parametrize("ancho,alto", TAMANOS)
+    def test_las_tres_zonas_estan_separadas_por_un_filete(self, pagina, ancho, alto):
+        """El centro va delimitado a los dos lados, no solo por la derecha."""
+        p = pagina(ancho, alto)
+        bordes = p.evaluate(
+            """() => {
+                 const nav = [...document.querySelectorAll(
+                     '[data-testid="stMain"] [data-testid="stColumn"]')]
+                     .find(c => c.querySelector('.cabecera'));
+                 const panel = document.querySelector('[data-testid="stSidebar"]');
+                 return {
+                   navDerecha: parseFloat(getComputedStyle(nav).borderRightWidth),
+                   panelIzquierda: parseFloat(getComputedStyle(panel).borderLeftWidth),
+                   navAlto: nav.getBoundingClientRect().height,
+                 };
+               }"""
+        )
+        assert bordes["navDerecha"] > 0, "Falta el filete de la columna de vistas."
+        assert bordes["panelIzquierda"] > 0, "Falta el filete del panel de filtros."
+        # Un filete que se corta a media pantalla se lee peor que ninguno.
+        assert bordes["navAlto"] >= alto * 0.9, (
+            f"El filete de la izquierda solo llega a {bordes['navAlto']:.0f} px "
+            f"de los {alto} de la ventana."
+        )
+
     def test_los_iconos_de_navegacion_son_simbolos_y_no_texto(self, pagina):
         """Cada vista lleva un icono de Material Symbols, no un emoji."""
         p = pagina()
         iconos = p.evaluate(
             """() => [...document.querySelectorAll(
-                 '[data-testid="stMain"] [data-testid="stButton"] [data-testid="stIconMaterial"]')]
+                 '[data-testid="stMain"] [data-testid="stElementContainer"]'
+                 + ':not(.st-key-nav_plegar) [data-testid="stButton"]'
+                 + ' [data-testid="stIconMaterial"]')]
                  .map(e => ({nombre: e.textContent.trim(),
                              fuente: getComputedStyle(e).fontFamily}))"""
         )

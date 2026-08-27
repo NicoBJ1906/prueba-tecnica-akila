@@ -133,6 +133,19 @@ La pantalla tiene tres zonas, cada una para un gesto distinto:
 | **Centro** | Indicadores y gráficos | Lo que se mira |
 | **Derecha** | Filtros y ficha del proyecto | Con qué se acota: es donde la mano vuelve |
 
+Un filete a cada lado del centro delimita las tres, para que la columna de en
+medio se lea como una zona y no como el resto de la página.
+
+**La columna de vistas se recoge a un carril de iconos.** Recogida pasa de 212 a
+76 px y le devuelve ese ancho al gráfico, pero los cuatro iconos siguen ahí: se
+puede seguir navegando sin desplegarla, que es la diferencia entre recogerla y
+esconderla. El rótulo no desaparece del todo —queda oculto a la vista pero
+presente en el árbol—, así que sigue siendo el nombre accesible de cada botón. Y
+la vista activa se lee en el título del centro, que en ese estado es lo que dice
+dónde estás.
+
+![La columna de vistas recogida a iconos](../docs/capturas/dashboard-nav-recogida.png)
+
 La navegación se construye con **columnas y botones de Streamlit**, no con un
 segundo panel lateral: el framework solo ofrece uno, y fabricar otro con CSS lo
 haría depender de nombres internos. Como efecto secundario, las columnas se
@@ -194,7 +207,7 @@ ejercicio2_dashboard/
 │   ├── etl.py         # carga, validación, diagnóstico de calidad y consolidación
 │   ├── metricas.py    # los indicadores, como funciones puras
 │   └── app.py         # la interfaz (solo compone y dibuja)
-└── tests/             # 43 de datos + 20 de interfaz
+└── tests/             # 43 de datos + 23 de interfaz
 ```
 
 **La decisión de diseño principal: el cálculo no vive en la interfaz.** `etl.py` y
@@ -265,7 +278,8 @@ mide la página — que el gráfico entre entero en 1280 × 720 y 1440 × 900, q
 ningún indicador quede cortado ni pierda letras en unos puntos suspensivos, que
 los cuatro vayan en su tarjeta, que las tres formas de pago quepan en un
 renglón, que no haya desborde horizontal, que las cuatro pestañas pinten
-contenido y que el contraste consolidado/crudo cambie las cifras de 209 a 271.
+contenido, que la columna de vistas se recoja a iconos **y vuelva a abrirse**, y
+que el contraste consolidado/crudo cambie las cifras de 209 a 271.
 
 Son opcionales y se saltan solas si Playwright no está instalado:
 

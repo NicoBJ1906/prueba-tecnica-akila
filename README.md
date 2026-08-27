@@ -58,7 +58,7 @@ Se abre en `http://localhost:8501`.
 pytest
 ```
 
-175 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
+178 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
 

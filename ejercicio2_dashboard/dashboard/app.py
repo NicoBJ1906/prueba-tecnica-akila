@@ -409,10 +409,94 @@ st.markdown(
         background: #f2f4ee;
         color: {GRIS_MARCA};
       }}
+      /* Aire entre las vistas y el control que recoge la columna, para que no
+         se lea como una quinta vista. */
+      .separador-nav {{
+        border-top: 1px solid #ececea;
+        margin: 0.9rem 0 0.6rem;
+      }}
+
+      /* El mismo filete que separa el panel de filtros del contenido, ahora
+         también al otro lado: las tres zonas quedan delimitadas igual y el
+         centro se lee como una columna y no como el resto de la página.
+         Se ancla en `.cabecera`, que es marca propia, y no en el orden de las
+         columnas, que Streamlit puede reorganizar en pantallas estrechas. */
+      @media (min-width: 992px) {{
+        [data-testid="stMain"] [data-testid="stColumn"]:has(.cabecera) {{
+          border-right: 1px solid #ececea;
+          padding-right: 1.2rem;
+          /* El filete llega abajo, como el del panel de filtros. Sin esto la
+             columna mide lo que miden sus cuatro botones y la línea se corta a
+             media pantalla, que es peor que no tenerla. `min-height` y no
+             `height`: si el contenido central creciera, la columna lo acompaña
+             en lugar de dejar la línea corta otra vez. */
+          min-height: calc(100vh - 3rem);
+        }}
+      }}
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+
+# Se inyecta solo cuando la columna está recogida. Vive aparte del bloque
+# principal porque depende del estado de la sesión, no del tema.
+_CSS_NAV_COMPACTA = """
+    <style>
+      @media (min-width: 992px) {
+        /* Ancho fijo y no proporcional: recogida, la columna tiene que medir lo
+           que mide un icono, y un peso de `st.columns` daría un carril más
+           ancho en un monitor grande que en un portátil. */
+        [data-testid="stMain"] [data-testid="stColumn"]:has(.cabecera) {
+          flex: 0 0 76px !important;
+          width: 76px !important;
+          min-width: 76px !important;
+          padding-right: 0.6rem;
+        }
+        /* El contenido se queda con todo lo que deja libre: sin esto conserva
+           el ancho que le tocaba por peso y aparece un hueco entre ambos. */
+        [data-testid="stMain"] [data-testid="stColumn"]:has(.cabecera)
+          + [data-testid="stColumn"] {
+          flex: 1 1 auto !important;
+          width: auto !important;
+          min-width: 0 !important;
+        }
+        /* El rótulo se esconde de la vista pero sigue en el árbol: un botón
+           cuyo único contenido es un icono no le dice nada a un lector de
+           pantalla. */
+        [data-testid="stMain"] [data-testid="stButton"] button [data-testid="stMarkdownContainer"] {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+        }
+        [data-testid="stMain"] [data-testid="stButton"] button {
+          justify-content: center;
+          padding-left: 0;
+          padding-right: 0;
+        }
+        [data-testid="stMain"] [data-testid="stButton"] button [data-testid="stIconMaterial"] {
+          flex: 0 0 auto;
+        }
+        .marca-nombre,
+        .rotulo-nav {
+          display: none;
+        }
+        .marca-logo {
+          width: 34px;
+        }
+        .marca-logo-texto {
+          font-size: 1.15rem;
+        }
+        .cabecera {
+          padding-bottom: 0.9rem;
+          margin-bottom: 1rem;
+        }
+      }
+    </style>
+    """
 
 
 @st.cache_data(show_spinner="Cargando cartera…")
@@ -473,6 +557,12 @@ def _navegacion() -> str:
     """
     if "vista" not in st.session_state:
         st.session_state.vista = VISTAS[0].nombre
+    if "nav_compacta" not in st.session_state:
+        st.session_state.nav_compacta = False
+
+    compacta = st.session_state.nav_compacta
+    if compacta:
+        st.markdown(_CSS_NAV_COMPACTA, unsafe_allow_html=True)
 
     # La marca encabeza la navegación: identifica el tablero desde la primera
     # columna que se lee, y deja el panel de la derecha solo para los filtros.
@@ -492,9 +582,11 @@ def _navegacion() -> str:
     st.markdown('<div class="rotulo-nav">Vistas</div>', unsafe_allow_html=True)
     for vista in VISTAS:
         activa = st.session_state.vista == vista.nombre
-        # Sin `help`: el tooltip envuelve el botón en tres capas más que se
-        # encogen al ancho del texto, y cada rótulo acababa alineado en un
-        # sitio distinto. Los nombres ya se explican solos.
+        # Sin `help`, tampoco recogida: el tooltip de Streamlit deja por cada
+        # botón un segundo elemento de 0x0 en el DOM, y desplegada además
+        # descuadra la alineación de los rótulos. El nombre no se pierde —viaja
+        # en el rótulo oculto, que sigue siendo el nombre accesible del botón—
+        # y la vista activa se lee en el título del centro.
         if st.button(
             vista.nombre,
             icon=vista.icono,
@@ -504,6 +596,21 @@ def _navegacion() -> str:
         ):
             st.session_state.vista = vista.nombre
             st.rerun()
+
+    # El control de la propia columna va al final: primero la marca, luego a
+    # dónde se puede ir, y solo entonces cómo se recoge la barra. Plegada deja
+    # los cuatro iconos a la vista, así que sigue sirviendo para navegar y no
+    # solo para ganar sitio.
+    st.markdown('<div class="separador-nav"></div>', unsafe_allow_html=True)
+    if st.button(
+        "Contraer" if not compacta else "Desplegar",
+        icon=":material/left_panel_close:" if not compacta else ":material/left_panel_open:",
+        key="nav_plegar",
+        use_container_width=True,
+        type="tertiary",
+    ):
+        st.session_state.nav_compacta = not compacta
+        st.rerun()
 
     return st.session_state.vista
 
