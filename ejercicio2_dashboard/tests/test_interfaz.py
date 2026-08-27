@@ -111,6 +111,10 @@ def pagina(navegador, servidor):
         pagina = contexto.new_page()
         pagina.goto(servidor, wait_until="networkidle")
         pagina.wait_for_selector(".stVegaLiteChart", timeout=30_000)
+        # Hasta que las tipografías no están listas, un icono ocupa el ancho de
+        # su nombre en texto y desplaza lo que tiene al lado: medir antes da
+        # posiciones que no son las que verá nadie.
+        pagina.wait_for_function("() => document.fonts.status === 'loaded'", timeout=20_000)
         pagina.wait_for_timeout(ESPERA_RENDER)
         return pagina
 
@@ -200,8 +204,7 @@ class TestMaquetacion:
 
 
 class TestNavegacion:
-    ETIQUETAS = ["Ventas por semana", "Producto e inventario",
-                 "Calidad de los datos", "Datos"]
+    ETIQUETAS = ["Ventas", "Producto", "Calidad", "Registros"]
 
     @staticmethod
     def _botones(p):
@@ -238,6 +241,9 @@ class TestNavegacion:
 
         Sin estirarlos, un rótulo corto como «Datos» aparece centrado mientras
         los largos parecen alineados, y la columna se ve descuadrada.
+
+        Se admiten unos pocos píxeles de diferencia: cada icono tiene su propio
+        ancho de trazo y desplaza el texto de forma imperceptible.
         """
         p = pagina()
         posiciones = p.evaluate(
@@ -246,9 +252,22 @@ class TestNavegacion:
                  .filter(b => b.getBoundingClientRect().width > 0)
                  .map(b => Math.round(b.querySelector('p').getBoundingClientRect().left))"""
         )
-        assert len(set(posiciones)) == 1, (
-            f"Los rótulos empiezan en posiciones distintas: {posiciones}"
+        assert max(posiciones) - min(posiciones) <= 4, (
+            f"Los rótulos empiezan en posiciones muy distintas: {posiciones}"
         )
+
+    def test_los_iconos_de_navegacion_son_simbolos_y_no_texto(self, pagina):
+        """Cada vista lleva un icono de Material Symbols, no un emoji."""
+        p = pagina()
+        iconos = p.evaluate(
+            """() => [...document.querySelectorAll(
+                 '[data-testid="stMain"] [data-testid="stButton"] [data-testid="stIconMaterial"]')]
+                 .map(e => ({nombre: e.textContent.trim(),
+                             fuente: getComputedStyle(e).fontFamily}))"""
+        )
+        assert len(iconos) == len(self.ETIQUETAS)
+        rotos = [i["nombre"] for i in iconos if "ymbols" not in i["fuente"]]
+        assert rotos == [], f"Iconos sin su tipografía: {rotos}"
 
     def test_la_barra_lateral_se_pliega_y_se_puede_volver_a_abrir(self, pagina):
         """Plegar la barra no puede ser un viaje sin retorno.

@@ -132,10 +132,15 @@ st.markdown(
         [data-testid="stAppViewContainer"] {{ flex-direction: row-reverse; }}
       }}
 
-      /* 3 rem, no menos: Streamlit fija una barra superior propia y con menos
-         margen las etiquetas de los indicadores quedan por debajo de ella. */
+      /* La barra superior de Streamlit queda vacía al ocultar «Deploy» y el
+         menú, pero sigue reservando su altura y empujaba el contenido casi
+         medio centímetro hacia abajo. Se recoge, y el margen del contenido baja
+         en consecuencia: la marca sube hasta el borde y el gráfico gana sitio.
+         El control para reabrir el panel no se pierde — va anclado al viewport,
+         no a esta barra. */
+      [data-testid="stHeader"] {{ height: 0; min-height: 0; }}
       .block-container {{
-        padding-top: 3rem;
+        padding-top: 1.6rem;
         padding-bottom: 1rem;
         padding-left: 2.5rem;
         padding-right: 2.5rem;
@@ -202,6 +207,9 @@ st.markdown(
            los rótulos se apilan letra a letra mientras dura la animación. */
         overflow-x: hidden;
       }}
+      /* Plegado, el panel conserva un píxel de ancho y su filete quedaba
+         dibujando una línea vertical suelta sobre el contenido. */
+      [data-testid="stSidebar"][aria-expanded="false"] {{ border-left: none; }}
       /* El contenido conserva su ancho aunque el panel se encoja: así se
          recorta limpiamente en lugar de recomponerse. */
       [data-testid="stSidebarUserContent"] {{ min-width: 260px; }}
@@ -221,8 +229,18 @@ st.markdown(
       [data-testid="stSidebarUserContent"] {{ padding-top: 0; }}
 
       /* El logo, como una firma: sin banda, sin recuadro y sin competir con
-         los datos. El peso visual del tablero está en las cifras. */
-      .cabecera {{ padding: 0 0 1.5rem; }}
+         los datos. El peso visual del tablero está en las cifras.
+         El margen negativo lo sube hasta la altura de los indicadores: el
+         relleno superior del contenedor está calculado para las etiquetas de
+         las cifras, y aquí dejaba la marca descolgada. */
+      /* Un filete corto bajo la marca separa identidad de navegación sin
+         partir la columna en dos bloques. Sin margen negativo: el contenedor
+         recorta lo que sobresale por arriba y el logo aparecía descabezado. */
+      .cabecera {{
+        padding: 0 0 1.1rem;
+        border-bottom: 1px solid #ececea;
+        margin-bottom: 1.3rem;
+      }}
       .marca-logo {{
         width: 92px;
         display: block;
@@ -257,6 +275,15 @@ st.markdown(
       }}
       .ficha strong {{ color: {GRIS_MARCA}; font-weight: 500; }}
 
+      /* Nombre completo de la vista activa, ahora que el rótulo de navegación
+         es de una sola palabra. */
+      .titulo-vista {{
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: {GRIS_MARCA};
+        margin: 0.15rem 0 0.9rem;
+      }}
+
       /* --- Navegación entre vistas ----------------------------------------- */
       /* Botones alineados a la izquierda, no centrados como los de acción: se
          leen como una lista de secciones y no como cuatro botones sueltos. */
@@ -273,29 +300,54 @@ st.markdown(
          flotante, y un `>` deja de coincidir sin dar ningún error. */
       [data-testid="stMain"] [data-testid="stButton"] button {{
         justify-content: flex-start;
-        padding: 0.6rem 0.85rem;
+        gap: 0.6rem;
+        padding: 0.62rem 0.9rem;
         border-radius: 9px;
         font-size: 0.92rem;
         font-weight: 500;
         border: 1px solid transparent;
         transition: background 120ms ease, color 120ms ease;
       }}
-      /* Streamlit envuelve el rótulo en varios contenedores con clases
-         generadas, y todos se encogen al ancho del texto: por eso un rótulo
-         corto como «Datos» quedaba centrado mientras los largos parecían
-         alineados. Se estiran todos por descendencia, sin depender de esos
-         nombres de clase, que cambian entre versiones. */
-      [data-testid="stMain"] [data-testid="stButton"] button * {{
+      /* Los botones de navegación van más juntos entre sí que los elementos
+         normales de Streamlit: se leen como una lista, no como acciones
+         sueltas repartidas por la columna. */
+      [data-testid="stMain"] [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] [data-testid="stButton"]) {{
+        gap: 0.3rem;
+      }}
+      /* Streamlit envuelve el rótulo en varios contenedores que se encogen al
+         ancho del texto: por eso un rótulo corto como «Datos» quedaba centrado
+         mientras los largos parecían alineados. Se estiran los envoltorios y se
+         reparte el espacio con flex — el icono conserva su tamaño y el texto se
+         queda con el resto. Estirar el icono también, como haría un selector
+         universal, lo deja separado del texto al otro extremo del botón. */
+      [data-testid="stMain"] [data-testid="stButton"] button > div,
+      [data-testid="stMain"] [data-testid="stButton"] button > div > span {{
         width: 100%;
       }}
-      /* El párrafo necesita el ancho completo además de la alineación: sin él
-         se encoge hasta el texto y un rótulo corto como «Datos» queda centrado
-         mientras los largos parecen alineados. `white-space: pre` conserva el
-         espacio que separa icono y texto. */
+      /* Ancho fijo para el icono: cada símbolo tiene su propio trazo y, sin
+         reservarles la misma caja, los rótulos arrancan hasta ocho píxeles
+         desplazados entre sí y la columna se ve descuadrada. */
+      [data-testid="stMain"] [data-testid="stButton"] button [data-testid="stIconMaterial"] {{
+        flex: 0 0 1.15rem;
+        width: 1.15rem;
+        text-align: center;
+      }}
+      /* `flex: 1 1 0` y no `auto`: con `auto` el contenedor se queda con el
+         ancho de su texto y cada rótulo acaba centrado en el hueco que le
+         sobra, así que ninguno arranca donde el de al lado. */
+      [data-testid="stMain"] [data-testid="stButton"] button [data-testid="stMarkdownContainer"] {{
+        flex: 1 1 0;
+        min-width: 0;
+      }}
+      /* El párrafo ocupa todo el contenedor y alinea a la izquierda. Si algún
+         rótulo no cupiera, se recorta con puntos suspensivos: partirlo en dos
+         líneas descuadraría la altura de los botones entre sí. */
       [data-testid="stMain"] [data-testid="stButton"] button p {{
         width: 100%;
         text-align: left;
-        white-space: pre;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }}
       /* La vista activa: fondo de marca y peso, para que se vea de un vistazo
          en cuál estás sin tener que leer los cuatro rótulos. */
@@ -352,13 +404,23 @@ class Vista(NamedTuple):
     nombre: str
 
 
+# Iconos de Material Symbols, la familia que Streamlit ya trae. Frente a los
+# emoji tienen dos ventajas aquí: son monocromáticos —así toman el color del
+# botón y acompañan al estado activo en lugar de competir con él— y comparten
+# trazo entre sí, que es lo que hace que una lista de iconos se lea como un
+# conjunto y no como cuatro pegatinas.
+#
+# Nombres de una palabra: en una columna de navegación es lo que cabe sin
+# recortarse en pantallas estrechas, y el icono más el encabezado de cada vista
+# ya dan el contexto que un rótulo largo repetiría.
+#
 # El orden es el del recorrido natural: primero cómo va la venta, luego qué
 # producto es, después de dónde salen las cifras y por último el detalle.
 VISTAS = (
-    Vista("📈", "Ventas por semana"),
-    Vista("🏢", "Producto e inventario"),
-    Vista("⚠️", "Calidad de los datos"),
-    Vista("📋", "Datos"),
+    Vista(":material/trending_up:", "Ventas"),
+    Vista(":material/apartment:", "Producto"),
+    Vista(":material/fact_check:", "Calidad"),
+    Vista(":material/table_rows:", "Registros"),
 )
 
 
@@ -394,7 +456,8 @@ def _navegacion() -> str:
         # encogen al ancho del texto, y cada rótulo acababa alineado en un
         # sitio distinto. Los nombres ya se explican solos.
         if st.button(
-            f"{vista.icono} {vista.nombre}",
+            vista.nombre,
+            icon=vista.icono,
             key=f"nav_{vista.nombre}",
             use_container_width=True,
             type="primary" if activa else "tertiary",
@@ -837,7 +900,9 @@ def main() -> None:
     # solo ofrece uno, y fabricar otro con CSS lo haría depender de nombres
     # internos. Como contrapartida, las columnas se apilan solas en pantallas
     # estrechas, que es justo el comportamiento que se quiere.
-    navegacion, contenido = st.columns([1, 4.2], gap="medium")
+    # 1,15 y no 1: con la columna más estrecha, «Producto e inventario» no
+    # cabía y se recortaba a media palabra.
+    navegacion, contenido = st.columns([1.15, 4.2], gap="medium")
 
     with navegacion:
         vista = _navegacion()
@@ -860,17 +925,28 @@ def main() -> None:
         if informe.hay_conflictos and not usar_crudo:
             partes.append(
                 f"⚠️ {informe.filas_totales} registros → {informe.unidades_unicas} "
-                "apartamentos reales (ver «Calidad de los datos»)"
+                "apartamentos reales (ver «Calidad»)"
             )
         st.caption(" · ".join(partes))
 
+        # El rótulo de navegación es de una palabra, así que cada vista se
+        # presenta con su nombre completo: es donde se explica qué se está
+        # mirando sin ocupar sitio en la columna de la izquierda.
         if vista == VISTAS[0].nombre:
+            st.markdown('<div class="titulo-vista">Ventas por semana</div>',
+                        unsafe_allow_html=True)
             _pestana_ventas(df)
         elif vista == VISTAS[1].nombre:
+            st.markdown('<div class="titulo-vista">Producto e inventario</div>',
+                        unsafe_allow_html=True)
             _pestana_producto(df)
         elif vista == VISTAS[2].nombre:
+            st.markdown('<div class="titulo-vista">Calidad de los datos</div>',
+                        unsafe_allow_html=True)
             _pestana_calidad(informe, crudo)
         else:
+            st.markdown('<div class="titulo-vista">Registros de la cartera</div>',
+                        unsafe_allow_html=True)
             st.caption(f"{len(df)} apartamentos en la selección actual.")
             st.dataframe(
                 df, hide_index=True, use_container_width=True, height=380,
