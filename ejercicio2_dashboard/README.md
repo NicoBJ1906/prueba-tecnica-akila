@@ -124,20 +124,29 @@ dashboard: está en el proceso que genera el export.
 
 ### Cómo está organizado
 
-La pantalla separa dos cosas que se usan de forma distinta: **arriba, qué se
-mira** —los indicadores y la navegación entre las cuatro vistas— y **a la
-derecha, con qué se acota**, que es donde la mano vuelve una y otra vez.
+La pantalla tiene tres zonas, cada una para un gesto distinto:
 
-Streamlit solo tiene un panel lateral y lo coloca a la izquierda, así que el
-tablero invierte el orden del contenedor para llevarlo a la derecha. Es una
-regla apoyada en un atributo interno de Streamlit, y por eso está acotada la
-versión mayor en `requirements.txt` y hay una prueba que verifica la posición
-del panel. Si aun así dejara de aplicar, **el panel vuelve a su sitio original y
-el tablero sigue funcionando igual**: el fallo sería de colocación, nunca de
-funcionamiento.
+| Zona | Qué contiene | Por qué ahí |
+|---|---|---|
+| **Izquierda** | Marca y las cuatro vistas | Qué tablero es esto y a dónde puedo ir |
+| **Centro** | Indicadores y gráficos | Lo que se mira |
+| **Derecha** | Filtros y ficha del proyecto | Con qué se acota: es donde la mano vuelve |
 
-El detalle se reparte en cuatro vistas: **Ventas por semana**, **Producto e
-inventario**, **Calidad de los datos** y **Datos**.
+La navegación se construye con **columnas y botones de Streamlit**, no con un
+segundo panel lateral: el framework solo ofrece uno, y fabricar otro con CSS lo
+haría depender de nombres internos. Como efecto secundario, las columnas se
+apilan solas en pantallas estrechas.
+
+El panel de la derecha **sí es el panel lateral de Streamlit**, movido de sitio
+invirtiendo el orden del contenedor. Esa regla se aplica solo por encima de
+992 px: por debajo, Streamlit deja de reservarle sitio y lo superpone al
+contenido, y ahí invertir el orden lo dejaba encima del gráfico.
+
+Es la única regla del tablero que se apoya en un atributo interno de Streamlit,
+y por eso está acotada la versión mayor en `requirements.txt` y hay una prueba
+que verifica la posición del panel. Si aun así dejara de aplicar, **el panel
+vuelve a su sitio original y el tablero sigue funcionando igual**: el fallo
+sería de colocación, nunca de funcionamiento.
 
 No es una decisión estética. El enunciado pide entender el proyecto «de un
 vistazo», y el objetivo de maquetación es concreto: **que el gráfico completo,
@@ -145,8 +154,9 @@ con su eje de meses, entre en pantalla sin scroll desde 1280 × 720 hacia
 arriba** — lo que queda visible en un portátil de 13" con el navegador
 maximizado. Verificado en ocho tamaños, de 1024 × 768 a 1920 × 1080.
 
-Para conseguirlo, el encabezado se mantiene deliberadamente corto: el título
-vive en el panel de filtros, los indicadores no llevan chips de variación y todo el
+Para conseguirlo, el encabezado se mantiene deliberadamente corto: la marca y
+el título viven en la columna de navegación, los indicadores no llevan chips de
+variación y todo el
 contexto —avance, ritmo, inventario, aviso de calidad— cabe en un solo renglón.
 Cada línea que se añada ahí le quita altura al gráfico.
 

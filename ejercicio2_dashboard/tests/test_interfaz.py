@@ -203,26 +203,52 @@ class TestNavegacion:
     ETIQUETAS = ["Ventas por semana", "Producto e inventario",
                  "Calidad de los datos", "Datos"]
 
-    def test_las_cuatro_pestanas_abren_y_pintan_contenido(self, pagina):
+    @staticmethod
+    def _botones(p):
+        return p.locator('[data-testid="stMain"] [data-testid="stButton"] button')
+
+    def test_las_cuatro_vistas_abren_y_pintan_contenido(self, pagina):
         # Se seleccionan por posición y no por nombre: «Datos» también aparece
         # dentro de «Calidad de los datos» y la búsqueda por texto es ambigua.
         p = pagina()
-        pestanas = p.locator('[role="tab"]')
-        assert pestanas.count() == len(self.ETIQUETAS)
+        botones = self._botones(p)
+        assert botones.count() == len(self.ETIQUETAS)
 
         for indice, etiqueta in enumerate(self.ETIQUETAS):
-            pestana = pestanas.nth(indice)
-            assert etiqueta in pestana.inner_text()
-            pestana.click()
-            p.wait_for_timeout(1200)
+            boton = botones.nth(indice)
+            assert etiqueta in boton.inner_text()
+            boton.click()
+            p.wait_for_timeout(1500)
             assert p.locator('[data-testid="stException"]').count() == 0
-            visible = p.evaluate(
+
+            activo = p.evaluate(
                 """() => {
-                  const panel = document.querySelector('[role="tabpanel"]:not([hidden])');
-                  return panel ? panel.innerText.trim().length : 0;
+                  const b = [...document.querySelectorAll(
+                    '[data-testid="stMain"] [data-testid="stButton"] button')]
+                    .find(x => x.getAttribute('kind') === 'primary');
+                  return b ? b.innerText.trim() : null;
                 }"""
             )
-            assert visible > 20, f"La pestaña «{etiqueta}» aparece vacía."
+            assert etiqueta in activo, (
+                f"Se pulsó «{etiqueta}» pero la vista marcada como activa es «{activo}»."
+            )
+
+    def test_los_rotulos_de_navegacion_quedan_alineados(self, pagina):
+        """Los contenedores internos del botón se encogen al ancho del texto.
+
+        Sin estirarlos, un rótulo corto como «Datos» aparece centrado mientras
+        los largos parecen alineados, y la columna se ve descuadrada.
+        """
+        p = pagina()
+        posiciones = p.evaluate(
+            """() => [...document.querySelectorAll(
+                 '[data-testid="stMain"] [data-testid="stButton"] button')]
+                 .filter(b => b.getBoundingClientRect().width > 0)
+                 .map(b => Math.round(b.querySelector('p').getBoundingClientRect().left))"""
+        )
+        assert len(set(posiciones)) == 1, (
+            f"Los rótulos empiezan en posiciones distintas: {posiciones}"
+        )
 
     def test_la_barra_lateral_se_pliega_y_se_puede_volver_a_abrir(self, pagina):
         """Plegar la barra no puede ser un viaje sin retorno.
@@ -255,12 +281,12 @@ class TestNavegacion:
         p.wait_for_timeout(1500)
         assert ancho() > 100, "El control de reabrir no devolvió la barra lateral."
 
-    def test_la_tabla_de_tipos_esta_en_su_pestana(self, pagina):
+    def test_la_tabla_de_tipos_esta_en_su_vista(self, pagina):
         """El contenido que se buscaba haciendo scroll tiene que estar aquí."""
         p = pagina()
-        p.get_by_role("tab", name="Producto e inventario").click()
-        p.wait_for_timeout(1500)
-        texto = p.locator('[role="tabpanel"]:not([hidden])').inner_text()
+        self._botones(p).nth(1).click()   # Producto e inventario
+        p.wait_for_timeout(1600)
+        texto = p.locator('[data-testid="stMain"]').inner_text()
         assert "Tipos de apartamento vendidos" in texto
         assert "Inventario por tipo" in texto
 

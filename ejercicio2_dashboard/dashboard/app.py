@@ -20,6 +20,7 @@ from __future__ import annotations
 import base64
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 import altair as alt
 import pandas as pd
@@ -118,10 +119,18 @@ st.markdown(
          que se invierte el orden de las dos columnas del contenedor. Separa lo
          que se mira —la navegación, arriba— de con qué se acota, que es donde
          la mano vuelve una y otra vez.
-         Si esta regla dejara de aplicar en una versión futura, el panel vuelve
-         a su sitio de origen y el tablero sigue funcionando igual: el fallo
-         sería de colocación, nunca de funcionamiento. */
-      [data-testid="stAppViewContainer"] {{ flex-direction: row-reverse; }}
+
+         Solo por encima de 992 px: en ventanas estrechas Streamlit deja de
+         reservar sitio al panel y lo superpone al contenido, y ahí invertir el
+         orden lo dejaba encima del gráfico. Por debajo de ese ancho vuelve a
+         mandar el comportamiento de Streamlit, que ya resuelve ese caso.
+
+         Si la regla dejara de aplicar en una versión futura, el panel vuelve a
+         su sitio de origen y el tablero sigue funcionando igual: el fallo sería
+         de colocación, nunca de funcionamiento. */
+      @media (min-width: 992px) {{
+        [data-testid="stAppViewContainer"] {{ flex-direction: row-reverse; }}
+      }}
 
       /* 3 rem, no menos: Streamlit fija una barra superior propia y con menos
          margen las etiquetas de los indicadores quedan por debajo de ella. */
@@ -145,11 +154,6 @@ st.markdown(
          donde vivía el panel antes de moverlo, y un botón que abre algo desde
          el lado contrario despista más que ayuda. */
       [data-testid="stExpandSidebarButton"] {{
-        position: fixed;
-        top: 0.8rem;
-        right: 1rem;
-        left: auto;
-        z-index: 100;
         background: {VERDE};
         border-radius: 8px;
         padding: 0.3rem;
@@ -159,11 +163,21 @@ st.markdown(
       [data-testid="stExpandSidebarButton"] span,
       [data-testid="stExpandSidebarButton"] svg {{ color: #ffffff; fill: #ffffff; }}
 
-      /* Las flechas de plegar y desplegar apuntan al lado donde Streamlit
-         espera tener el panel. Con el panel a la derecha, señalarían al revés. */
-      [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
-      [data-testid="stSidebarHeader"] [data-testid="stIconMaterial"] {{
-        transform: scaleX(-1);
+      /* Ancla y flechas acompañan al panel, y solo mientras el panel esté
+         movido: por debajo de 992 px vuelve a la izquierda y estas dos reglas
+         lo dejarían señalando al lado equivocado. */
+      @media (min-width: 992px) {{
+        [data-testid="stExpandSidebarButton"] {{
+          position: fixed;
+          top: 0.8rem;
+          right: 1rem;
+          left: auto;
+          z-index: 100;
+        }}
+        [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+        [data-testid="stSidebarHeader"] [data-testid="stIconMaterial"] {{
+          transform: scaleX(-1);
+        }}
       }}
       [data-testid="stMetricValue"] {{
         font-size: 1.75rem;
@@ -183,7 +197,14 @@ st.markdown(
         /* El filete acompaña al panel: ahora separa por la izquierda. */
         border-right: none;
         border-left: 1px solid #ececea;
+        /* Al plegarse, el panel se estrecha en lugar de desaparecer de golpe.
+           Sin recortar lo que sobra, el contenido se reajusta al nuevo ancho y
+           los rótulos se apilan letra a letra mientras dura la animación. */
+        overflow-x: hidden;
       }}
+      /* El contenido conserva su ancho aunque el panel se encoja: así se
+         recorta limpiamente en lugar de recomponerse. */
+      [data-testid="stSidebarUserContent"] {{ min-width: 260px; }}
       /* Streamlit reserva 60 px arriba para el botón de plegar la barra, y eso
          dejaba una franja clara sobre el logo. El botón se superpone a la banda
          de marca —sigue siendo accesible— y la cabecera empieza en el borde. */
@@ -201,8 +222,7 @@ st.markdown(
 
       /* El logo, como una firma: sin banda, sin recuadro y sin competir con
          los datos. El peso visual del tablero está en las cifras. */
-      /* El relleno superior deja sitio al botón de plegar, que va superpuesto. */
-      .cabecera {{ padding: 1.15rem 0 1.7rem; }}
+      .cabecera {{ padding: 0 0 1.5rem; }}
       .marca-logo {{
         width: 92px;
         display: block;
@@ -238,45 +258,65 @@ st.markdown(
       .ficha strong {{ color: {GRIS_MARCA}; font-weight: 500; }}
 
       /* --- Navegación entre vistas ----------------------------------------- */
-      /* Con los filtros a la derecha, esta fila es lo único que dice dónde
-         estás, así que se trata como una barra de navegación y no como unas
-         pestañas discretas: más alto, más aire y un borde que la asienta. */
-      [data-testid="stTabs"] [data-baseweb="tab-list"],
-      [data-testid="stTabs"] [role="tablist"] {{
-        gap: 0.3rem;
-        background: #f6f8f2;
-        padding: 0.35rem;
-        border: 1px solid #e8ebe1;
-        border-radius: 12px;
-        margin-bottom: 0.4rem;
+      /* Botones alineados a la izquierda, no centrados como los de acción: se
+         leen como una lista de secciones y no como cuatro botones sueltos. */
+      .rotulo-nav {{
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #a8a8a2;
+        margin: 0.35rem 0 0.7rem;
       }}
-      [data-testid="stTabs"] [role="tab"] {{
-        padding: 0.62rem 1.25rem;
+      /* Selector por descendencia, no por hijo directo: al llevar tooltip, el
+         botón queda envuelto en tres capas que Streamlit añade para el aviso
+         flotante, y un `>` deja de coincidir sin dar ningún error. */
+      [data-testid="stMain"] [data-testid="stButton"] button {{
+        justify-content: flex-start;
+        padding: 0.6rem 0.85rem;
         border-radius: 9px;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 500;
-        color: #6b6b66;
+        border: 1px solid transparent;
         transition: background 120ms ease, color 120ms ease;
       }}
-      [data-testid="stTabs"] [role="tab"]:hover {{
-        background: rgba(255, 255, 255, 0.65);
-        color: {GRIS_MARCA};
+      /* Streamlit envuelve el rótulo en varios contenedores con clases
+         generadas, y todos se encogen al ancho del texto: por eso un rótulo
+         corto como «Datos» quedaba centrado mientras los largos parecían
+         alineados. Se estiran todos por descendencia, sin depender de esos
+         nombres de clase, que cambian entre versiones. */
+      [data-testid="stMain"] [data-testid="stButton"] button * {{
+        width: 100%;
       }}
-      /* El espacio entre el icono y el texto está en el propio rótulo; basta
-         con impedir que el navegador lo colapse para que no queden pegados. */
-      [data-testid="stTabs"] [role="tab"] [data-testid="stMarkdownContainer"] p {{
+      /* El párrafo necesita el ancho completo además de la alineación: sin él
+         se encoge hasta el texto y un rótulo corto como «Datos» queda centrado
+         mientras los largos parecen alineados. `white-space: pre` conserva el
+         espacio que separa icono y texto. */
+      [data-testid="stMain"] [data-testid="stButton"] button p {{
+        width: 100%;
+        text-align: left;
         white-space: pre;
       }}
-      [data-testid="stTabs"] [role="tab"][aria-selected="true"] {{
-        background: #ffffff;
-        color: {VERDE};
+      /* La vista activa: fondo de marca y peso, para que se vea de un vistazo
+         en cuál estás sin tener que leer los cuatro rótulos. */
+      [data-testid="stMain"] [data-testid="stButton"] button[kind="primary"] {{
+        background: {VERDE};
+        border-color: {VERDE};
+        color: #ffffff;
         font-weight: 600;
-        box-shadow: 0 1px 3px rgba(56, 56, 56, 0.14);
       }}
-      /* El subrayado deslizante sobra cuando la pestaña activa ya tiene fondo. */
-      [data-testid="stTabs"] [data-baseweb="tab-highlight"],
-      [data-testid="stTabs"] [data-baseweb="tab-border"],
-      [data-testid="stTabs"] .react-aria-SelectionIndicator {{ display: none; }}
+      [data-testid="stMain"] [data-testid="stButton"] button[kind="primary"]:hover {{
+        background: {GRIS_MARCA};
+        border-color: {GRIS_MARCA};
+        color: #ffffff;
+      }}
+      [data-testid="stMain"] [data-testid="stButton"] button[kind="tertiary"] {{
+        color: #6b6b66;
+      }}
+      [data-testid="stMain"] [data-testid="stButton"] button[kind="tertiary"]:hover {{
+        background: #f2f4ee;
+        color: {GRIS_MARCA};
+      }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -303,6 +343,66 @@ def _logo_incrustado(ruta: str) -> str:
     if not fichero.exists():
         return ""
     return base64.b64encode(fichero.read_bytes()).decode("ascii")
+
+
+class Vista(NamedTuple):
+    """Una entrada de la navegación."""
+
+    icono: str
+    nombre: str
+
+
+# El orden es el del recorrido natural: primero cómo va la venta, luego qué
+# producto es, después de dónde salen las cifras y por último el detalle.
+VISTAS = (
+    Vista("📈", "Ventas por semana"),
+    Vista("🏢", "Producto e inventario"),
+    Vista("⚠️", "Calidad de los datos"),
+    Vista("📋", "Datos"),
+)
+
+
+def _navegacion() -> str:
+    """Dibuja la navegación y devuelve la vista activa.
+
+    Se apoya en `session_state` porque cada botón provoca un redibujado: sin
+    guardar la elección, la página volvería siempre a la primera vista. Los
+    datos están en caché, así que el redibujado no recalcula nada.
+    """
+    if "vista" not in st.session_state:
+        st.session_state.vista = VISTAS[0].nombre
+
+    # La marca encabeza la navegación: identifica el tablero desde la primera
+    # columna que se lee, y deja el panel de la derecha solo para los filtros.
+    logo = _logo_incrustado(str(RUTA_LOGO))
+    imagen = (
+        f'<img class="marca-logo" src="data:image/png;base64,{logo}" alt="Akila">'
+        if logo
+        else '<div class="marca-logo-texto">akila</div>'
+    )
+    st.markdown(
+        f'<div class="cabecera">{imagen}'
+        '<div class="marca-nombre">Cartera de apartamentos</div>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="rotulo-nav">Vistas</div>', unsafe_allow_html=True)
+    for vista in VISTAS:
+        activa = st.session_state.vista == vista.nombre
+        # Sin `help`: el tooltip envuelve el botón en tres capas más que se
+        # encogen al ancho del texto, y cada rótulo acababa alineado en un
+        # sitio distinto. Los nombres ya se explican solos.
+        if st.button(
+            f"{vista.icono} {vista.nombre}",
+            key=f"nav_{vista.nombre}",
+            use_container_width=True,
+            type="primary" if activa else "tertiary",
+        ):
+            st.session_state.vista = vista.nombre
+            st.rerun()
+
+    return st.session_state.vista
 
 
 def _columnas_cartera() -> dict:
@@ -483,21 +583,6 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
     esos filtros viven en la pestaña de ventas, donde su alcance se entiende.
     """
     with st.sidebar:
-        # El título vive aquí y no sobre el contenido: en la pantalla principal
-        # cada línea de cabecera empuja el gráfico hacia abajo y le come el eje.
-        logo = _logo_incrustado(str(RUTA_LOGO))
-        imagen = (
-            f'<img class="marca-logo" src="data:image/png;base64,{logo}" alt="Akila">'
-            if logo
-            else '<div class="marca-logo-texto">akila</div>'
-        )
-        st.markdown(
-            f'<div class="cabecera">{imagen}'
-            '<div class="marca-nombre">Cartera de apartamentos</div>'
-            "</div>",
-            unsafe_allow_html=True,
-        )
-
         st.markdown('<div class="rotulo">Vista de datos</div>', unsafe_allow_html=True)
         usar_crudo = st.radio(
             "Vista de datos",
@@ -746,45 +831,51 @@ def main() -> None:
         st.stop()
 
     r = resumen(df)
-    _kpis(r)
 
-    # Una sola línea de contexto bajo los indicadores. Cada línea que se añade
-    # aquí baja el gráfico y le recorta el eje de meses, así que todo lo que no
-    # es una cifra de cabecera se resume en este renglón.
-    partes = [f"**{r.porcentaje_avance:.0f} %** del proyecto vendido"]
-    if r.meses_inventario is not None:
-        partes.append(
-            f"ritmo **{r.ritmo_semanal_reciente:.1f}/semana**, inventario para "
-            f"**{r.meses_inventario:.0f} meses**"
-        )
-    partes.append(f"pendiente **{formato_cop(r.valor_disponible_cop)}**")
-    if hay_filtro:
-        partes.append(f"filtrando **{len(df)} de {len(base)}**")
-    if informe.hay_conflictos and not usar_crudo:
-        partes.append(
-            f"⚠️ {informe.filas_totales} registros → {informe.unidades_unicas} "
-            "apartamentos reales (ver «Calidad de los datos»)"
-        )
-    st.caption(" · ".join(partes))
+    # Navegación a la izquierda y contenido a la derecha. Se usan columnas de
+    # Streamlit —API pública— en lugar de un segundo panel lateral: el framework
+    # solo ofrece uno, y fabricar otro con CSS lo haría depender de nombres
+    # internos. Como contrapartida, las columnas se apilan solas en pantallas
+    # estrechas, que es justo el comportamiento que se quiere.
+    navegacion, contenido = st.columns([1, 4.2], gap="medium")
 
-    # Espacio fino (U+2002) entre icono y texto: el espacio normal se pierde
-    # al renderizar el emoji y los rótulos quedan como «📈Ventas por semana».
-    ventas, producto, calidad, datos = st.tabs(
-        ["📈 Ventas por semana", "🏢 Producto e inventario",
-         "⚠️ Calidad de los datos", "📋 Datos"]
-    )
-    with ventas:
-        _pestana_ventas(df)
-    with producto:
-        _pestana_producto(df)
-    with calidad:
-        _pestana_calidad(informe, crudo)
-    with datos:
-        st.caption(f"{len(df)} apartamentos en la selección actual.")
-        st.dataframe(
-            df, hide_index=True, use_container_width=True, height=380,
-            column_config=_columnas_cartera(),
-        )
+    with navegacion:
+        vista = _navegacion()
+
+    with contenido:
+        _kpis(r)
+
+        # Una sola línea de contexto bajo los indicadores. Cada línea que se
+        # añade aquí baja el gráfico y le recorta el eje de meses, así que todo
+        # lo que no sea una cifra de cabecera se resume en este renglón.
+        partes = [f"**{r.porcentaje_avance:.0f} %** del proyecto vendido"]
+        if r.meses_inventario is not None:
+            partes.append(
+                f"ritmo **{r.ritmo_semanal_reciente:.1f}/semana**, inventario para "
+                f"**{r.meses_inventario:.0f} meses**"
+            )
+        partes.append(f"pendiente **{formato_cop(r.valor_disponible_cop)}**")
+        if hay_filtro:
+            partes.append(f"filtrando **{len(df)} de {len(base)}**")
+        if informe.hay_conflictos and not usar_crudo:
+            partes.append(
+                f"⚠️ {informe.filas_totales} registros → {informe.unidades_unicas} "
+                "apartamentos reales (ver «Calidad de los datos»)"
+            )
+        st.caption(" · ".join(partes))
+
+        if vista == VISTAS[0].nombre:
+            _pestana_ventas(df)
+        elif vista == VISTAS[1].nombre:
+            _pestana_producto(df)
+        elif vista == VISTAS[2].nombre:
+            _pestana_calidad(informe, crudo)
+        else:
+            st.caption(f"{len(df)} apartamentos en la selección actual.")
+            st.dataframe(
+                df, hide_index=True, use_container_width=True, height=380,
+                column_config=_columnas_cartera(),
+            )
 
 
 if __name__ == "__main__":
