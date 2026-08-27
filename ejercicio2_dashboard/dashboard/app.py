@@ -102,7 +102,14 @@ st.markdown(
          reserva deja el tablero idéntico en estructura. */
       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-      html, body, [class*="st-"], [data-testid="stMarkdownContainer"] {{
+      /* Los iconos de Streamlit son ligaduras tipográficas: el elemento
+         contiene el nombre del icono («keyboard_double_arrow_left») y es su
+         fuente la que lo dibuja como símbolo. Si se les impone otra familia,
+         la ligadura no resuelve y el nombre aparece escrito en pantalla, así
+         que quedan excluidos de la regla. */
+      html, body,
+      [class*="st-"]:not([data-testid="stIconMaterial"]),
+      [data-testid="stMarkdownContainer"] {{
         font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
       }}
 

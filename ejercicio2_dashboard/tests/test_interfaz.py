@@ -158,6 +158,23 @@ class TestMaquetacion:
         p = pagina()
         assert p.locator('[data-testid="stException"]').count() == 0
 
+    def test_los_iconos_no_muestran_su_nombre_en_crudo(self, pagina):
+        """Un icono con la tipografía equivocada escribe su nombre en pantalla.
+
+        Los iconos de Streamlit son ligaduras: el elemento contiene el texto
+        «keyboard_double_arrow_left» y es su fuente la que lo dibuja como
+        símbolo. Al fijar una tipografía propia para toda la aplicación es fácil
+        pisarlos sin darse cuenta, y entonces el nombre aparece escrito junto al
+        logo. Pasó, y por eso existe esta prueba.
+        """
+        p = pagina()
+        rotos = p.evaluate(
+            """() => [...document.querySelectorAll('[data-testid="stIconMaterial"]')]
+                 .filter(e => !/material|symbols|icons/i.test(getComputedStyle(e).fontFamily))
+                 .map(e => `${e.textContent.trim()} → ${getComputedStyle(e).fontFamily}`)"""
+        )
+        assert rotos == [], f"Iconos sin su tipografía: {rotos}"
+
 
 class TestNavegacion:
     ETIQUETAS = ["Ventas por semana", "Producto e inventario",
