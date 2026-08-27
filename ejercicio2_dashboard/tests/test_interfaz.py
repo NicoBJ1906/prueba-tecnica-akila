@@ -154,6 +154,29 @@ class TestMaquetacion:
         )
         assert cortados == [], f"Indicadores cortados: {cortados}"
 
+    def test_el_panel_de_filtros_esta_a_la_derecha(self, pagina):
+        """Streamlit coloca su único panel lateral a la izquierda.
+
+        El tablero lo lleva a la derecha invirtiendo el orden del contenedor,
+        para separar la navegación —arriba— de los filtros. La regla se apoya en
+        un nombre interno de Streamlit, así que esta prueba avisa si una versión
+        futura deja de aplicarla: el tablero seguiría funcionando, pero con la
+        maqueta cambiada.
+        """
+        p = pagina()
+        posiciones = p.evaluate(
+            """() => {
+              const panel = document.querySelector('[data-testid="stSidebar"]');
+              const contenido = document.querySelector('[data-testid="stMain"]');
+              return {panel: panel.getBoundingClientRect().left,
+                      contenido: contenido.getBoundingClientRect().left};
+            }"""
+        )
+        assert posiciones["panel"] > posiciones["contenido"], (
+            "El panel de filtros volvió a la izquierda: revisa la regla que "
+            "invierte el contenedor."
+        )
+
     def test_no_hay_errores_de_python_en_pantalla(self, pagina):
         p = pagina()
         assert p.locator('[data-testid="stException"]').count() == 0

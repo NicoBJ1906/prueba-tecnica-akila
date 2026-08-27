@@ -113,6 +113,16 @@ st.markdown(
         font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
       }}
 
+      /* El panel de filtros, a la derecha.
+         Streamlit solo tiene un panel lateral y lo coloca a la izquierda, así
+         que se invierte el orden de las dos columnas del contenedor. Separa lo
+         que se mira —la navegación, arriba— de con qué se acota, que es donde
+         la mano vuelve una y otra vez.
+         Si esta regla dejara de aplicar en una versión futura, el panel vuelve
+         a su sitio de origen y el tablero sigue funcionando igual: el fallo
+         sería de colocación, nunca de funcionamiento. */
+      [data-testid="stAppViewContainer"] {{ flex-direction: row-reverse; }}
+
       /* 3 rem, no menos: Streamlit fija una barra superior propia y con menos
          margen las etiquetas de los indicadores quedan por debajo de ella. */
       .block-container {{
@@ -128,10 +138,18 @@ st.markdown(
       [data-testid="stToolbar"] [data-testid="stBaseButton-header"],
       [data-testid="stMainMenuButton"] {{ display: none; }}
 
-      /* Ese control aparece solo con la barra plegada, y de serie es un icono
+      /* Ese control aparece solo con el panel plegado, y de serie es un icono
          suelto que se pierde contra el fondo. Aquí se presenta como un botón
-         con la marca, para que se vea que hay algo que abrir. */
+         con la marca, para que se vea que hay algo que abrir.
+         Va anclado a la derecha: Streamlit lo deja a la izquierda, que es
+         donde vivía el panel antes de moverlo, y un botón que abre algo desde
+         el lado contrario despista más que ayuda. */
       [data-testid="stExpandSidebarButton"] {{
+        position: fixed;
+        top: 0.8rem;
+        right: 1rem;
+        left: auto;
+        z-index: 100;
         background: {VERDE};
         border-radius: 8px;
         padding: 0.3rem;
@@ -140,6 +158,13 @@ st.markdown(
       [data-testid="stExpandSidebarButton"]:hover {{ background: {GRIS_MARCA}; }}
       [data-testid="stExpandSidebarButton"] span,
       [data-testid="stExpandSidebarButton"] svg {{ color: #ffffff; fill: #ffffff; }}
+
+      /* Las flechas de plegar y desplegar apuntan al lado donde Streamlit
+         espera tener el panel. Con el panel a la derecha, señalarían al revés. */
+      [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+      [data-testid="stSidebarHeader"] [data-testid="stIconMaterial"] {{
+        transform: scaleX(-1);
+      }}
       [data-testid="stMetricValue"] {{
         font-size: 1.75rem;
         font-weight: 600;
@@ -155,7 +180,9 @@ st.markdown(
       /* --- Barra lateral --------------------------------------------------- */
       [data-testid="stSidebar"] {{
         background: #ffffff;
-        border-right: 1px solid #ececea;
+        /* El filete acompaña al panel: ahora separa por la izquierda. */
+        border-right: none;
+        border-left: 1px solid #ececea;
       }}
       /* Streamlit reserva 60 px arriba para el botón de plegar la barra, y eso
          dejaba una franja clara sobre el logo. El botón se superpone a la banda
@@ -210,20 +237,30 @@ st.markdown(
       }}
       .ficha strong {{ color: {GRIS_MARCA}; font-weight: 500; }}
 
-      /* --- Pestañas -------------------------------------------------------- */
+      /* --- Navegación entre vistas ----------------------------------------- */
+      /* Con los filtros a la derecha, esta fila es lo único que dice dónde
+         estás, así que se trata como una barra de navegación y no como unas
+         pestañas discretas: más alto, más aire y un borde que la asienta. */
       [data-testid="stTabs"] [data-baseweb="tab-list"],
       [data-testid="stTabs"] [role="tablist"] {{
-        gap: 0.25rem;
-        background: #f2f4ee;
-        padding: 0.28rem;
-        border-radius: 10px;
+        gap: 0.3rem;
+        background: #f6f8f2;
+        padding: 0.35rem;
+        border: 1px solid #e8ebe1;
+        border-radius: 12px;
+        margin-bottom: 0.4rem;
       }}
       [data-testid="stTabs"] [role="tab"] {{
-        padding: 0.4rem 1rem;
-        border-radius: 8px;
-        font-size: 0.92rem;
+        padding: 0.62rem 1.25rem;
+        border-radius: 9px;
+        font-size: 0.95rem;
         font-weight: 500;
         color: #6b6b66;
+        transition: background 120ms ease, color 120ms ease;
+      }}
+      [data-testid="stTabs"] [role="tab"]:hover {{
+        background: rgba(255, 255, 255, 0.65);
+        color: {GRIS_MARCA};
       }}
       /* El espacio entre el icono y el texto está en el propio rótulo; basta
          con impedir que el navegador lo colapse para que no queden pegados. */

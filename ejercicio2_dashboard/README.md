@@ -124,9 +124,20 @@ dashboard: está en el proceso que genera el export.
 
 ### Cómo está organizado
 
-Los indicadores de cabecera están siempre visibles y el detalle se reparte en
-cuatro pestañas: **Ventas por semana**, **Producto e inventario**, **Calidad de
-los datos** y **Datos**.
+La pantalla separa dos cosas que se usan de forma distinta: **arriba, qué se
+mira** —los indicadores y la navegación entre las cuatro vistas— y **a la
+derecha, con qué se acota**, que es donde la mano vuelve una y otra vez.
+
+Streamlit solo tiene un panel lateral y lo coloca a la izquierda, así que el
+tablero invierte el orden del contenedor para llevarlo a la derecha. Es una
+regla apoyada en un atributo interno de Streamlit, y por eso está acotada la
+versión mayor en `requirements.txt` y hay una prueba que verifica la posición
+del panel. Si aun así dejara de aplicar, **el panel vuelve a su sitio original y
+el tablero sigue funcionando igual**: el fallo sería de colocación, nunca de
+funcionamiento.
+
+El detalle se reparte en cuatro vistas: **Ventas por semana**, **Producto e
+inventario**, **Calidad de los datos** y **Datos**.
 
 No es una decisión estética. El enunciado pide entender el proyecto «de un
 vistazo», y el objetivo de maquetación es concreto: **que el gráfico completo,
@@ -135,7 +146,7 @@ arriba** — lo que queda visible en un portátil de 13" con el navegador
 maximizado. Verificado en ocho tamaños, de 1024 × 768 a 1920 × 1080.
 
 Para conseguirlo, el encabezado se mantiene deliberadamente corto: el título
-vive en la barra lateral, los indicadores no llevan chips de variación y todo el
+vive en el panel de filtros, los indicadores no llevan chips de variación y todo el
 contexto —avance, ritmo, inventario, aviso de calidad— cabe en un solo renglón.
 Cada línea que se añada ahí le quita altura al gráfico.
 
@@ -143,7 +154,7 @@ Cada línea que se añada ahí le quita altura al gráfico.
 
 Se dividen según su alcance, para que nunca haya duda de qué están afectando:
 
-- **En la barra lateral, los estructurales** (torre, tipo de apartamento, precio,
+- **En el panel derecho, los estructurales** (torre, tipo de apartamento, precio,
   área): describen *qué apartamentos* se están mirando y afectan a todo.
 - **En la pestaña de ventas, los del periodo comercial** (rango de fechas, forma
   de pago): solo tienen sentido sobre las ventas.
