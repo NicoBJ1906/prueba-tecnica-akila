@@ -89,7 +89,28 @@ siguiendo solo el README): los dos ejercicios arrancan y las pruebas pasan.
    vez de 13. Son unas 20 líneas en `_clasificar` (`pipeline.py`) y convierte el
    discurso en «la IA es la segunda opinión, no el clasificador por defecto».
 
-3. Repasar `docs/presentacion.md` con lo añadido en la última sesión (vista de
+3. **Adversarial review pendiente.** Se lanzó y se canceló a mitad por consumo:
+   no hay hallazgos, hay que rehacerlo entero. Cinco ángulos, en paralelo, cada
+   uno con el papel de entrevistador de Akila buscando razones para no
+   contratar, sin tocar el repo original y verificando cada afirmación:
+
+   1. *Cumplimiento literal del enunciado* — frase por frase; clonar limpio y
+      seguir solo el README, como haría el evaluador.
+   2. *Corrección de las cifras* — recalcular todo con pandas sin usar el código
+      del candidato; buscar casos donde la regla de consolidación sea
+      indefendible; intentar que `metricas.insights()` afirme algo falso.
+   3. *Calidad de código* — y sobre todo **pruebas de mutación**: romper el
+      código a propósito en una copia (invertir un `>`, cambiar un orden,
+      quitar una condición) y ver qué sobrevive con los tests en verde. Es lo
+      que dice si la cobertura vale algo.
+   4. *Ejercicio 1 y la tesis de la IA* — construir correos nuevos con jerga y
+      faltas para reventar las reglas; atacar los guardrails; juzgar si «una
+      sola etapa con IA» es criterio o excusa.
+   5. *Seguridad* — secretos en el historial de git, qué datos personales salen
+      del equipo, y CSVs hostiles contra el `file_uploader` nuevo (HTML sin
+      escapar, CSV injection, tipos basura, codificaciones).
+
+4. Repasar `docs/presentacion.md` con lo añadido en la última sesión (vista de
    torres, hallazgos, carga de otro export).
 
 ---
