@@ -191,25 +191,6 @@ def avance_por_torre(df: pd.DataFrame) -> pd.DataFrame:
     return tabla[columnas].sort_values("torre", ignore_index=True)
 
 
-def mapa_torre_piso(df: pd.DataFrame) -> pd.DataFrame:
-    """Una fila por torre y piso, con cuántas unidades hay y cuántas vendidas.
-
-    Es la planta del proyecto puesta en una rejilla: de un vistazo se ve si lo
-    que no rota está en una torre concreta o en una altura concreta, que es una
-    pregunta que ninguna tabla por tipo responde.
-    """
-    columnas = ["torre", "piso", "total", "vendidos", "porcentaje"]
-    if df.empty:
-        return pd.DataFrame(columns=columnas)
-
-    tabla = df.groupby(["torre", "piso"], as_index=False).agg(
-        total=("id", "count"),
-        vendidos=("estado", lambda s: int((s == ESTADO_VENDIDO).sum())),
-    )
-    tabla["porcentaje"] = tabla["vendidos"] / tabla["total"] * 100
-    return tabla[columnas]
-
-
 # Tres franjas de altura y no los 22 pisos uno a uno: una rejilla de 88 celdas
 # hay que estudiarla, y una de 12 se lee de un vistazo. Los cortes siguen cómo
 # se vende un edificio —planta baja, zona media y alturas—, no un reparto

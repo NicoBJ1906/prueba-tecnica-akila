@@ -24,7 +24,6 @@ CATEGORIAS = ("cliente", "prospecto", "tercero", "desconocido")
 ESTADO_AUTOMATICO = "Automático"
 ESTADO_REVISION = "Revisión humana"
 ESTADO_SIN_ACCION = "Sin acción"
-ESTADO_DESCARTADO = "Descartado"
 
 
 @dataclass(frozen=True)

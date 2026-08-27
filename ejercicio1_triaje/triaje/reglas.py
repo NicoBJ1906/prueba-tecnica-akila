@@ -17,7 +17,7 @@ import re
 import unicodedata
 
 from .config import Config
-from .modelos import Asunto, Clasificacion, Correo
+from .modelos import CATEGORIAS, Asunto, Clasificacion, Correo
 
 # Formas habituales de nombrar un apartamento en un correo real:
 # "apartamento 1105", "apto 803", "el 906", "Torre 2 apto 1105".
@@ -235,15 +235,28 @@ def es_ambiguo(correo: Correo, config: Config) -> bool:
 
 
 def categoria_remitente(correo: Correo, config: Config) -> str:
-    """Relación del remitente con la empresa: condiciona el responsable."""
+    """Relación del remitente con la empresa: condiciona el responsable.
+
+    El valor devuelto se comprueba contra `CATEGORIAS`: la constante declaraba
+    el dominio y nadie la miraba, así que añadir aquí una categoría nueva sin
+    darla de alta allí no lo habría notado nadie hasta ver una fila rara en el
+    Excel.
+    """
     temas = detectar_temas(correo, config)
     if "alianza" in temas:
-        return "tercero"
-    if extraer_apartamento(correo):
-        return "cliente"
-    if "comercial" in temas:
-        return "prospecto"
-    return "desconocido"
+        categoria = "tercero"
+    elif extraer_apartamento(correo):
+        categoria = "cliente"
+    elif "comercial" in temas:
+        categoria = "prospecto"
+    else:
+        categoria = "desconocido"
+
+    assert categoria in CATEGORIAS, (
+        f"Categoría fuera del dominio declarado: {categoria!r}. "
+        f"Añádela a CATEGORIAS en modelos.py."
+    )
+    return categoria
 
 
 # --------------------------------------------------------------------------
