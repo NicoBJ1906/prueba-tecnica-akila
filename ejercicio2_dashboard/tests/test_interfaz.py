@@ -307,7 +307,8 @@ class TestNavegacion:
         p = pagina()
         posiciones = p.evaluate(
             """() => [...document.querySelectorAll(
-                 '[data-testid="stMain"] [data-testid="stButton"] button')]
+                 '[data-testid="stMain"] [data-testid="stElementContainer"]'
+                 + ':not(.st-key-nav_plegar) [data-testid="stButton"] button')]
                  .filter(b => b.getBoundingClientRect().width > 0)
                  .map(b => Math.round(b.querySelector('p').getBoundingClientRect().left))"""
         )
@@ -328,7 +329,8 @@ class TestNavegacion:
                 '[data-testid="stMain"] [data-testid="stColumn"]')]
                 .find(c => c.querySelector('.cabecera'));
             const bot = [...document.querySelectorAll(
-                '[data-testid="stMain"] [data-testid="stButton"] button')];
+                '[data-testid="stMain"] [data-testid="stElementContainer"]'
+                + ':not(.st-key-nav_plegar) [data-testid="stButton"] button')];
             const visible = el => el && el.getBoundingClientRect().width > 2;
             return {
               ancho: Math.round(nav.getBoundingClientRect().width),
@@ -429,6 +431,77 @@ class TestNavegacion:
         reabrir.click()
         p.wait_for_timeout(1500)
         assert ancho() > 100, "El control de reabrir no devolvió la barra lateral."
+
+    def test_los_dos_controles_de_plegado_son_gemelos(self, pagina):
+        """Los dos bordes de la pantalla se pliegan con el mismo gesto.
+
+        El de la columna era un botón ancho con texto al final de la lista —se
+        leía como una quinta vista— y el del panel solo aparecía al pasar el
+        ratón por encima. Uno que no se ve no se usa.
+        """
+        p = pagina(1440, 900)
+        medidas = p.evaluate(
+            """() => {
+                 const info = e => {
+                   if (!e) return null;
+                   const r = e.getBoundingClientRect();
+                   return {
+                     w: Math.round(r.width), h: Math.round(r.height),
+                     visible: getComputedStyle(e).visibility,
+                     icono: e.querySelector('[data-testid="stIconMaterial"]')?.textContent.trim(),
+                   };
+                 };
+                 return {
+                   izquierda: info(document.querySelector('.st-key-nav_plegar button')),
+                   derecha: info(document.querySelector(
+                     '[data-testid="stSidebarCollapseButton"] button')),
+                 };
+               }"""
+        )
+        izq, der = medidas["izquierda"], medidas["derecha"]
+        assert izq and der, f"Falta uno de los dos controles: {medidas}"
+        # Sin pasar el ratón por encima: los dos tienen que estar a la vista.
+        assert izq["visible"] == der["visible"] == "visible", (
+            f"Un control está oculto hasta el hover: {medidas}"
+        )
+        assert (izq["w"], izq["h"]) == (der["w"], der["h"]), (
+            f"Tamaños distintos: {izq} vs {der}"
+        )
+        assert izq["icono"] == der["icono"], (
+            f"Iconos distintos: {izq['icono']} vs {der['icono']}"
+        )
+
+    def test_el_aviso_de_filtros_sobrevive_al_plegar_el_panel(self, pagina):
+        """Con el panel plegado, las cifras filtradas no pueden pasar por totales.
+
+        El recuento de la selección vivía dentro del panel de filtros, así que
+        se plegaba con él: quedaban «50 vendidos» en pantalla sin nada que
+        dijera que eran de una selección y no del proyecto.
+        """
+        p = pagina(1440, 900)
+        texto = lambda: p.evaluate(  # noqa: E731
+            "() => document.querySelector('[data-testid=\"stMain\"]').innerText"
+        )
+        assert "Filtros activos" not in texto(), (
+            "Sin filtros puestos el aviso no debería aparecer."
+        )
+
+        # Se estrecha el rango de precio arrastrando su tirador izquierdo.
+        caja = p.locator('[data-testid="stSidebar"] [data-testid="stSlider"]').first.bounding_box()
+        p.mouse.move(caja["x"] + 8, caja["y"] + caja["height"] / 2)
+        p.mouse.down()
+        p.mouse.move(caja["x"] + caja["width"] * 0.5, caja["y"] + caja["height"] / 2, steps=10)
+        p.mouse.up()
+        p.wait_for_timeout(ESPERA_RENDER)
+        assert "Filtros activos" in texto(), "Con filtros puestos falta el aviso."
+
+        p.hover('[data-testid="stSidebar"]')
+        p.wait_for_timeout(400)
+        p.click('[data-testid="stSidebarHeader"] button')
+        p.wait_for_timeout(ESPERA_RENDER)
+        assert "Filtros activos" in texto(), (
+            "El aviso se plegó con el panel: las cifras filtradas quedan sin avisar."
+        )
 
     def test_la_tabla_de_tipos_esta_en_su_vista(self, pagina):
         """El contenido que se buscaba haciendo scroll tiene que estar aquí."""

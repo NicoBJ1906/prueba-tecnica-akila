@@ -409,11 +409,44 @@ st.markdown(
         background: #f2f4ee;
         color: {GRIS_MARCA};
       }}
-      /* Aire entre las vistas y el control que recoge la columna, para que no
-         se lea como una quinta vista. */
-      .separador-nav {{
-        border-top: 1px solid #ececea;
-        margin: 0.9rem 0 0.6rem;
+      /* --- Control que recoge la columna de vistas -------------------------- */
+      /* Gemelo del que pliega el panel de filtros: mismo icono y mismo tamaño,
+         cada uno arriba en su borde. Se saca del flujo para que no ocupe una
+         fila propia bajo los botones, donde se leía como una quinta vista. */
+      .st-key-nav_plegar {{
+        position: absolute;
+        top: 0.15rem;
+        right: 1.2rem;
+        width: auto !important;
+        z-index: 5;
+      }}
+      [data-testid="stMain"] .st-key-nav_plegar button {{
+        width: 28px;
+        height: 28px;
+        min-height: 0;
+        padding: 0;
+        justify-content: center;
+        border-radius: 7px;
+      }}
+      [data-testid="stMain"] .st-key-nav_plegar button [data-testid="stIconMaterial"] {{
+        flex: 0 0 auto;
+        font-size: 1.15rem;
+      }}
+      /* El rótulo solo existe para lectores de pantalla: sin él, el botón no
+         tiene nombre y se anuncia vacío. */
+      [data-testid="stMain"] .st-key-nav_plegar button [data-testid="stMarkdownContainer"] {{
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }}
+      /* Streamlit esconde el control de su panel hasta que el ratón pasa por
+         encima. Con uno de los dos siempre a la vista y el otro no, la pantalla
+         parecía tener un solo lado plegable —y el que no se ve, no se usa—. */
+      [data-testid="stSidebarCollapseButton"],
+      [data-testid="stSidebarCollapseButton"] button {{
+        visibility: visible !important;
       }}
 
       /* El mismo filete que separa el panel de filtros del contenido, ahora
@@ -425,6 +458,13 @@ st.markdown(
         [data-testid="stMain"] [data-testid="stColumn"]:has(.cabecera) {{
           border-right: 1px solid #ececea;
           padding-right: 1.2rem;
+          /* Ancla del control que la recoge, que va posicionado sobre ella. */
+          position: relative;
+          /* La columna se estrecha y se ensancha con la misma suavidad con la
+             que Streamlit anima su panel lateral, para que los dos bordes de la
+             pantalla se comporten igual. */
+          transition: flex-basis 220ms ease, width 220ms ease,
+                      min-width 220ms ease, padding-right 220ms ease;
           /* El filete llega abajo, como el del panel de filtros. Sin esto la
              columna mide lo que miden sus cuatro botones y la línea se corta a
              media pantalla, que es peor que no tenerla. `min-height` y no
@@ -493,6 +533,15 @@ _CSS_NAV_COMPACTA = """
         .cabecera {
           padding-bottom: 0.9rem;
           margin-bottom: 1rem;
+        }
+        /* Recogida, el control invita a abrir: la flecha se voltea y pasa a
+           apuntar hacia donde va a salir la columna. Es el mismo gesto que hace
+           Streamlit con el suyo al plegar el panel. */
+        .st-key-nav_plegar {
+          right: 0.55rem;
+        }
+        .st-key-nav_plegar button [data-testid="stIconMaterial"] {
+          transform: scaleX(-1);
         }
       }
     </style>
@@ -597,16 +646,15 @@ def _navegacion() -> str:
             st.session_state.vista = vista.nombre
             st.rerun()
 
-    # El control de la propia columna va al final: primero la marca, luego a
-    # dónde se puede ir, y solo entonces cómo se recoge la barra. Plegada deja
-    # los cuatro iconos a la vista, así que sigue sirviendo para navegar y no
-    # solo para ganar sitio.
-    st.markdown('<div class="separador-nav"></div>', unsafe_allow_html=True)
+    # El control de la columna es gemelo del que pliega el panel de filtros: el
+    # mismo icono, el mismo tamaño y cada uno arriba en su borde, apuntando cada
+    # cual hacia donde se recoge su barra. Puesto como un botón ancho al final
+    # de la lista se leía como una quinta vista, que es justo lo que no es.
+    # El rótulo viaja oculto para que el botón conserve su nombre accesible.
     if st.button(
         "Contraer" if not compacta else "Desplegar",
-        icon=":material/left_panel_close:" if not compacta else ":material/left_panel_open:",
+        icon=":material/keyboard_double_arrow_left:",
         key="nav_plegar",
-        use_container_width=True,
         type="tertiary",
     ):
         st.session_state.nav_compacta = not compacta
@@ -858,11 +906,6 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
         filtrado = base[condiciones]
         hay_filtro = len(filtrado) < len(base)
 
-        # El recuento de la selección va debajo de los propios filtros, que es
-        # donde se mira al moverlos, y solo aparece cuando hay algo filtrado.
-        if hay_filtro:
-            st.caption(f"Viendo {len(filtrado)} de {len(base)} apartamentos.")
-
         # Pie: la ficha del proyecto, no la del fichero. A dirección le dice
         # algo «300 apartamentos en 4 torres»; «apartamentos_akila.csv», no.
         ventas = canonico[canonico["estado"] == ESTADO_VENDIDO]["fecha_venta"].dropna()
@@ -894,7 +937,7 @@ def _barra_lateral(crudo: pd.DataFrame, canonico: pd.DataFrame, informe):
             f'<div class="ficha">{"<br>".join(ficha)}</div>', unsafe_allow_html=True
         )
 
-    return usar_crudo, filtrado
+    return usar_crudo, filtrado, hay_filtro, len(base)
 
 
 def _kpis(r) -> None:
@@ -1082,7 +1125,7 @@ def main() -> None:
         st.error(f"No se pudieron cargar los datos.\n\n{exc}")
         st.stop()
 
-    usar_crudo, df = _barra_lateral(crudo, canonico, informe)
+    usar_crudo, df, hay_filtro, total_sin_filtrar = _barra_lateral(crudo, canonico, informe)
 
     if usar_crudo:
         st.error(
@@ -1112,11 +1155,22 @@ def main() -> None:
     with contenido:
         _kpis(r)
 
-        # Bajo los indicadores no va nada más. Un renglón que encadena avance,
+        # Bajo los indicadores no va nada fijo. Un renglón que encadena avance,
         # ritmo, inventario, valor pendiente y aviso de calidad se lee como una
         # nota al pie y no como un tablero: cada dato de ese resumen tiene ya su
         # sitio —el ritmo y el inventario en «Ventas», el recuento de registros
         # en «Calidad», el estado del proyecto en el panel de la derecha—.
+        #
+        # La única excepción: que haya filtros puestos. Ese aviso no puede vivir
+        # solo en el panel de la derecha, porque el panel se pliega y se lo
+        # lleva consigo; entonces las cifras siguen siendo las de una selección
+        # y ya nada lo dice. Aparece únicamente cuando hay algo filtrado, así
+        # que en la vista de partida la cabecera sigue limpia.
+        if hay_filtro:
+            st.caption(
+                f"⚠️ Filtros activos: estas cifras son de **{len(df)} "
+                f"apartamentos** de {total_sin_filtrar}, no del proyecto entero."
+            )
 
         # El rótulo de navegación es de una palabra, así que cada vista se
         # presenta con su nombre completo: es donde se explica qué se está

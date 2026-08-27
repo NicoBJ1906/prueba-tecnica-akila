@@ -207,7 +207,7 @@ ejercicio2_dashboard/
 │   ├── etl.py         # carga, validación, diagnóstico de calidad y consolidación
 │   ├── metricas.py    # los indicadores, como funciones puras
 │   └── app.py         # la interfaz (solo compone y dibuja)
-└── tests/             # 43 de datos + 23 de interfaz
+└── tests/             # 43 de datos + 25 de interfaz
 ```
 
 **La decisión de diseño principal: el cálculo no vive en la interfaz.** `etl.py` y
