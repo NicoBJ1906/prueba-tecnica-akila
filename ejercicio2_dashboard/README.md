@@ -117,6 +117,15 @@ Ventas, Producto, Torres y Datos:
   semana del último trimestre y, a ese ritmo, cuánto queda hasta agotar lo
   disponible. Es la respuesta directa a «¿cómo va el proyecto?», y va debajo del
   gráfico de ventas, que es lo que la sustenta.
+
+  El trimestre se cuenta **sobre la ventana de datos del export**, que termina en
+  la última venta registrada (2026-07-20), no en la fecha de hoy. Es deliberado:
+  el fichero es una foto tomada ese día, y las semanas posteriores no son semanas
+  sin ventas, son semanas sin dato. Descontarlas del promedio sería inventar una
+  caída comercial que el export no respalda. Si el tablero se conectara a la
+  fuente en vivo, donde el silencio sí significa «no se vendió», la ventana
+  debería anclarse a hoy: son 2,8 unidades por semana en lugar de 5,1, y 7,4
+  meses de inventario en lugar de 4,1.
 - **Inventario por tipo** — dónde se está quedando el producto sin colocar. Cada
   tipo con su color, lo vendido en tono sólido y lo libre en el mismo color
   atenuado, para que la barra se lea como avance.

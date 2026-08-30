@@ -63,7 +63,7 @@ lanzado desde dentro de una carpeta solo encuentra las de esa.
 pytest
 ```
 
-170 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
+171 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
 
@@ -84,7 +84,7 @@ detectaba 13 de 19 y destapó cuatro huecos reales —entre ellos un `assert`
 tautológico que seguía a la constante que pretendía comprobar—; están
 corregidos.
 
-Hay además 30 pruebas de interfaz que abren el dashboard en un navegador real y
+Hay además 30 pruebas de interfaz —201 en total— que abren el dashboard en un navegador real y
 comprueban la maquetación y el comportamiento: que el gráfico entre entero en
 pantalla, que ningún indicador se corte, que los filtros muevan las cifras y se
 puedan deshacer, y que subir un export distinto recalcule el tablero entero.
@@ -145,8 +145,9 @@ prueba-tecnica-akila/
 ├── ejercicio1_triaje/       # pipeline de triaje + config editable + Excel generado
 ├── ejercicio2_dashboard/    # ETL, métricas y dashboard
 ├── docs/
-│   ├── presentacion.md      # guion de la presentación
 │   ├── capturas/
+│   ├── ejemplo-ejecucion/   # salida de referencia del triaje
+│   ├── mutaciones.py        # arnés de pruebas de mutación
 │   └── enunciado_original.md
 ├── requirements.txt         # 4 dependencias
 └── requirements-ia.txt      # proveedores de IA (opcionales)
