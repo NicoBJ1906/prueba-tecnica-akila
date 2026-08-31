@@ -9,6 +9,9 @@ sin instalar nada
 
 ---
 
+> **[Supuestos, limitaciones y herramientas utilizadas →](docs/supuestos-y-herramientas.md)**
+> Con qué se desarrolló, qué se dio por supuesto y qué no hace esta solución.
+
 ## Los dos ejercicios
 
 | | Qué resuelve | Cómo se ejecuta |
