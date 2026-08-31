@@ -3,6 +3,8 @@
 Una mutación que SOBREVIVE (los tests siguen en verde con el código roto) señala
 una zona sin cobertura real. Es la única forma honesta de saber si 198 pruebas
 verdes significan algo.
+
+Se ejecuta desde cualquier sitio: las rutas se resuelven a partir de este fichero.
 """
 
 from __future__ import annotations
@@ -10,11 +12,20 @@ from __future__ import annotations
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
-ORIGEN = Path("/Users/nicolas/Documents/Prueba tecnica/prueba-tecnica-akila")
-TRABAJO = Path(__file__).parent / "mut1"
-PY = ORIGEN / ".venv" / "bin" / "python"
+ORIGEN = Path(__file__).resolve().parents[1]
+
+# La copia se hace fuera del repositorio: dentro, `copytree` acabaría copiándose
+# a sí misma y el repo se quedaría con una carpeta que no debería versionarse.
+TRABAJO = Path(tempfile.gettempdir()) / "mutaciones-akila"
+
+# El intérprete del entorno virtual si existe; si no, el que ejecuta esto.
+# La ruta de los ejecutables cambia entre Windows (Scripts) y el resto (bin).
+_VENV_UNIX = ORIGEN / ".venv" / "bin" / "python"
+_VENV_WIN = ORIGEN / ".venv" / "Scripts" / "python.exe"
+PY = next((c for c in (_VENV_UNIX, _VENV_WIN) if c.exists()), Path(sys.executable))
 
 # Solo los tests que no levantan navegador: 1,3 s frente a 3 min.
 TESTS = [
@@ -110,7 +121,8 @@ def main() -> int:
         shutil.rmtree(TRABAJO)
     shutil.copytree(ORIGEN, TRABAJO,
                     ignore=shutil.ignore_patterns(".venv", ".git", "__pycache__",
-                                                  ".pytest_cache", ".ruff_cache"))
+                                                  ".pytest_cache", ".ruff_cache",
+                                                  "mutaciones-akila", "mut1"))
 
     print("Comprobando que la copia parte en verde…")
     if not correr_tests(TRABAJO):
