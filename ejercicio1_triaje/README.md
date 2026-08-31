@@ -6,33 +6,47 @@
 
 ---
 
-## Cómo ejecutarlo
+## Qué hace, en una lista
 
-Desde este directorio (`ejercicio1_triaje/`), con el entorno ya instalado
-([ver README raíz](../README.md)):
+Sin tecnicismos, de arriba abajo:
 
-```bash
-python -m triaje
-```
+1. Se conecta al correo de la empresa.
+2. Lee **solo una carpeta**, la que se le indique. Nunca la bandeja entera.
+3. **No toca nada**: no marca como leído, no archiva y no responde.
+4. Descarta lo que no es un cliente: notificaciones del banco, avisos automáticos.
+5. Descarta los repetidos, para que el mismo correo no genere dos filas.
+6. Los «gracias» los deja anotados, pero sin crear trabajo para nadie.
+7. De cada correo decide **de qué cliente es, qué pide, qué tan urgente es y de
+   qué apartamento habla**.
+8. Si algo no le queda claro, **pregunta a una IA**. Si lo tiene claro, no la usa.
+9. Lo legal y lo de dinero **siempre lo revisa una persona**, decida lo que decida
+   la IA.
+10. Busca el **Excel de seguimiento por su nombre** en OneDrive, Documentos o
+    Escritorio. Funciona igual en Windows y en Mac.
+11. Escribe la fila: `Fecha | Cliente | Tipo | Urgencia | Acción | Responsable`.
+12. Aparta lo dudoso en una hoja llamada **«Para revisar»**: esa es la nueva
+    bandeja de trabajo de la persona.
+13. Se repite solo cada minuto: entra un correo, aparece la fila.
 
-Genera dos ficheros en `salida/`:
+**En una frase:** le quita a la persona el copiar y pegar, y le deja solo lo que
+hay que pensar.
 
-| Fichero | Qué contiene |
+## Qué consigue
+
+De **2 horas diarias** a **10–15 minutos** de revisión. Sobre los 15 correos de la
+muestra: **12 quedan listos sin que nadie los toque**, 2 se apartan para revisión
+y 1 se registra sin generar tarea.
+
+El detalle de cómo cambia el día a día de la persona está en el
+[apartado 3](#3-cómo-se-le-entrega-esto-a-la-persona-que-hace-el-proceso).
+
+## Cómo leer este documento
+
+| Si eres… | Lee… |
 |---|---|
-| `seguimiento.xlsx` | El Excel de seguimiento, con las columnas exigidas |
-| `informe_ejecucion.md` | Qué hizo el proceso: volúmenes, descartes, coste |
-
-Opciones útiles:
-
-```bash
-python -m triaje --proveedor reglas       # sin IA (por defecto si no hay credenciales)
-python -m triaje --proveedor anthropic    # clasificación con Claude Haiku
-python -m triaje --reiniciar-estado       # vuelve a procesar todo desde cero
-python -m triaje --entrada otros.csv --salida otro.xlsx
-```
-
-**No hace falta ninguna clave de API para ejecutarlo.** Sin credenciales entra
-en modo `reglas` y produce el mismo Excel con la misma estructura.
+| **Quien evalúa la prueba** | Los tres apartados numerados: son las tres respuestas que pide el enunciado |
+| **Quien va a usar el sistema** | «Qué cambia en su día a día» y «Lo que puedes cambiar sin ayuda técnica» |
+| **Quien va a mantener el código** | «Cómo ejecutarlo» en adelante |
 
 ---
 
@@ -233,26 +247,134 @@ desplegar: se guarda el fichero y la siguiente ejecución ya lo aplica.
 
 ---
 
-## De este prototipo a producción
+# Parte técnica
 
-Lo que se entrega aquí es el **motor**, funcionando de verdad sobre los datos de
-la muestra. Para automatizarlo de punta a punta solo cambia la primera pieza:
+Lo que sigue es para quien vaya a ejecutar o mantener el sistema. Nada de esto
+hace falta para entender qué hace ni para evaluarlo.
+
+## Cómo ejecutarlo
+
+Desde este directorio (`ejercicio1_triaje/`), con el entorno ya instalado
+([ver README raíz](../README.md)):
+
+```bash
+python -m triaje
+```
+
+Genera dos ficheros en `salida/`:
+
+| Fichero | Qué contiene |
+|---|---|
+| `seguimiento.xlsx` | El Excel de seguimiento, con las columnas exigidas |
+| `informe_ejecucion.md` | Qué hizo el proceso: volúmenes, descartes, coste |
+
+Opciones útiles:
+
+```bash
+python -m triaje --proveedor reglas       # sin IA (por defecto si no hay credenciales)
+python -m triaje --proveedor anthropic    # clasificación con Claude Haiku
+python -m triaje --reiniciar-estado       # vuelve a procesar todo desde cero
+python -m triaje --entrada otros.csv --salida otro.xlsx
+```
+
+**No hace falta ninguna clave de API para ejecutarlo.** Sin credenciales entra
+en modo `reglas` y produce el mismo Excel con la misma estructura.
+
+---
+
+## Del CSV a un buzón real
+
+El CSV de la muestra no es la única entrada: el sistema lee también un buzón por
+IMAP. Con eso el proceso queda automatizado de punta a punta.
+
+**Es opcional.** Sin credenciales todo funciona igual sobre el CSV: quien clone el
+repositorio ejecuta `python -m triaje` y obtiene el mismo Excel.
+
+### Modo desatendido
+
+Tres variables y un comando. Funciona igual en Windows, macOS y Linux:
+
+```bash
+export TRIAJE_IMAP_USUARIO="buzon@laempresa.com"
+export TRIAJE_IMAP_CLAVE="contraseña de aplicación"
+export TRIAJE_IMAP_CARPETA="Akila"
+
+python -m triaje --auto
+```
+
+`--auto` hace cuatro cosas sin preguntar:
+
+1. **Deduce el servidor** por el dominio del correo. `@outlook.com` →
+   `outlook.office365.com`, `@gmail.com` → `imap.gmail.com`, y así con Zoho,
+   iCloud, Yahoo y GMX. Con un dominio propio se indica a mano.
+2. **Localiza el Excel por nombre**, no por ruta: busca `seguimiento.xlsx` en
+   OneDrive, Documentos y Escritorio —los nombres se prueban en español y en
+   inglés, así que da igual el idioma del sistema— y escribe ahí. Si no existe,
+   lo crea.
+3. **Lee solo la carpeta indicada**, nunca la bandeja entera.
+4. **Vigila cada minuto**: un correo que entra aparece como fila un minuto después.
+
+En Windows PowerShell las variables se definen con `$env:TRIAJE_IMAP_USUARIO="..."`.
+El resto es idéntico.
+
+### Control manual
+
+```bash
+python -m triaje --buzon --carpeta Akila --dias 7    # una pasada
+python -m triaje --buzon --carpeta Akila --vigilar 30
+python -m triaje --buscar-excel control.xlsx         # otro nombre de fichero
+```
+
+| Variable | Para qué |
+|---|---|
+| `TRIAJE_IMAP_USUARIO` | La cuenta del buzón |
+| `TRIAJE_IMAP_CLAVE` | Contraseña de aplicación. **Nunca** la del correo |
+| `TRIAJE_IMAP_SERVIDOR` | Opcional. Admite `outlook`, `zoho`… o el host completo |
+| `TRIAJE_IMAP_CARPETA` | La carpeta o etiqueta que alimenta el triaje |
+| `TRIAJE_CARPETA_SEGUIMIENTO` | Dónde vive el Excel. Apúntala a OneDrive o Drive |
+
+Las credenciales se leen **solo** del entorno. No hay ninguna en el código, en
+`config.toml` ni en el historial de este repositorio.
+
+### Solo lee
+
+No marca como leído, no archiva, no mueve y no responde. Tres salvaguardas, cada
+una con su prueba:
+
+| Salvaguarda | Qué impide |
+|---|---|
+| `BODY.PEEK[]` en vez de `BODY[]` | Que leer un correo lo marque como leído |
+| Sesión IMAP en `readonly=True` | Que el servidor acepte una escritura |
+| Se exige `--carpeta`; `INBOX` pide `--permitir-inbox` | Que un descuido descargue la bandeja entera |
+
+La primera es la que más importa: `RFC822` es lo que aparece en los ejemplos de
+internet y marcaría como leído el correo de los clientes. La prueba falla si
+alguien lo cambia.
+
+### Cómo se alimenta el buzón
+
+El triaje lee una carpeta dedicada. En un buzón de atención al cliente eso se
+resuelve con una regla del propio gestor de correo: lo que entra a la dirección
+pública se etiqueta y se saca de Recibidos. En Gmail es un filtro por
+destinatario; en Outlook, una regla de bandeja.
+
+Así **la empresa decide qué entra al triaje sin tocar el sistema**: si mañana
+quieren procesar también los correos de posventa, añaden una condición a la regla.
+
+### Lo que falta para producción
 
 ```mermaid
 flowchart LR
-    subgraph Hoy["Esta entrega"]
-        A1[CSV de correos] --> M[Motor de triaje]
-    end
-    subgraph Prod["En producción"]
-        A2[Buzón · IMAP / Microsoft Graph] --> T[Disparador diario<br/>n8n · Power Automate · cron] --> M2[El mismo motor] --> S[Excel en SharePoint<br/>o Google Sheets] --> N[Aviso al responsable]
-    end
+    A[Buzón IMAP] --> M[Motor de triaje] --> S[Excel de seguimiento]
+    M -.pendiente.-> N[Aviso al responsable]
+    style A fill:#1baf7a,color:#fff
     style M fill:#2a78d6,color:#fff
-    style M2 fill:#2a78d6,color:#fff
 ```
 
-`leer_correos()` es la única función que se sustituye. Todo lo demás —reglas,
-guardrails, enrutamiento, Excel, informe— funciona igual, porque trabaja con
-objetos `Correo`, no con ficheros.
+El buzón, el motor y el Excel están. Queda avisar al responsable cuando le cae una
+fila —un correo, un mensaje de Teams— y, si no se quiere dejar el proceso en
+marcha, programarlo con el `cron` del sistema o el Programador de tareas de
+Windows en lugar de `--auto`.
 
 ---
 
@@ -269,11 +391,13 @@ ejercicio1_triaje/
 │   ├── reglas.py          # TODO lo determinista (el módulo más grande, y con razón)
 │   ├── proveedores.py     # los tres clasificadores intercambiables + validación
 │   ├── estado.py          # memoria de lo ya procesado (idempotencia)
+│   ├── buzon.py           # conector IMAP opcional: solo lee, nunca escribe
+│   ├── localizar.py       # encuentra el Excel por nombre en cualquier equipo
 │   ├── pipeline.py        # orquestación de las etapas
 │   ├── excel.py           # volcado al Excel de seguimiento
 │   ├── informe.py         # informe de ejecución
 │   └── __main__.py        # línea de comandos
-└── tests/                 # 112 pruebas, incluidas las adversariales
+└── tests/                 # 149 pruebas, incluidas las adversariales
 ```
 
 ### El Excel que produce
