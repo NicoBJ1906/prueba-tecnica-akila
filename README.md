@@ -1,17 +1,36 @@
 # Prueba técnica Akila · IA y optimización de procesos
 
-Solución a los dos ejercicios de la prueba, por **Nicolás Bejarano**.
+Solución a los dos ejercicios, por **Nicolás Bejarano**.
 
-| | |
-|---|---|
-| **Ejercicio 1** · [Triaje de correos](ejercicio1_triaje/) | Un proceso de 2 h diarias reducido a 10–15 min de revisión, con IA solo donde aporta |
-| **Ejercicio 2** · [Dashboard de ventas](ejercicio2_dashboard/) | Tablero para dirección, sobre datos que resultaron no estar limpios |
+**[▶ Ver el dashboard funcionando](https://prueba-tecnica-akila.streamlit.app)** ·
+sin instalar nada
+
+![Dashboard de ventas](docs/capturas/dashboard-general.png)
 
 ---
 
-## Puesta en marcha
+## Los dos ejercicios
 
-Cinco minutos, y **no hace falta ninguna clave de API ni ninguna cuenta**.
+| | Qué resuelve | Cómo se ejecuta |
+|---|---|---|
+| **1 · [Triaje de correos](ejercicio1_triaje/)** | 2 h diarias de leer y copiar correos a un Excel → 15 min de revisar solo lo dudoso | `python -m triaje` |
+| **2 · [Dashboard de ventas](ejercicio2_dashboard/)** | Un tablero para dirección, sobre datos que resultaron no estar limpios | `streamlit run ejercicio2_dashboard/dashboard/app.py` |
+
+## Empezar
+
+```bash
+git clone https://github.com/NicoBJ1906/prueba-tecnica-akila.git
+cd prueba-tecnica-akila
+python3 -m venv .venv && source .venv/bin/activate    # Windows: py -m venv .venv && .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Y ya. **No hace falta ninguna clave de API ni ninguna cuenta.**
+
+<details>
+<summary><b>Instrucciones paso a paso</b> — si no tienes Python o es tu primera vez con una terminal</summary>
+
+<br>
 
 ### Paso 0 · Comprueba que tienes Python
 
@@ -62,78 +81,12 @@ Sabrás que ha funcionado porque el nombre `(.venv)` aparece al principio de la
 línea de la terminal. **Si cierras la terminal, hay que repetir solo la línea de
 `activate`**, no la instalación.
 
----
+</details>
 
-## Ejercicio 1 · El triaje de correos
+<details>
+<summary><b>Si algo no funciona</b> — los seis errores habituales y su solución</summary>
 
-```bash
-cd ejercicio1_triaje
-python -m triaje
-```
-
-**Qué verás en pantalla:**
-
-```
-  Correos leídos ................. 15
-  Descartados .................... 2
-  Filas en el seguimiento ........ 15
-    · automáticas ................ 12
-    · para revisión humana ....... 2
-```
-
-**Qué se genera**, dentro de `ejercicio1_triaje/salida/`:
-
-| Fichero | Qué es |
-|---|---|
-| `seguimiento.xlsx` | El Excel, con cuatro hojas: Resumen, Seguimiento, Para revisar y Descartados |
-| `informe_ejecucion.md` | Qué hizo el proceso y por qué descartó cada cosa |
-
-Ábrelo con Excel, Numbers o Google Sheets. La hoja **«Seguimiento»** tiene las
-seis columnas que pide el enunciado; la de **«Para revisar»** es la cola de
-trabajo de la persona.
-
-> Se puede ejecutar las veces que quieras: no duplica filas. La segunda vez dirá
-> «Ya procesados» y no escribirá nada nuevo. Para empezar de cero:
-> `python -m triaje --reiniciar-estado`
-
-**Con un buzón de correo real** (opcional, ver el
-[README del ejercicio 1](ejercicio1_triaje/README.md#del-csv-a-un-buzón-real)):
-
-```bash
-export TRIAJE_IMAP_USUARIO="buzon@laempresa.com"
-export TRIAJE_IMAP_CLAVE="contraseña de aplicación"
-export TRIAJE_IMAP_CARPETA="Akila"
-python -m triaje --auto
-```
-
----
-
-## Ejercicio 2 · El dashboard
-
-Desde la **raíz del repositorio** (si vienes del paso anterior, escribe `cd ..`):
-
-```bash
-streamlit run ejercicio2_dashboard/dashboard/app.py
-```
-
-Se abre solo en el navegador, en `http://localhost:8501`. Si no se abre, copia esa
-dirección a mano.
-
-**Qué verás:** cuatro cifras arriba —209 vendidos, 91 disponibles, $137,7 MM y 5
-tipos— y cuatro vistas a la izquierda: **Ventas**, **Producto**, **Torres** y
-**Datos**. Los filtros están a la derecha.
-
-Empieza por la vista **«Datos»**: explica por qué el fichero dice traer 457
-apartamentos cuando en realidad son 300, y deja comparar las dos lecturas.
-
-Para cerrarlo, `Ctrl + C` en la terminal.
-
-> También está publicado y funcionando, sin instalar nada:
-> **[prueba-tecnica-akila.streamlit.app](https://prueba-tecnica-akila.streamlit.app)**
-
----
-
-## Si algo no funciona
+<br>
 
 | Lo que ves | Qué pasa |
 |---|---|
@@ -144,9 +97,119 @@ Para cerrarlo, `Ctrl + C` en la terminal.
 | `No se pudo escribir en …seguimiento.xlsx` | Tienes el Excel abierto. Ciérralo y repite: no se pierde ningún correo |
 | El puerto 8501 está ocupado | `streamlit run … --server.port 8502` |
 
+</details>
+
+---
+
+## Ejercicio 1 · El triaje
+
+```bash
+cd ejercicio1_triaje
+python -m triaje
+```
+
+```
+  Correos leídos ................. 15
+  Filas en el seguimiento ........ 15
+    · automáticas ................ 12     ← listas, sin tocar nada
+    · para revisión humana ....... 2      ← lo dudoso y lo legal
+```
+
+Genera `salida/seguimiento.xlsx` con cuatro hojas —**Seguimiento** (las 6 columnas
+del enunciado), **Para revisar**, **Descartados** y **Resumen**— más un informe de
+lo que hizo y por qué.
+
+Se puede ejecutar mil veces: **no duplica filas**.
+
+> **También lee un buzón real.** Con tres variables de entorno se conecta por IMAP
+> a Gmail, Outlook o el que sea, y vuelca al Excel cada minuto. Solo lee: no marca
+> como leído ni archiva.
+> [Cómo se configura →](ejercicio1_triaje/README.md#del-csv-a-un-buzón-real)
+
+## Ejercicio 2 · El dashboard
+
+```bash
+streamlit run ejercicio2_dashboard/dashboard/app.py
+```
+
+Se abre en `http://localhost:8501`. Cuatro vistas: **Ventas**, **Producto**,
+**Torres** y **Datos**.
+
+| Vendidos | Disponibles | Valor vendido | Variedad |
+|:---:|:---:|:---:|:---:|
+| **209** | **91** | **$137,7 MM** | **5 tipos** |
+
+---
+
+## Las dos decisiones que definen esta entrega
+
+**1 · La IA clasifica; no decide y no responde.** De las once etapas del triaje,
+una sola usa un modelo. No se automatiza responder al cliente, decidir sobre
+desistimientos, asignar responsables ni definir qué es urgente.
+
+**2 · Los datos no estaban limpios, y eso cambia las cifras.** El export dice
+traer 457 apartamentos. **Son 300.**
+
+| | Leyendo el fichero tal cual | Consolidado |
+|---|---|---|
+| Vendidos | 271 | **209** |
+| Disponibles | 186 | **91** |
+
+Reportar «271 vendidos» a dirección sería inventar un 30 % de ventas.
+
+<details>
+<summary><b>El razonamiento completo de las dos</b></summary>
+
+<br>
+
+### 1. La IA clasifica; no decide y no responde
+
+De las once etapas del triaje, **una sola** usa un modelo de lenguaje. No por
+prudencia decorativa, sino porque cada etapa determinista es más barata, más
+rápida y explicable ante un cliente enfadado. Extraer un número de apartamento
+con una expresión regular acierta el 100 % y cuesta cero; pedírselo a un modelo
+es pagar por una respuesta peor.
+
+Lo que **no** se automatiza: responder al cliente, decidir sobre desistimientos
+y devoluciones, asignar responsables y definir qué es urgente. Los dos primeros
+por coste de error asimétrico —automatizar bien ahorra dos minutos, automatizar
+mal cuesta un pleito—; los dos últimos porque son política de la empresa y viven
+en una tabla que la empresa mantiene, no en el criterio variable de un modelo.
+
+El razonamiento completo, caso por caso, está en el
+[README del Ejercicio 1](ejercicio1_triaje/README.md#1-qué-automatizaría-con-ia-y-qué-no).
+
+### 2. Los datos del Ejercicio 2 no estaban limpios, y eso cambia las cifras
+
+109 unidades aparecen repetidas con tipo, área, precio y estado contradictorios;
+47 figuran vendidas más de una vez en fechas distintas.
+
+El
+dashboard le dedica una vista entera —«Calidad»—, documenta la
+regla que aplica y permite comparar ambas lecturas con un selector, porque
+la regla es discutible y quien decide debe poder verla.
+
+El detalle, con las alternativas descartadas, está en el
+[README del Ejercicio 2](ejercicio2_dashboard/README.md#lo-primero-que-hay-que-saber-sobre-estos-datos).
+
+</details>
+
 ---
 
 ## Las pruebas
+
+```bash
+pytest                       # 242 pruebas
+python docs/mutaciones.py    # rompe el código a propósito y comprueba que las pruebas lo noten
+```
+
+**El arnés de mutación detecta las 19 de 19.** Que las pruebas pasen no demuestra
+que sirvan; esto sí.
+
+<details>
+<summary><b>Qué cubren exactamente</b></summary>
+
+<br>
 
 También desde la raíz: `pytest` recoge las de cada ejercicio por su ruta, y
 lanzado desde dentro de una carpeta solo encuentra las de esa.
@@ -187,49 +250,14 @@ pip install -r requirements-dev.txt && playwright install chromium
 pytest ejercicio2_dashboard/tests/test_interfaz.py
 ```
 
----
-
-## Las dos decisiones que definen esta entrega
-
-### 1. La IA clasifica; no decide y no responde
-
-De las once etapas del triaje, **una sola** usa un modelo de lenguaje. No por
-prudencia decorativa, sino porque cada etapa determinista es más barata, más
-rápida y explicable ante un cliente enfadado. Extraer un número de apartamento
-con una expresión regular acierta el 100 % y cuesta cero; pedírselo a un modelo
-es pagar por una respuesta peor.
-
-Lo que **no** se automatiza: responder al cliente, decidir sobre desistimientos
-y devoluciones, asignar responsables y definir qué es urgente. Los dos primeros
-por coste de error asimétrico —automatizar bien ahorra dos minutos, automatizar
-mal cuesta un pleito—; los dos últimos porque son política de la empresa y viven
-en una tabla que la empresa mantiene, no en el criterio variable de un modelo.
-
-El razonamiento completo, caso por caso, está en el
-[README del Ejercicio 1](ejercicio1_triaje/README.md#1-qué-automatizaría-con-ia-y-qué-no).
-
-### 2. Los datos del Ejercicio 2 no estaban limpios, y eso cambia las cifras
-
-El export dice traer 457 apartamentos. **Son 300.** 109 unidades aparecen
-repetidas con tipo, área, precio y estado contradictorios; 47 figuran vendidas
-más de una vez en fechas distintas.
-
-| | Leyendo el fichero tal cual | Consolidado |
-|---|---|---|
-| Vendidos | 271 | **209** |
-| Disponibles | 186 | **91** |
-
-Reportar «271 vendidos» a dirección sería inventar un 30 % de ventas. El
-dashboard le dedica una vista entera —«Calidad»—, documenta la
-regla que aplica y permite comparar ambas lecturas con un selector, porque
-la regla es discutible y quien decide debe poder verla.
-
-El detalle, con las alternativas descartadas, está en el
-[README del Ejercicio 2](ejercicio2_dashboard/README.md#lo-primero-que-hay-que-saber-sobre-estos-datos).
+</details>
 
 ---
 
-## Estructura
+<details>
+<summary><b>Estructura del proyecto</b></summary>
+
+<br>
 
 ```
 prueba-tecnica-akila/
@@ -249,7 +277,12 @@ prueba-tecnica-akila/
 proveedores de IA son opcionales y no hacen falta para ejecutar nada. La
 configuración del triaje usa `tomllib`, que ya viene con Python.
 
-## Seguridad
+</details>
+
+<details>
+<summary><b>Seguridad</b></summary>
+
+<br>
 
 Las credenciales se leen **solo** de variables de entorno (`ANTHROPIC_API_KEY`,
 `GEMINI_API_KEY`). No hay ninguna clave en el código, en la configuración ni en
@@ -259,3 +292,5 @@ commit.
 Los datos de los correos son personales: el diseño los mantiene en local y solo
 envía al proveedor de IA el texto necesario para clasificar, sin almacenarlo
 fuera. En modo `reglas` no sale nada del equipo.
+
+</details>
