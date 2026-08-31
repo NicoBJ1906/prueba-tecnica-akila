@@ -33,6 +33,9 @@ CORREOS_POR_DEFECTO = RAIZ / "data" / "correos_clientes.csv"
 SALIDA_POR_DEFECTO = RAIZ / "ejercicio1_triaje" / "salida" / "seguimiento.xlsx"
 ESTADO_POR_DEFECTO = RAIZ / "ejercicio1_triaje" / "salida" / "estado.json"
 
+# Fallos seguidos que aguanta la vigilancia antes de rendirse.
+FALLOS_SEGUIDOS_TOLERADOS = 5
+
 
 def construir_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -162,11 +165,22 @@ def main(argv: list[str] | None = None) -> int:
     # Modo vigilancia: el registro de procesados se mantiene vivo entre vueltas,
     # así que cada pasada solo añade al Excel los correos que llegaron nuevos.
     print(f"\n  Vigilando el buzón cada {args.vigilar} s. Ctrl+C para parar.\n")
+    fallos = 0
     try:
         while True:
-            codigo = _una_pasada(args, config, proveedor, registro_procesados)
-            if codigo != 0:
-                return codigo
+            if _una_pasada(args, config, proveedor, registro_procesados) == 0:
+                fallos = 0
+            else:
+                # Un corte de red o el Excel abierto un momento no deben apagar
+                # un proceso pensado para estar todo el día en marcha. Si el
+                # fallo persiste, es de configuración y ahí sí se para.
+                fallos += 1
+                if fallos >= FALLOS_SEGUIDOS_TOLERADOS:
+                    print(f"  {fallos} intentos fallidos seguidos. Se detiene.",
+                          file=sys.stderr)
+                    return 2
+                print(f"  Reintentando en {args.vigilar} s "
+                      f"({fallos}/{FALLOS_SEGUIDOS_TOLERADOS}).", file=sys.stderr)
             time.sleep(args.vigilar)
     except KeyboardInterrupt:
         print("\n  Vigilancia detenida.\n")
@@ -195,8 +209,17 @@ def _una_pasada(args, config, proveedor, registro_procesados) -> int:
 
     resultado = ejecutar(correos, config, proveedor, registro_procesados)
 
-    escribir(resultado, args.salida)
-    informe = escribir_informe(resultado, args.salida.parent / "informe_ejecucion.md")
+    try:
+        escribir(resultado, args.salida)
+        informe = escribir_informe(resultado, args.salida.parent / "informe_ejecucion.md")
+    except OSError as exc:
+        # Lo más habitual: el fichero está abierto en Excel, que en Windows lo
+        # bloquea. No se pierde nada: el registro de procesados se guarda
+        # después, así que estos correos se vuelven a procesar al reintentar.
+        print(f"No se pudo escribir en {args.salida}: {exc}\n"
+              "Si lo tienes abierto en Excel, ciérralo y vuelve a ejecutar. "
+              "Ningún correo se ha perdido.", file=sys.stderr)
+        return 2
     if registro_procesados:
         registro_procesados.guardar()
 
