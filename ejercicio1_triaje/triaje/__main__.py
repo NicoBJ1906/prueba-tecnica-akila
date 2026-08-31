@@ -119,6 +119,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.auto:
         args.buzon = True
         args.carpeta = os.environ.get("TRIAJE_IMAP_CARPETA", "").strip() or args.carpeta
+        if args.carpeta.strip().upper() == CARPETA_POR_DEFECTO:
+            print(
+                "Falta indicar qué carpeta del buzón alimenta el triaje.\n"
+                '    export TRIAJE_IMAP_CARPETA="Akila"\n'
+                "Se pide a propósito: leer la bandeja de entrada volcaría todo el "
+                "correo personal al Excel.",
+                file=sys.stderr,
+            )
+            return 2
         if args.buscar_excel is None:
             args.buscar_excel = NOMBRE_POR_DEFECTO
         if args.vigilar is None:
