@@ -63,7 +63,7 @@ lanzado desde dentro de una carpeta solo encuentra las de esa.
 pytest
 ```
 
-171 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
+212 pruebas: unitarias, de integración, *golden tests* contra cifras verificadas
 a mano y adversariales (intentos de manipulación del clasificador, respuestas
 inválidas del modelo, caída del proveedor, entradas malformadas).
 
@@ -77,14 +77,14 @@ validación— y verifica que las pruebas lo detecten.
 python docs/mutaciones.py    # trabaja sobre una copia; no toca el repo
 ```
 
-Detecta **17 de 19**. Las dos que sobreviven son *equivalentes*: quitar un
-`dropna` que el `groupby` ya aplicaba, y filtrar por un campo que en esos
-registros siempre es nulo. Ninguna cambia un resultado. La primera pasada
-detectaba 13 de 19 y destapó cuatro huecos reales —entre ellos un `assert`
-tautológico que seguía a la constante que pretendía comprobar—; están
-corregidos.
+**Detecta las 19.** No siempre fue así: la primera pasada cazaba 13 y destapó
+cuatro huecos reales —entre ellos un `assert` tautológico que seguía a la
+constante que pretendía comprobar—. Las últimas tres en caer fueron los umbrales
+que evitan reportar ruido en los hallazgos, el filtro de unidades sin fecha de
+entrega y la composición de pago, que sumaba disponibles. Todas están cubiertas
+ahora.
 
-Hay además 30 pruebas de interfaz —201 en total— que abren el dashboard en un navegador real y
+Hay además 30 pruebas de interfaz —242 en total— que abren el dashboard en un navegador real y
 comprueban la maquetación y el comportamiento: que el gráfico entre entero en
 pantalla, que ningún indicador se corte, que los filtros muevan las cifras y se
 puedan deshacer, y que subir un export distinto recalcule el tablero entero.

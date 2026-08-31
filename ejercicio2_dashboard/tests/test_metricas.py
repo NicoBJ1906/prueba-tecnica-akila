@@ -332,3 +332,77 @@ class TestInsights:
             )
         titulares = " ".join(h.titular for h in insights(df_de(*filas)))
         assert "rezagada" not in titulares
+
+
+# ---------------------------------------------------------------------------
+# Umbrales y filtros que evitan reportar ruido
+# ---------------------------------------------------------------------------
+
+def test_una_brecha_pequena_entre_torres_no_se_reporta(fila, df_de):
+    """Con lotes de este tamaño, menos de diez puntos entra en lo que mueve el azar."""
+    filas = []
+    # Torre 1: 11 de 20 vendidas (55 %). Torre 2: 10 de 20 (50 %). Brecha: 5 pts.
+    for i in range(20):
+        filas.append(fila(id=i, torre="Torre 1", numero_puerta=i,
+                          estado=ESTADO_VENDIDO if i < 11 else ESTADO_DISPONIBLE,
+                          fecha_venta=pd.Timestamp("2026-01-05") if i < 11 else pd.NaT))
+    for i in range(20):
+        filas.append(fila(id=100 + i, torre="Torre 2", numero_puerta=i,
+                          estado=ESTADO_VENDIDO if i < 10 else ESTADO_DISPONIBLE,
+                          fecha_venta=pd.Timestamp("2026-01-05") if i < 10 else pd.NaT))
+
+    titulares = " ".join(h.titular for h in insights(df_de(*filas)))
+    assert "rezagada" not in titulares
+
+
+def test_una_brecha_grande_entre_torres_si_se_reporta(fila, df_de):
+    """Contraste del anterior: el umbral filtra ruido, no apaga el hallazgo."""
+    filas = []
+    for i in range(20):
+        filas.append(fila(id=i, torre="Torre 1", numero_puerta=i,
+                          estado=ESTADO_VENDIDO,
+                          fecha_venta=pd.Timestamp("2026-01-05")))
+    for i in range(20):
+        filas.append(fila(id=100 + i, torre="Torre 2", numero_puerta=i,
+                          estado=ESTADO_DISPONIBLE, fecha_venta=pd.NaT))
+
+    titulares = " ".join(h.titular for h in insights(df_de(*filas)))
+    assert "rezagada" in titulares
+
+
+def test_las_unidades_sin_fecha_de_entrega_no_entran_en_las_cohortes(fila, df_de):
+    """Sin fecha no hay trimestre al que asignarlas: contarlas inflaría el total."""
+    df = df_de(
+        fila(id=1, numero_puerta=1, fecha_entrega=pd.Timestamp("2027-02-01")),
+        fila(id=2, numero_puerta=2, fecha_entrega=pd.NaT),
+        fila(id=3, numero_puerta=3, fecha_entrega=pd.NaT),
+    )
+    tabla = cohortes_entrega(df)
+    assert tabla["total"].sum() == 1
+
+
+def test_sin_ninguna_fecha_de_entrega_la_tabla_sale_vacia_pero_completa(fila, df_de):
+    """El tablero dibuja esta tabla siempre: si le faltaran columnas, reventaría."""
+    df = df_de(
+        fila(id=1, numero_puerta=1, fecha_entrega=pd.NaT),
+        fila(id=2, numero_puerta=2, fecha_entrega=pd.NaT),
+    )
+    tabla = cohortes_entrega(df)
+    assert tabla.empty
+    assert list(tabla.columns) == [
+        "trimestre", "total", "vendidos", "disponibles", "porcentaje",
+    ]
+
+
+def test_la_composicion_de_pago_solo_mira_lo_vendido(fila, df_de):
+    """Un disponible con forma de pago rellenada no es caja: no debe sumar."""
+    df = df_de(
+        fila(id=1, numero_puerta=1, estado=ESTADO_VENDIDO,
+             fecha_venta=pd.Timestamp("2026-01-05"), forma_pago="Contado",
+             monto_credito_cop=0, monto_contado_cop=500_000_000),
+        fila(id=2, numero_puerta=2, estado=ESTADO_DISPONIBLE, forma_pago="Crédito",
+             monto_credito_cop=400_000_000, monto_contado_cop=100_000_000),
+    )
+    tabla = composicion_pago(df)
+    assert tabla["unidades"].sum() == 1
+    assert list(tabla["forma_pago"]) == ["Contado"]
