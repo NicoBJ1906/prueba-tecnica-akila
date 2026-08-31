@@ -56,7 +56,7 @@ def test_auto_sin_carpeta_no_arranca(monkeypatch, capsys):
     assert "TRIAJE_IMAP_CARPETA" in capsys.readouterr().err
 
 
-def test_la_vigilancia_aguanta_un_fallo_puntual(monkeypatch, tmp_path, entrada_csv):
+def test_la_vigilancia_aguanta_un_fallo_puntual(monkeypatch, entrada_csv):
     """Un corte de red no debe apagar un proceso que corre todo el día."""
     intentos = {"n": 0}
 

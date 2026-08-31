@@ -11,13 +11,40 @@ Solución a los dos ejercicios de la prueba, por **Nicolás Bejarano**.
 
 ## Puesta en marcha
 
-Requiere **Python 3.11 o superior**. Desde la raíz del repositorio:
+Cinco minutos, y **no hace falta ninguna clave de API ni ninguna cuenta**.
+
+### Paso 0 · Comprueba que tienes Python
+
+Hace falta **Python 3.11 o superior**. Para saber si lo tienes, abre una terminal
+(en Windows, *PowerShell*; en macOS, *Terminal*) y escribe:
+
+```bash
+python3 --version     # en Windows:  py --version
+```
+
+Si responde algo como `Python 3.12.4`, listo. Si dice que no encuentra la orden o
+sale una versión menor que 3.11, instálalo desde
+[python.org/downloads](https://www.python.org/downloads/). En Windows, marca la
+casilla **«Add Python to PATH»** durante la instalación.
+
+### Paso 1 · Descarga el proyecto
+
+```bash
+git clone https://github.com/NicoBJ1906/prueba-tecnica-akila.git
+cd prueba-tecnica-akila
+```
+
+Si no tienes `git`, puedes bajar el ZIP desde GitHub («Code» → «Download ZIP»),
+descomprimirlo y entrar en la carpeta.
+
+### Paso 2 · Prepara el entorno
+
+Esto crea una carpeta `.venv` con las cuatro librerías que usa el proyecto, sin
+tocar el resto de tu equipo.
 
 **macOS / Linux**
 
 ```bash
-git clone <url-del-repositorio>
-cd prueba-tecnica-akila
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -26,35 +53,100 @@ pip install -r requirements.txt
 **Windows (PowerShell)**
 
 ```powershell
-git clone <url-del-repositorio>
-cd prueba-tecnica-akila
 py -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-### Ejercicio 1 — triaje de correos
+Sabrás que ha funcionado porque el nombre `(.venv)` aparece al principio de la
+línea de la terminal. **Si cierras la terminal, hay que repetir solo la línea de
+`activate`**, no la instalación.
+
+---
+
+## Ejercicio 1 · El triaje de correos
 
 ```bash
 cd ejercicio1_triaje
 python -m triaje
 ```
 
-Genera `salida/seguimiento.xlsx` y `salida/informe_ejecucion.md`.
-**No necesita ninguna clave de API**: sin credenciales clasifica con reglas
-deterministas y produce el mismo Excel.
+**Qué verás en pantalla:**
 
-### Ejercicio 2 — dashboard
+```
+  Correos leídos ................. 15
+  Descartados .................... 2
+  Filas en el seguimiento ........ 15
+    · automáticas ................ 12
+    · para revisión humana ....... 2
+```
 
-Desde la **raíz del repositorio** (si vienes del paso anterior, `cd ..` primero):
+**Qué se genera**, dentro de `ejercicio1_triaje/salida/`:
+
+| Fichero | Qué es |
+|---|---|
+| `seguimiento.xlsx` | El Excel, con cuatro hojas: Resumen, Seguimiento, Para revisar y Descartados |
+| `informe_ejecucion.md` | Qué hizo el proceso y por qué descartó cada cosa |
+
+Ábrelo con Excel, Numbers o Google Sheets. La hoja **«Seguimiento»** tiene las
+seis columnas que pide el enunciado; la de **«Para revisar»** es la cola de
+trabajo de la persona.
+
+> Se puede ejecutar las veces que quieras: no duplica filas. La segunda vez dirá
+> «Ya procesados» y no escribirá nada nuevo. Para empezar de cero:
+> `python -m triaje --reiniciar-estado`
+
+**Con un buzón de correo real** (opcional, ver el
+[README del ejercicio 1](ejercicio1_triaje/README.md#del-csv-a-un-buzón-real)):
+
+```bash
+export TRIAJE_IMAP_USUARIO="buzon@laempresa.com"
+export TRIAJE_IMAP_CLAVE="contraseña de aplicación"
+export TRIAJE_IMAP_CARPETA="Akila"
+python -m triaje --auto
+```
+
+---
+
+## Ejercicio 2 · El dashboard
+
+Desde la **raíz del repositorio** (si vienes del paso anterior, escribe `cd ..`):
 
 ```bash
 streamlit run ejercicio2_dashboard/dashboard/app.py
 ```
 
-Se abre en `http://localhost:8501`.
+Se abre solo en el navegador, en `http://localhost:8501`. Si no se abre, copia esa
+dirección a mano.
 
-### Pruebas
+**Qué verás:** cuatro cifras arriba —209 vendidos, 91 disponibles, $137,7 MM y 5
+tipos— y cuatro vistas a la izquierda: **Ventas**, **Producto**, **Torres** y
+**Datos**. Los filtros están a la derecha.
+
+Empieza por la vista **«Datos»**: explica por qué el fichero dice traer 457
+apartamentos cuando en realidad son 300, y deja comparar las dos lecturas.
+
+Para cerrarlo, `Ctrl + C` en la terminal.
+
+> También está publicado y funcionando, sin instalar nada:
+> **[prueba-tecnica-akila.streamlit.app](https://prueba-tecnica-akila.streamlit.app)**
+
+---
+
+## Si algo no funciona
+
+| Lo que ves | Qué pasa |
+|---|---|
+| `command not found: python3` | Python no está instalado o no está en el PATH. En Windows usa `py` en lugar de `python3` |
+| `No module named pandas` | Falta activar el entorno: repite la línea de `activate` del paso 2 |
+| `.venv\Scripts\Activate.ps1 no se puede cargar` | PowerShell bloquea scripts. Ejecuta `Set-ExecutionPolicy -Scope Process RemoteSigned` y repite |
+| `No se encontró el fichero de datos` | Estás en la carpeta equivocada. El dashboard se lanza desde la raíz; el triaje desde `ejercicio1_triaje` |
+| `No se pudo escribir en …seguimiento.xlsx` | Tienes el Excel abierto. Ciérralo y repite: no se pierde ningún correo |
+| El puerto 8501 está ocupado | `streamlit run … --server.port 8502` |
+
+---
+
+## Las pruebas
 
 También desde la raíz: `pytest` recoge las de cada ejercicio por su ruta, y
 lanzado desde dentro de una carpeta solo encuentra las de esa.
